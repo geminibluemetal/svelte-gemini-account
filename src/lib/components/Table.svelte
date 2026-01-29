@@ -1,36 +1,54 @@
+<script>
+  const { title = '', headers = [], items = [] } = $props();
+
+  let overRow = $state(-1);
+
+  const gridTemplate = $derived(`auto repeat(${headers.length}, minmax(max-content, 1fr)) auto`);
+</script>
+
 <div class="p-5 h-screen flex flex-col">
-  <!-- Grid Table Wrapper -->
   <div class="flex-1 overflow-auto border-2 border-black">
-    <!-- HEADER -->
-    <div class="sticky top-0 z-30 bg-white">
-      <!-- Title Row -->
+    <!-- ONE GRID -->
+    <div class="grid" style="grid-template-columns: {gridTemplate};">
+      <!-- TITLE ROW -->
       <div
-        class="grid grid-cols-10 bg-red-700 text-white text-center font-bold border-b-0 border-black"
+        class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-[0px]"
       >
-        <div class="col-span-full">Delivery Sheet</div>
+        {title}
       </div>
 
-      <!-- Column Header Row -->
-      <div
-        class="grid grid-cols-10 bg-black text-white text-center border-white border-b-0 border-t-2"
-      >
-        {#each Array.from({ length: 10 }) as _, col}
-          <div class="border-r-2 border-white last:border-r-0">
-            S.no {col + 1}
+      <!-- HEADER -->
+      <div class="sticky top-6.5 z-20 bg-black text-white border-r-2 border-white text-center px-1">
+        S.No
+      </div>
+
+      {#each headers as header}
+        <div
+          class="sticky top-6.5 z-20 bg-black text-white border-r-2 border-white text-center px-1"
+        >
+          {header.name}
+        </div>
+      {/each}
+
+      <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
+
+      <!-- BODY -->
+      {#each items as item, row}
+        <div
+          class="border-r border-b px-1 py-0.5 text-center bg-white"
+          onmouseover={() => (overRow = row)}
+        >
+          {row + 1}
+        </div>
+        {#each headers as header}
+          <div class="border-r border-b px-1 py-0.5 bg-white" onmouseover={() => (overRow = row)}>
+            {item[header.key]}
           </div>
         {/each}
-      </div>
-    </div>
 
-    <!-- BODY -->
-    <div>
-      {#each Array.from({ length: 50 }) as _, row}
-        <div class="grid grid-cols-10 not-last:border-b border-gray-500 hover:bg-gray-200">
-          {#each Array.from({ length: 10 }) as _, col}
-            <div class="border-r border-gray-500 last:border-r-0 px-1 py-0.5">
-              Vasans {row + 1}
-            </div>
-          {/each}
+        <div class="border-b px-1 py-0.5 text-center bg-white" onmouseover={() => (overRow = row)}>
+          {overRow}
+          {overRow == row ? 'true' : 'false'}
         </div>
       {/each}
     </div>
