@@ -22,7 +22,7 @@
         S.No
       </div>
 
-      {#each headers as header}
+      {#each headers as header, index (index)}
         <div
           class="sticky top-6.5 z-20 bg-black text-white border-r-2 border-white text-center px-1"
         >
@@ -33,23 +33,36 @@
       <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
 
       <!-- BODY -->
-      {#each items as item, row}
+      {#each items as item, row (row)}
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <!-- svelte-ignore a11y_mouse_events_have_key_events -->
         <div
-          class="border-r border-b px-1 py-0.5 text-center bg-white"
+          class="border-r border-b px-1 py-0.5 border-gray-400 text-center
+          {overRow == row ? 'bg-gray-200' : 'bg-white'}"
           onmouseover={() => (overRow = row)}
         >
           {row + 1}
         </div>
-        {#each headers as header}
-          <div class="border-r border-b px-1 py-0.5 bg-white" onmouseover={() => (overRow = row)}>
+
+        {#each headers as header, col (col)}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+          <div
+            class="border-r border-b px-1 py-0.5 border-gray-400
+            {overRow == row ? 'bg-gray-200' : 'bg-white'}"
+            onmouseover={() => (overRow = row)}
+          >
             {item[header.key]}
           </div>
         {/each}
 
-        <div class="border-b px-1 py-0.5 text-center bg-white" onmouseover={() => (overRow = row)}>
-          {overRow}
-          {overRow == row ? 'true' : 'false'}
-        </div>
+        <!-- svelte-ignore a11y_no_static_element_interactions -->
+        <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+        <div
+          class="border-b px-1 py-0.5 border-gray-400 text-center
+          {overRow == row ? 'bg-gray-200' : 'bg-white'}"
+          onmouseover={() => (overRow = row)}
+        ></div>
       {/each}
     </div>
   </div>
