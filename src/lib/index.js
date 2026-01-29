@@ -3,6 +3,8 @@
 
 import { startSSE, stopSSE } from "./core/client/sseReceiver";
 import { sseEmit, createEventStream } from "./core/server/sseBus";
+import Table from "./components/Table.svelte";
 
 export { startSSE, stopSSE };
 export { sseEmit, createEventStream }
+export { Table }
