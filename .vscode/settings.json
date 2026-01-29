@@ -1,0 +1,170 @@
+{
+  // ---------------------------------------------------
+  // FILE + EDITOR BEHAVIOR
+  // ---------------------------------------------------
+
+  // Associate .css files with Tailwind CSS IntelliSense
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+
+  // Force LF line endings (recommended for cross-platform projects)
+  "files.eol": "\n",
+
+  // Improve file search speed by excluding heavy folders
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svelte-kit": true,
+    "**/node_modules": true
+  },
+
+  // Disable automatic indentation detection
+  "editor.detectIndentation": false,
+
+  // Use 2 spaces everywhere
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+
+  // Format file on save
+  "editor.formatOnSave": true,
+
+  // Default formatter → Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // Trim extra spaces automatically
+  "files.trimTrailingWhitespace": true,
+  "files.trimFinalNewlines": true,
+
+  // ---------------------------------------------------
+  // VISUAL IMPROVEMENTS
+  // ---------------------------------------------------
+
+  // Highlight brackets with colors (great for JS/Svelte)
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+
+  // Show code folding lines
+  "editor.showFoldingControls": "always",
+
+  // Minimap on the right side for quick navigation
+  "editor.minimap.enabled": true,
+  "editor.minimap.renderCharacters": false,
+
+  // Smooth cursor animation
+  "editor.cursorSmoothCaretAnimation": "off",
+
+  // Enable breadcrumbs for better file navigation
+  "breadcrumbs.enabled": true,
+
+  // ---------------------------------------------------
+  // INTELLISENSE + HINTS
+  // ---------------------------------------------------
+
+  // Enable inline hints (like parameter names)
+  "editor.inlayHints.enabled": "on",
+  "editor.inlayHints.fontFamily": "JetBrains Mono",
+  "editor.inlayHints.fontSize": 12,
+
+  // Improve IntelliSense suggestions quality
+  "editor.suggest.localityBonus": true,
+  "editor.suggestSelection": "first",
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // ---------------------------------------------------
+  // SVELTE, JS, TS QUALITY
+  // ---------------------------------------------------
+
+  // Better Svelte type checking
+  "svelte.plugin.typescript.diagnostics.enable": true,
+
+  // Show completions for unused JS/TS code
+  "javascript.suggest.completeFunctionCalls": true,
+  "typescript.suggest.completeFunctionCalls": true,
+
+  // Auto import fixes
+  "typescript.updateImportsOnFileMove.enabled": "always",
+
+  // Validate JS code in VS Code even without TypeScript
+  "javascript.validate.enable": true,
+
+  // ---------------------------------------------------
+  // TAILWINDCSS EXPERIENCE
+  // ---------------------------------------------------
+
+  // Enable TailwindCSS class autocomplete everywhere
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "svelte": "html"
+  },
+
+  // Enable suggestions inside strings
+  "tailwindCSS.experimental.classRegex": [
+    ["tw`([^`]*)", "(?:tw|twMerge)\\`([^`]*)"],
+    ["class:([^=]+)"]
+  ],
+
+  // ---------------------------------------------------
+  // TERMINAL
+  // ---------------------------------------------------
+
+  // Default terminal → CMD
+  "terminal.integrated.defaultProfile.windows": "Command Prompt",
+
+  // Register command prompt profile
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt": {
+      "path": "C:\\Windows\\System32\\cmd.exe"
+    }
+  },
+
+  // ----------------------------------------------
+  // GIT + VERSION CONTROL
+  // ----------------------------------------------
+
+  // Auto fetch Git remotes
+  "git.autofetch": true,
+
+  // Show untracked files
+  "git.showUntrackedFiles": "all",
+
+  // Enable diff word highlighting
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // Highlight changes in the gutter
+  "scm.diffDecorations": "all",
+
+  // ---------------------------------------------------
+  // ACCESSIBILITY + ERROR SIGNALS
+  // ---------------------------------------------------
+
+  "accessibility.signals.lineHasError": {
+    "sound": "on"
+  },
+  "accessibility.signals.lineHasWarning": {
+    "sound": "on",
+    "announcement": "auto"
+  },
+  "accessibility.signals.lineHasInlineSuggestion": {
+    "sound": "on"
+  },
+
+  // ---------------------------------------------------
+  // UI LAYOUT
+  // ---------------------------------------------------
+
+  // Always show status bar
+  "workbench.statusBar.visible": true,
+
+  // Highlight active indent level
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.guides.indentation": true
+
+  // ---------------------------------------------------
+  // AUTO SAVE OPTIONS
+  // ---------------------------------------------------
+
+  // Optional: auto save on focus change
+  // "files.autoSave": "onFocusChange"
+}
