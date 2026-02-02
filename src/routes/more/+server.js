@@ -7,23 +7,23 @@ import { ESCPOSPrinter } from '$lib'; // Ensure path is correct
 const execAsync = promisify(exec);
 
 async function runMasterTest() {
-  const printerPath = "\\\\localhost\\THERMAL";
-  const tempFileName = "master_test.txt";
+  const printerPath = '\\\\localhost\\THERMAL';
+  const tempFileName = 'master_test.txt';
   const tempPath = path.join(process.cwd(), tempFileName);
 
-  console.log("--- Starting Print Job ---");
+  console.log('--- Starting Print Job ---');
 
   try {
     const printer = new ESCPOSPrinter();
 
     // 1. Build Buffer
-    console.log("Generating buffer...");
+    console.log('Generating buffer...');
     printer
       .reset()
       // .beepOn(3, 3)
-      .align('center')
-      .setTextSize(0, 0)
-      // .bold(true)
+      // .align('center')
+      .setTextSize(1, 1)
+      .bold(true)
       // .line("Gowtham")
       // .bold(false)
       // .line("Full Options Template")
@@ -34,14 +34,14 @@ async function runMasterTest() {
       // .bold(true).line("BOLD TEXT MODE").bold(false)
       // .dashedLine()
       // .line("INVENTORY CHECK")
-      // .tableRow("Apple", "Qty: 10")
-      // .tableRow("Banana", "Qty: 05")
-      // .tableRow("Dragonfruit", "Qty: 25")
+      .tableRow('Apple', 'Qty: 10', 48)
+      .tableRow('Banana', 'Qty: 05', 48)
+      .tableRow('Dragonfruit', 'Qty: 25', 48)
       // .dashedLine()
       // .align('center')
-      .line("NATIVE BARCODE")
-      .barcode("12345678")
-      .line("NATIVE QR CODE")
+      .line('NATIVE BARCODE')
+      .barcode('12345678')
+      .line('NATIVE QR CODE')
       .feed(4)
       .cut();
 
@@ -50,7 +50,7 @@ async function runMasterTest() {
 
     // 2. Write File
     console.log(`Writing temp file to: ${tempPath}`);
-    fs.writeFileSync(tempPath, buffer, "binary");
+    fs.writeFileSync(tempPath, buffer, 'binary');
 
     // 3. Execute Copy Command
     const command = `copy /b "${tempPath}" "${printerPath}"`;
@@ -59,22 +59,21 @@ async function runMasterTest() {
     const { stdout, stderr } = await execAsync(command);
 
     if (stderr) {
-      console.error("OS Command Stderr:", stderr);
+      console.error('OS Command Stderr:', stderr);
     }
-    console.log("OS Command Stdout:", stdout);
+    console.log('OS Command Stdout:', stdout);
 
     // 4. Cleanup
     if (fs.existsSync(tempPath)) {
       fs.unlinkSync(tempPath);
-      console.log("Temp file deleted.");
+      console.log('Temp file deleted.');
     }
 
-    console.log("--- Print Job Finished Successfully ---");
-
+    console.log('--- Print Job Finished Successfully ---');
   } catch (err) {
-    console.error("--- CRITICAL PRINT ERROR ---");
-    console.error("Message:", err.message);
-    console.error("Stack:", err.stack);
+    console.error('--- CRITICAL PRINT ERROR ---');
+    console.error('Message:', err.message);
+    console.error('Stack:', err.stack);
 
     // Final attempt to clean up if error happened after file creation
     if (fs.existsSync(tempPath)) {
@@ -83,4 +82,4 @@ async function runMasterTest() {
   }
 }
 
-runMasterTest();
+// runMasterTest();
