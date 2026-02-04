@@ -1,4 +1,4 @@
-import { createEventStream } from '$lib';
+import { createEventStream } from '$lib/core/server/sseBus';
 
 export function GET() {
   return new Response(createEventStream(), {

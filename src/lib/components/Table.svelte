@@ -6,6 +6,7 @@
     headers = [],
     items = [],
     hideSerial = false,
+    hideAction = false,
     bottomSpace = true,
     moveToEnd = true
   } = $props();
@@ -13,8 +14,14 @@
   let overRow = $state(-1);
   let container = $state(null);
 
+  const headersGridColumnsWidth = $derived(
+    headers.reduce((acc, header) => {
+      return header?.width ? `${acc}${header.width}px ` : `${acc}auto `;
+    }, '')
+  );
+
   const gridTemplate = $derived(
-    `${hideSerial ? '' : 'auto'} repeat(${headers.length}, minmax(max-content, 1fr)) auto`
+    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '100px'}`
   );
 
   onMount(() => {
@@ -24,15 +31,17 @@
   });
 </script>
 
-<div class="p-5 h-screen flex flex-col">
-  <div class="flex-1 overflow-auto border-2 border-black" bind:this={container}>
+<div class="p-5 h-screen flex flex-col w-fit">
+  <div class="overflow-auto border-2 border-black" bind:this={container}>
     <!-- ONE GRID -->
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <!-- TITLE ROW -->
       <div
-        class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0"
+        class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
       >
-        {title}
+        <div class="flex-1 text-left"></div>
+        <div class="flex-1 text-center">{title}</div>
+        <div class="flex-1 text-right"></div>
       </div>
 
       <!-- HEADER -->
@@ -52,7 +61,9 @@
         </div>
       {/each}
 
-      <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
+      {#if !hideAction}
+        <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
+      {/if}
 
       <!-- BODY -->
       {#each items as item, row (row)}
@@ -83,11 +94,13 @@
 
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-        <div
-          class="border-b px-1 border-gray-500 text-center
+        {#if !hideAction}
+          <div
+            class="border-b px-1 border-gray-500 text-center
           {overRow == row ? 'bg-black/20' : 'bg-white'}"
-          onmouseover={() => (overRow = row)}
-        ></div>
+            onmouseover={() => (overRow = row)}
+          ></div>
+        {/if}
       {/each}
 
       {#if bottomSpace}

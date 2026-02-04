@@ -2,7 +2,7 @@
   import './layout.css';
   import favicon from '$lib/assets/favicon.svg';
   import { onDestroy, onMount } from 'svelte';
-  import { startSSE, stopSSE } from '$lib';
+  import { startSSE, stopSSE } from '$lib/core/client/sseReceiver';
 
   let { children } = $props();
   onMount(startSSE);

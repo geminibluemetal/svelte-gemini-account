@@ -1,5 +1,5 @@
 <script>
-  import { Table } from '$lib';
+  import Table from '$lib/components/Table.svelte';
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
@@ -11,15 +11,16 @@
   ];
 
   const a = {
-    name: 'KunthaniMedu',
-    price_025: 300,
-    price_050: 300,
+    name: 'Velthigamani Benda',
+    price_025: 5000,
+    price_050: 5000,
     price_100: 300,
     price_150: 300,
     price_200: 300
   };
 
-  const items = Array.from({ length: 100 }).map((_) => a);
+  const items = Array.from({ length: 500 }).map((_) => a);
+  items.unshift({ ...a, name: 'Kumar' });
 </script>
 
 <Table title="Items List" {headers} {items}></Table>

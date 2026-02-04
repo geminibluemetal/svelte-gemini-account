@@ -1,5 +1,5 @@
 <script>
-  import { CashTable } from '$lib';
+  import { CashTable } from '$lib/components/Table.svelte';
 
   const a = {
     time: '02:30 AM',

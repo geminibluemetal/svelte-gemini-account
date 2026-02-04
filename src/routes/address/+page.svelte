@@ -1,5 +1,5 @@
 <script>
-  import { Table } from '$lib';
+  import Table from '$lib/components/Table.svelte';
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
