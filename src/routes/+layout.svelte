@@ -6,6 +6,7 @@
   import { startSSE, stopSSE } from '$lib/core/client/sseReceiver';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { PanelRightClose } from 'lucide-svelte';
+  import Toast from '$lib/components/Toast.svelte';
 
   let { children, data } = $props();
   const apps = $derived(data.apps);
@@ -78,3 +79,4 @@
     </aside>
   </div>
 </div>
+<Toast />
