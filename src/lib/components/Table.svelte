@@ -1,5 +1,7 @@
 <script>
-  import { onMount } from 'svelte';
+  import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
+  import { onDestroy, onMount } from 'svelte';
 
   const {
     title = '',
@@ -21,17 +23,48 @@
   );
 
   const gridTemplate = $derived(
-    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '100px'}`
+    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`
   );
+
+  const rowUp = () => (overRow = overRow - 1 >= 0 ? overRow - 1 : overRow);
+  const rowDown = () => (overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow);
+  const gotoTop = () => (overRow = 0);
+  const gotoBottom = () => (overRow = items.length - 1);
+  const jump20Top = () => (overRow = overRow - 20 >= 0 ? overRow - 20 : overRow);
+  const jump20Bottom = () => (overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow);
+
+  $effect(() => {
+    const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
+    if (!isElementFullyVisible(overRowElement, container, { top: 50 })) {
+      scrollToMiddle(overRowElement, container);
+    }
+  });
 
   onMount(() => {
     if (moveToEnd) {
       container.scrollTop = container.scrollHeight;
     }
+    keyboardEventBus.on('ArrowUp', rowUp);
+    keyboardEventBus.on('ArrowDown', rowDown);
+    keyboardEventBus.on('Home', gotoTop);
+    keyboardEventBus.on('End', gotoBottom);
+    keyboardEventBus.on('PageUp', jump20Top);
+    keyboardEventBus.on('PageDown', jump20Bottom);
+  });
+
+  onDestroy(() => {
+    keyboardEventBus.off('ArrowUp', rowUp);
+    keyboardEventBus.off('ArrowDown', rowDown);
+    keyboardEventBus.off('Home', gotoTop);
+    keyboardEventBus.off('End', gotoBottom);
+    keyboardEventBus.off('PageUp', jump20Top);
+    keyboardEventBus.off('PageDown', jump20Bottom);
   });
 </script>
 
-<div class="p-5 h-screen flex flex-col w-fit">
+<div class="p-2 h-screen flex flex-col w-fit">
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <div class="overflow-auto border-2 border-black" bind:this={container}>
     <!-- ONE GRID -->
     <div class="grid" style="grid-template-columns: {gridTemplate};">
@@ -72,8 +105,9 @@
           <!-- svelte-ignore a11y_mouse_events_have_key_events -->
           <div
             class="border-r border-b px-1 border-gray-500 text-center
-          {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmouseover={() => (overRow = row)}
+            {overRow == row ? 'bg-black/20' : 'bg-white'}"
+            onmousemove={() => (overRow = row)}
+            data-over-row={row}
           >
             {row + 1}
           </div>
@@ -86,7 +120,7 @@
             class="border-r border-b px-1 border-gray-500
             {header?.align ? `text-${header.align}` : 'text-left'}
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmouseover={() => (overRow = row)}
+            onmousemove={() => (overRow = row)}
           >
             {item[header.key]}
           </div>
@@ -98,7 +132,7 @@
           <div
             class="border-b px-1 border-gray-500 text-center
           {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmouseover={() => (overRow = row)}
+            onmousemove={() => (overRow = row)}
           ></div>
         {/if}
       {/each}
