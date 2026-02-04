@@ -52,11 +52,11 @@
 
   <!-- sidebar wrapper -->
   <div
-    class="overflow-hidden transition-[width] duration-300 ease-in-out border-l-2"
+    class="overflow-hidden transition-[width] duration-300 ease-in-out"
     class:w-40={open}
     class:w-0={!open}
   >
-    <aside class="w-40 h-full p-2 flex flex-col gap-2 bg-white">
+    <aside class="w-40 h-full p-2 flex flex-col gap-2 bg-white border-l-2">
       {#each apps as app}
         <a
           href={app.url}
@@ -68,6 +68,10 @@
           </span>
         </a>
       {/each}
+      <button class="p-2 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer" onclick={toggleOpen}>
+        <span>&raquo; Close &raquo;</span> <br />
+        <span class="text-xs px-2 py-1 bg-black/10 rounded self-start"> Alt + X </span>
+      </button>
     </aside>
   </div>
 </div>
