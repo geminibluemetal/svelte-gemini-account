@@ -8,13 +8,17 @@
     headers = [],
     items = [],
     hideSerial = false,
-    hideAction = false,
+    hideAction = true,
     bottomSpace = true,
-    moveToEnd = true
+    moveToEnd = true,
+    customEvents = []
   } = $props();
 
   let overRow = $state(-1);
   let container = $state(null);
+
+  // Use a Map to store handlers by key
+  let customHandlersMap = $state(new Map());
 
   const headersGridColumnsWidth = $derived(
     headers.reduce((acc, header) => {
@@ -26,6 +30,7 @@
     `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`
   );
 
+  // Navigation functions
   const rowUp = () => (overRow = overRow - 1 >= 0 ? overRow - 1 : overRow);
   const rowDown = () => (overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow);
   const gotoTop = () => (overRow = 0);
@@ -35,7 +40,7 @@
 
   $effect(() => {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
-    if (!isElementFullyVisible(overRowElement, container, { top: 50 })) {
+    if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
       scrollToMiddle(overRowElement, container);
     }
   });
@@ -44,21 +49,45 @@
     if (moveToEnd) {
       container.scrollTop = container.scrollHeight;
     }
+
+    // Register navigation events
     keyboardEventBus.on('ArrowUp', rowUp);
     keyboardEventBus.on('ArrowDown', rowDown);
     keyboardEventBus.on('Home', gotoTop);
     keyboardEventBus.on('End', gotoBottom);
     keyboardEventBus.on('PageUp', jump20Top);
     keyboardEventBus.on('PageDown', jump20Bottom);
+
+    // Register custom events
+    const handlersMap = new Map();
+    customEvents.forEach(({ key, handler }) => {
+      const wrappedHandler = () => {
+        if (overRow >= 0 && overRow < items.length) {
+          handler(items[overRow]);
+        }
+      };
+
+      handlersMap.set(key, wrappedHandler);
+      keyboardEventBus.on(key, wrappedHandler);
+    });
+
+    customHandlersMap = handlersMap;
   });
 
   onDestroy(() => {
+    // Unregister navigation events
     keyboardEventBus.off('ArrowUp', rowUp);
     keyboardEventBus.off('ArrowDown', rowDown);
     keyboardEventBus.off('Home', gotoTop);
     keyboardEventBus.off('End', gotoBottom);
     keyboardEventBus.off('PageUp', jump20Top);
     keyboardEventBus.off('PageDown', jump20Bottom);
+
+    // Unregister custom events
+    customHandlersMap.forEach((handler, key) => {
+      keyboardEventBus.off(key, handler);
+    });
+    customHandlersMap.clear();
   });
 </script>
 
@@ -88,7 +117,8 @@
 
       {#each headers as header, index (index)}
         <div
-          class="sticky top-6.5 z-20 bg-black text-white border-r-2 border-white text-center px-1"
+          class="sticky top-6.5 z-20 bg-black text-white border-white text-center px-1
+          {hideAction && index == headers.length - 1 ? 'border-r-0' : 'border-r-2'}"
         >
           {header.name}
         </div>
@@ -107,7 +137,6 @@
             class="border-r border-b px-1 border-gray-500 text-center
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
             onmousemove={() => (overRow = row)}
-            data-over-row={row}
           >
             {row + 1}
           </div>
@@ -117,10 +146,12 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <!-- svelte-ignore a11y_mouse_events_have_key_events -->
           <div
-            class="border-r border-b px-1 border-gray-500
+            class="border-b px-1 border-gray-500
+            {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
             {header?.align ? `text-${header.align}` : 'text-left'}
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
             onmousemove={() => (overRow = row)}
+            data-over-row={row}
           >
             {item[header.key]}
           </div>

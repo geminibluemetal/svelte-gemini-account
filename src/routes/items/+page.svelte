@@ -19,8 +19,21 @@
     price_200: 300
   };
 
+  function handleItemEdit(item) {
+    console.log('Edit', item);
+  }
+
+  function handleItemPrint(item) {
+    console.log('Print', item);
+  }
+
+  const customEvents = [
+    { key: 'E', handler: handleItemEdit },
+    { key: 'P', handler: handleItemPrint }
+  ];
+
   const items = Array.from({ length: 500 }).map((_) => a);
   items.unshift({ ...a, name: 'Kumar' });
 </script>
 
-<Table title="Items List" {headers} {items}></Table>
+<Table title="Items List" {headers} {items} {customEvents}></Table>
