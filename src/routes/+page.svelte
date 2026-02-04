@@ -1,14 +1,6 @@
 <script>
-  const apps = [
-    { name: 'Order Book', emoji: '📘', url: '/orders' },
-    { name: 'Tokens', emoji: '🎟️', url: '/tokens' },
-    { name: 'Delivery Sheet', emoji: '🧾', url: '/delivery' },
-    { name: 'Cash Report', emoji: '💰', url: '/cash' },
-    { name: 'Party', emoji: '👥', url: '/party' },
-    { name: 'Address', emoji: '🗺️', url: '/address' },
-    { name: 'Items', emoji: '📦', url: '/items' },
-    { name: 'More', emoji: '➕', url: '/more' }
-  ];
+  let { data } = $props();
+  const apps = $derived(data.apps);
 </script>
 
 <main class="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 text-center">
