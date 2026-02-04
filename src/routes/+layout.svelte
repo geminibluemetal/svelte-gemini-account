@@ -5,6 +5,7 @@
   import { goto } from '$app/navigation';
   import { startSSE, stopSSE } from '$lib/core/client/sseReceiver';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import { PanelRightClose } from 'lucide-svelte';
 
   let { children, data } = $props();
   const apps = $derived(data.apps);
@@ -69,8 +70,10 @@
         </a>
       {/each}
       <button class="p-2 rounded bg-gray-200 hover:bg-gray-300 cursor-pointer" onclick={toggleOpen}>
-        <span>&raquo; Close &raquo;</span> <br />
-        <span class="text-xs px-2 py-1 bg-black/10 rounded self-start"> Alt + X </span>
+        <span class="inline-flex items-center gap-2">
+          <PanelRightClose class="inline" size={22} /> Close
+        </span> <br />
+        <span class="text-xs px-2 py-1 bg-black/10 rounded self-start inline-block"> Alt + X </span>
       </button>
     </aside>
   </div>
