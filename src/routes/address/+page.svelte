@@ -1,23 +1,101 @@
 <script>
   import Table from '$lib/components/Table.svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import AddressForm from './AddressForm.svelte';
+  import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import Model from '$lib/components/Model.svelte';
+  import { showToast } from '$lib/stores/toast';
+  import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
+
+  const { data } = $props();
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
-    { name: '0.25', align: 'right', key: 'delivery_025' },
-    { name: '0.50 and 1.00', align: 'right', key: 'delivery_050_100' },
-    { name: '1.50', align: 'right', key: 'delivery_150' },
-    { name: '2.00 and Max', align: 'right', key: 'delivery_200_max' }
+    { name: '0.25 Delivery', align: 'right', key: 'delivery_025' },
+    { name: '1.00 Delivery', align: 'right', key: 'delivery_050_100' },
+    { name: '2.00 Delivery', align: 'right', key: 'delivery_max' }
   ];
 
-  const a = {
-    name: 'KunthaniMedu',
-    delivery_025: 1000,
-    delivery_050_100: 1000,
-    delivery_150: 1000,
-    delivery_200_max: 1000
-  };
+  const availableOptions = [
+    { key: '0', description: 'New Address' },
+    { key: 'E', description: 'Edit Address' },
+    { key: 'D', description: 'Delete Address' },
+    { key: 'H', description: 'List available Shortcut' }
+  ];
 
-  const items = Array.from({ length: 100 }).map((_) => a);
+  let formOpened = $state(false);
+  let helperOpened = $state(false);
+  let editableAddress = $state(null);
+
+  function handleAddressEdit(item) {
+    formOpened = true;
+    editableAddress = item;
+  }
+
+  async function handleAddressDelete(item) {
+    const formData = new FormData();
+    const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
+    if (confirmed) {
+      formData.append('id', item.id);
+      fetch('?/delete', {
+        method: 'POST',
+        body: formData
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.type == 'failure') {
+            showToast('Not Deleted', 'danger');
+          } else {
+            showToast('Deleted Success');
+          }
+        });
+    }
+  }
+
+  function handleFormClose() {
+    formOpened = false;
+    editableAddress = null;
+  }
+
+  function toggleHelper() {
+    helperOpened = !helperOpened;
+  }
+
+  const customEvents = [
+    { key: 'E', handler: handleAddressEdit },
+    { key: 'D', handler: handleAddressDelete }
+  ];
+
+  const toggleOpenForm = () => (formOpened = !formOpened);
+
+  onMount(() => {
+    keyboardEventBus.on('0', toggleOpenForm);
+    keyboardEventBus.on('H', toggleHelper);
+    syncOn('ADDRESS.LIST');
+  });
+  onDestroy(() => {
+    keyboardEventBus.off('0', toggleOpenForm);
+    keyboardEventBus.off('H', toggleHelper);
+    syncOff('ADDRESS.LIST');
+  });
 </script>
 
-<Table title="Address List" {headers} {items}></Table>
+<Table title="Address List" {headers} items={data.address} {customEvents} />
+<AddressForm
+  open={formOpened}
+  onClose={handleFormClose}
+  item={editableAddress}
+  allAddress={data.items}
+/>
+
+<Model open={helperOpened} onClose={toggleHelper}>
+  <div class="bg-white p-5 min-w-md">
+    {#each availableOptions as o}
+      <div class="m-1 flex gap-2 items-center">
+        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+        <span>=</span>
+        <span class="flex-11">{o.description}</span>
+      </div>
+    {/each}
+  </div>
+</Model>
