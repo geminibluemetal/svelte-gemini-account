@@ -45,5 +45,44 @@ export default {
         return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
       })
       .join(' ');
+  },
+
+  smartTitleChars: (str, allowedChars = []) => {
+    if (typeof str !== 'string') return str;
+    if (!str) return '';
+
+    // Escape special regex chars
+    const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    const allowed = allowedChars.map(escapeRegex).join('');
+
+    // Remove unwanted characters
+    const removeSpecials = new RegExp(`[^\\w\\s${allowed}]`, 'g');
+
+    // Build normalizeSeparators: always convert _, optionally convert -
+    // Start with just underscore
+    let separatorsPattern = '_';
+
+    // Only add hyphen if it's NOT in the original allowedChars (before escaping)
+    if (!allowedChars.includes('-')) {
+      separatorsPattern += '\\-';  // Escape hyphen for regex
+    }
+
+    // Create the regex
+    const normalizeSeparators = new RegExp(`[${separatorsPattern}]+`, 'g');
+
+    const words = str
+      .replace(removeSpecials, '')          // remove unwanted specials
+      .replace(normalizeSeparators, ' ')    // convert _ (and - if not allowed) to space
+      .replace(/\s+/g, ' ')
+      .split(/\s+/);
+
+    return words
+      .map((word) => {
+        if (/^[A-Z0-9]+$/.test(word)) return word; // acronyms
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(' ');
   }
+
 };

@@ -22,7 +22,9 @@
     newValue = 'ignore', // ignore|accept|create
     createOption = dummyFunction,
     placeholder = '',
+    allowedChars = [],
     onEnter = () => {},
+    onValueChange = () => {},
     disabled = false,
     readonly = false,
     textAlign = 'left',
@@ -113,11 +115,17 @@
       lower: stringCase.lower,
       title: stringCase.title,
       para: stringCase.para,
-      smartTitle: stringCase.smartTitle
+      smartTitle: stringCase.smartTitle,
+      smartTitleChars: stringCase.smartTitleChars
     };
-    value = handlers[caseMode]?.(newVal) ?? newVal;
+    if (caseMode == 'smartTitleChars') {
+      value = handlers[caseMode]?.(newVal, allowedChars) ?? newVal;
+    } else {
+      value = handlers[caseMode]?.(newVal) ?? newVal;
+    }
     optionCreateError = false;
     selectedOptionIndex = 0;
+    onValueChange(value);
   }
 
   function handleOnBlur() {
