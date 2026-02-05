@@ -1,5 +1,5 @@
 <script>
-  import { PlusCircle, Loader2Icon } from 'lucide-svelte';
+  import { PlusCircle, Loader2Icon, Split } from 'lucide-svelte';
   import stringCase from '$lib/utils/stringCase';
 
   const dummyFunction = () => {};
@@ -23,8 +23,9 @@
     createOption = dummyFunction,
     placeholder = '',
     allowedChars = [],
-    onEnter = () => {},
-    onValueChange = () => {},
+    onEnter = dummyFunction,
+    onValueChange = dummyFunction,
+    onValueSelected = dummyFunction,
     disabled = false,
     readonly = false,
     textAlign = 'left',
@@ -91,6 +92,14 @@
           showOptions = false;
         }
       }
+      if (value?.startsWith('=')) {
+        try {
+          let val = eval(value.slice(1));
+          value = `=${val}`;
+        } catch {
+          value = '';
+        }
+      }
       onEnter(e);
     } else if (e.key === 'Escape') {
       // Close dropdown without selecting
@@ -134,6 +143,10 @@
       const isValueExist = filtered.includes(value);
       if (!isValueExist && newValue != 'accept') value = '';
     }
+    if (value?.startsWith('=')) {
+      let val = eval(value.slice(1));
+      value = val;
+    }
   }
 
   async function handleCreateOption(e) {
@@ -142,6 +155,10 @@
     optionCreateError = !(await createOption(value));
     optionLoading = false;
   }
+
+  $effect(() => {
+    onValueSelected(value);
+  });
 </script>
 
 <div
@@ -214,7 +231,7 @@
       </div>
     {:else if showOptions && filtered.length == 0 && newValue == 'create'}
       <div
-        class="absolute top-full max-h-50 overflow-auto left-0 w-full border-amber-500 border-2 rounded-b-md bg-white z-10"
+        class="absolute top-full max-h-50 overflow-auto left-0 w-full border-amber-500 border-2 rounded-b-md bg-white z-1000"
       >
         <div
           class="bg-white dark:bg-gray-950 px-2 py-1 hover:bg-amber-50 dark:hover:bg-gray-800 cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis"

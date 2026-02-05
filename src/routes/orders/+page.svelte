@@ -1,5 +1,10 @@
 <script>
   import Table from '$lib/components/Table.svelte';
+  import { onDestroy, onMount } from 'svelte';
+  import OrderForm from './OrderForm.svelte';
+  import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
+  import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import Model from '$lib/components/Model.svelte';
 
   const headers = [
     { name: 'Date', align: 'left', key: 'date' },
@@ -22,29 +27,82 @@
     { name: 'DSV', align: 'right', key: 'delivery_sheet_verified' }
   ];
 
-  const a = {
-    name: 'Ohm Muruga Construction',
-    date: '23-06-2000',
-    order_number: '888',
-    party: 'Ohm Muruga Construction',
-    address: 'Velthigamanibenta',
-    phone: '9876543210',
-    item: '12mm+6mm',
-    total_qty: '10.00',
-    amount_type: 'COD',
-    amount: '12345',
-    advance: '12345',
-    discount: '12345',
-    balance: '12345',
-    sign: '0',
-    delivered_qty: '5.00',
-    balance_qty: '5.00',
-    notes: 'T (2+2) somthigg text here',
-    status: 'Delivered',
-    delivery_sheet_verified: '5'
-  };
+  const { data } = $props();
 
-  const items = Array.from({ length: 100 }).map((_) => a);
+  const availableOptions = [
+    { key: '0', description: 'New Item' },
+    { key: 'E', description: 'Edit Item' },
+    { key: 'D', description: 'Delete Item' },
+    { key: 'H', description: 'List available Shortcut' }
+  ];
+
+  let formOpened = $state(false);
+  let helperOpened = $state(false);
+  let editableOrder = $state(null);
+
+  function handleItemEdit(item) {
+    formOpened = true;
+    editableOrder = item;
+  }
+
+  async function handleItemDelete(item) {
+    const formData = new FormData();
+    const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
+    if (confirmed) {
+      formData.append('id', item.id);
+      fetch('?/delete', {
+        method: 'POST',
+        body: formData
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.type == 'failure') {
+            showToast('Not Deleted', 'danger');
+          } else {
+            showToast('Deleted Success');
+          }
+        });
+    }
+  }
+
+  function handleFormClose() {
+    formOpened = false;
+    editableOrder = null;
+  }
+
+  function toggleHelper() {
+    helperOpened = !helperOpened;
+  }
+
+  const customEvents = [
+    { key: 'E', handler: handleItemEdit },
+    { key: 'D', handler: handleItemDelete }
+  ];
+
+  const toggleOpenForm = () => (formOpened = !formOpened);
+
+  onMount(() => {
+    keyboardEventBus.on('0', toggleOpenForm);
+    keyboardEventBus.on('H', toggleHelper);
+    syncOn('ORDERS.LIST');
+  });
+  onDestroy(() => {
+    keyboardEventBus.off('0', toggleOpenForm);
+    keyboardEventBus.off('H', toggleHelper);
+    syncOff('ORDERS.LIST');
+  });
 </script>
 
-<Table title="Order Book" {headers} {items} hideSerial={true}></Table>
+<Table title="Order Book" {headers} items={data.orders} hideSerial={true}></Table>
+<OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
+<Model open={helperOpened} onClose={toggleHelper}>
+  <div class="bg-white p-5 min-w-md">
+    {#each availableOptions as o}
+      <div class="m-1 flex gap-2 items-center">
+        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+        <span>=</span>
+        <span class="flex-11">{o.description}</span>
+      </div>
+    {/each}
+  </div>
+</Model>

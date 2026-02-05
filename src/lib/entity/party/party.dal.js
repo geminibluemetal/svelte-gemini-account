@@ -14,6 +14,16 @@ export function fetchSinglePartyByName(name) {
   return stat.get();
 }
 
+export function updatePhoneByPartyName(name, phone) {
+  const query = `
+    UPDATE ${tableName}
+    SET phone = ?
+    WHERE name = ?
+  `;
+  const stmt = db.prepare(query);
+  return stmt.run(phone, name);
+}
+
 export function insertParty(data) {
   const query = `
     INSERT INTO ${tableName} (name, phone)

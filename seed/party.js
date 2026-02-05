@@ -39,7 +39,6 @@ export const seedData = [
   { name: "College Hostal", phone: "9894150004" },
   { name: "College Principal", phone: "9486528846" },
   { name: "CSK", phone: "" },
-  { name: "Delivery Sheet", phone: "" },
   { name: "Dhashnamoorthy", phone: "9159654756" },
   { name: "DKP Lorry", phone: "9789451911" },
   { name: "DR Lorry", phone: "9786339076" },
