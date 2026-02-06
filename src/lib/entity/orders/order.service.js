@@ -68,6 +68,15 @@ export async function updateOrder(data, editId) {
   if (data.advance && isNaN(Number(data.advance))) return { message: "Advance should be Number", ok: false }
   if (data.discount && isNaN(Number(data.discount))) return { message: "Discount should be Number", ok: false }
 
+  // Check advance amount changes when signed in
+  if (data.advance) {
+    const party = fetchSingleOrderById(editId)
+    console.log(party, data)
+    if (party.advance != data.advance && party.sign == 1) {
+      return { message: "Advance amount can't changed after Signed", ok: false }
+    }
+  }
+
   // Check party phone number if not exist save it.
   if (data.party_name) {
     const result = fetchSinglePartyByName(data.party_name)

@@ -88,14 +88,9 @@ export function updateOrderById(id, data) {
       advance = ?,
       discount = ?,
       balance = ?,
-      sign = ?,
       is_owner_order = ?,
       tracktor_only = ?,
-      delivered_qty = ?,
-      balance_qty = ?,
-      notes = ?,
-      status = ?,
-      delivery_sheet_verified = ?
+      notes = ?
     WHERE id = ?
   `;
 
@@ -112,14 +107,9 @@ export function updateOrderById(id, data) {
     data.advance || 0,
     data.discount || 0,
     data.balance || 0,
-    data.sign ? 1 : 0,
     data.is_owner_order ? 1 : 0,
     data.tracktor_only ? 1 : 0,
-    data.delivered_qty || 0,
-    data.balance_qty || 0,
     data.notes || '',
-    data.status || 'New',
-    data.delivery_sheet_verified || 0,
     id
   );
 }

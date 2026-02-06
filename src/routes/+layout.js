@@ -7,7 +7,7 @@ export async function load() {
     { name: 'Party', emoji: '👥', url: '/party', key: 'P' },
     { name: 'Address', emoji: '🗺️', url: '/address', key: 'A' },
     { name: 'Items', emoji: '📦', url: '/items', key: 'I' },
-    // { name: 'Weighment', emoji: '⚖️', url: '/weigh', key: 'W' },
+    { name: 'Vehicle', emoji: '🚚', url: '/vehicle', key: 'V' },
   ];
   return { apps }
 }

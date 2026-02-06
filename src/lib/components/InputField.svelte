@@ -39,8 +39,8 @@
   let selectedOptionIndex = $state(0);
   let filtered = $derived(
     fullSearch
-      ? options.filter((o) => o.toLowerCase().includes(value.toLowerCase()))
-      : options.filter((o) => o.toLowerCase().startsWith(value.toLowerCase()))
+      ? options.filter((o) => o.toLowerCase().includes(value?.toLowerCase()))
+      : options.filter((o) => o.toLowerCase().startsWith(value?.toLowerCase()))
   );
 
   // Auto-scroll when selectedOptionIndex changes
@@ -140,7 +140,7 @@
   function handleOnBlur() {
     if (options.length) {
       showOptions = false;
-      const isValueExist = filtered.includes(value);
+      const isValueExist = Array.isArray(filtered) ? filtered.includes(value) : false;
       if (!isValueExist && newValue != 'accept') value = '';
     }
     if (typeof value === 'string' && value?.startsWith('=')) {

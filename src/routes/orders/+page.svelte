@@ -6,21 +6,22 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
+  import { Highlight } from '$lib/utils/highlight';
 
   const headers = [
     { name: 'Date', align: 'center', key: 'date', display: 'date' },
-    { name: 'ON', align: 'center', key: 'order_number' },
+    { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor },
     { name: 'Party', align: 'left', key: 'party_name' },
     { name: 'Address', align: 'left', key: 'address' },
     { name: 'Phone', align: 'left', key: 'phone' },
     { name: 'Item', align: 'left', key: 'item' },
     { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal' },
-    { name: 'AT', align: 'center', key: 'amount_type' },
+    { name: 'AT', align: 'center', key: 'amount_type', color: AmountTypeColor },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
     { name: 'Advance', align: 'right', key: 'advance', display: 'currency' },
     { name: 'Disount', align: 'right', key: 'discount', display: 'currency' },
     { name: 'Balance', align: 'right', key: 'balance', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', display: 'boolean' },
+    { name: 'Sign', align: 'center', key: 'sign', display: 'boolean', color: SignColor },
     { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal' },
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
@@ -29,6 +30,30 @@
 
   function notesDisplay(value, item) {
     return `${item.tracktor_only ? '(🚜)' : ''} ${value}`;
+  }
+
+  function OrderNumberColor(value, item) {
+    return item.is_owner_order == 1 ? Highlight.red : null;
+  }
+
+  function SignColor(value) {
+    return value == 1 ? Highlight.green : null;
+  }
+
+  function AmountTypeColor(value) {
+    // COD, AC, Cash, Paytm, Gpay
+    switch (value) {
+      case 'COD':
+        return Highlight.purple;
+      case 'AC':
+        return Highlight.yellow;
+      case 'Cash':
+        return Highlight.green;
+      case 'Paytm':
+        return Highlight.red;
+      case 'Gpay':
+        return Highlight.blue;
+    }
   }
 
   const { data } = $props();

@@ -146,6 +146,7 @@
         {#each headers as header, col (col)}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+          {@const color = header?.color ? header.color(item[header.key], item) : null}
           <div
             class="border-b px-1 border-gray-500
             {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
@@ -153,6 +154,7 @@
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
             onmousemove={() => (overRow = row)}
             data-over-row={row}
+            style="background: {color?.background}; color: {color?.foreground}"
           >
             {#if header?.display && header.display instanceof Function}
               {header.display(item[header.key], item)}
