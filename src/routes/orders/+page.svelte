@@ -7,24 +7,23 @@
   import Model from '$lib/components/Model.svelte';
 
   const headers = [
-    { name: 'Date', align: 'left', key: 'date' },
-    { name: 'ON', align: 'left', key: 'order_number' },
-    { name: 'Party', align: 'left', key: 'party' },
-    { name: 'Address', align: 'right', key: 'address' },
-    { name: 'Phone', align: 'right', key: 'phone' },
-    { name: 'Item', align: 'right', key: 'item' },
-    { name: 'T Qty', align: 'right', key: 'total_qty' },
-    { name: 'AT', align: 'right', key: 'amount_type' },
-    { name: 'Amt', align: 'right', key: 'amount' },
-    { name: 'Adv', align: 'right', key: 'advance' },
-    { name: 'Dis', align: 'right', key: 'discount' },
-    { name: 'Bal', align: 'right', key: 'balance' },
-    { name: 'Sign', align: 'right', key: 'sign' },
-    { name: 'D Qty', align: 'right', key: 'delivered_qty' },
-    { name: 'B Qty', align: 'right', key: 'balance_qty' },
-    { name: 'Notes', align: 'right', key: 'notes' },
-    // { name: 'Status', align: 'right', key: 'status' },
-    { name: 'DSV', align: 'right', key: 'delivery_sheet_verified' }
+    { name: 'Date', align: 'center', key: 'date' },
+    { name: 'ON', align: 'center', key: 'order_number' },
+    { name: 'Party', align: 'left', key: 'party_name' },
+    { name: 'Address', align: 'left', key: 'address' },
+    { name: 'Phone', align: 'left', key: 'phone' },
+    { name: 'Item', align: 'left', key: 'item' },
+    { name: 'T Qty', align: 'center', key: 'total_qty' },
+    { name: 'AT', align: 'center', key: 'amount_type' },
+    { name: 'Amount', align: 'right', key: 'amount' },
+    { name: 'Advance', align: 'right', key: 'advance' },
+    { name: 'Disount', align: 'right', key: 'discount' },
+    { name: 'Balance', align: 'right', key: 'balance' },
+    { name: 'Sign', align: 'center', key: 'sign' },
+    { name: 'D Qty', align: 'center', key: 'delivered_qty' },
+    { name: 'B Qty', align: 'center', key: 'balance_qty' },
+    { name: 'Notes', align: 'left', key: 'notes' },
+    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified' }
   ];
 
   const { data } = $props();

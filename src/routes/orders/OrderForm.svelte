@@ -7,7 +7,7 @@
 
   const { open, onClose, item, allItems, options } = $props();
   let initialData = {
-    party: '',
+    party_name: '',
     address: '',
     phone: '',
     item: '',
@@ -25,7 +25,6 @@
     delivery_sheet_verified: ''
   };
 
-  let nameOptions = $state([]);
   let data = $state(initialData);
 
   const partyList = $derived(options.party.map((p) => p.name));
@@ -34,7 +33,7 @@
   const amountType = ['COD', 'AC', 'Cash', 'Paytm', 'Gpay'];
 
   function handleClose() {
-    nameOptions = [];
+    data = { ...initialData };
     onClose();
   }
 
@@ -77,8 +76,8 @@
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="party"
-      value={data.party}
+      name="party_name"
+      value={data.party_name}
       placeholder="Select Party"
       autoComplete="off"
       options={partyList}
@@ -106,7 +105,7 @@
     />
     <InputField
       name="total_qty"
-      type="number"
+      inputmode="decimal"
       caseMode="none"
       value={data.total_qty}
       placeholder="Total Quantity"
@@ -119,7 +118,7 @@
       autoComplete="off"
       options={amountType}
     />
-    {#if data.amount_type && data.amount_type !== 'AC'}
+    {#if amountType.includes(data.amount_type) && data.amount_type !== 'AC'}
       <InputField
         caseMode="none"
         name="amount"
@@ -143,13 +142,13 @@
       />
     {/if}
     <InputField
-      name="note"
-      value={data.note}
+      name="notes"
+      value={data.notes}
       placeholder="Note"
       autoComplete="off"
       caseMode="para"
     />
-    <CheckBoxField placeholder="Is Owner Order?" />
-    <CheckBoxField placeholder="Tractor Only" />
+    <CheckBoxField name="is_owner_order" placeholder="Is Owner Order?" />
+    <CheckBoxField name="tracktor_only" placeholder="Tractor Only" />
   </Form>
 </Model>
