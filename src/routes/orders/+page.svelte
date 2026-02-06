@@ -5,26 +5,31 @@
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
+  import { showToast } from '$lib/stores/toast';
 
   const headers = [
-    { name: 'Date', align: 'center', key: 'date' },
+    { name: 'Date', align: 'center', key: 'date', display: 'date' },
     { name: 'ON', align: 'center', key: 'order_number' },
     { name: 'Party', align: 'left', key: 'party_name' },
     { name: 'Address', align: 'left', key: 'address' },
     { name: 'Phone', align: 'left', key: 'phone' },
     { name: 'Item', align: 'left', key: 'item' },
-    { name: 'T Qty', align: 'center', key: 'total_qty' },
+    { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal' },
     { name: 'AT', align: 'center', key: 'amount_type' },
-    { name: 'Amount', align: 'right', key: 'amount' },
-    { name: 'Advance', align: 'right', key: 'advance' },
-    { name: 'Disount', align: 'right', key: 'discount' },
-    { name: 'Balance', align: 'right', key: 'balance' },
+    { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
+    { name: 'Advance', align: 'right', key: 'advance', display: 'currency' },
+    { name: 'Disount', align: 'right', key: 'discount', display: 'currency' },
+    { name: 'Balance', align: 'right', key: 'balance', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign' },
-    { name: 'D Qty', align: 'center', key: 'delivered_qty' },
-    { name: 'B Qty', align: 'center', key: 'balance_qty' },
-    { name: 'Notes', align: 'left', key: 'notes' },
+    { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal' },
+    { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal' },
+    { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
     { name: 'DSV', align: 'center', key: 'delivery_sheet_verified' }
   ];
+
+  function notesDisplay(value, item) {
+    return `${item.tracktor_only ? '(🚜)' : ''} ${value}`;
+  }
 
   const { data } = $props();
 
@@ -92,7 +97,7 @@
   });
 </script>
 
-<Table title="Order Book" {headers} items={data.orders} hideSerial={true}></Table>
+<Table title="Order Book" {headers} items={data.orders} hideSerial={true} {customEvents}></Table>
 <OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="bg-white p-5 min-w-md">

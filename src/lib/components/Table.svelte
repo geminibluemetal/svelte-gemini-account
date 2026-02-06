@@ -1,4 +1,5 @@
 <script>
+  import display from '$lib/core/client/display';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
   import { onDestroy, onMount } from 'svelte';
@@ -9,8 +10,8 @@
     items = [],
     hideSerial = false,
     hideAction = true,
-    bottomSpace = true,
-    moveToEnd = true,
+    bottomSpace = false,
+    moveToEnd = false,
     customEvents = []
   } = $props();
 
@@ -153,7 +154,15 @@
             onmousemove={() => (overRow = row)}
             data-over-row={row}
           >
-            {item[header.key]}
+            {#if header?.display && header.display instanceof Function}
+              {header.display(item[header.key], item)}
+            {:else if item[header.key] != null && item[header.key] !== '' && item[header.key] !== 0 && item[header.key] !== '0'}
+              {#if header?.display}
+                {display(header.display, item[header.key])}
+              {:else}
+                {item[header.key]}
+              {/if}
+            {/if}
           </div>
         {/each}
 

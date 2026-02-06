@@ -118,7 +118,7 @@
       autoComplete="off"
       options={amountType}
     />
-    {#if amountType.includes(data.amount_type) && data.amount_type !== 'AC'}
+    {#if amountType?.includes(data.amount_type) && data.amount_type !== 'AC'}
       <InputField
         caseMode="none"
         name="amount"
@@ -148,7 +148,11 @@
       autoComplete="off"
       caseMode="para"
     />
-    <CheckBoxField name="is_owner_order" placeholder="Is Owner Order?" />
-    <CheckBoxField name="tracktor_only" placeholder="Tractor Only" />
+    <CheckBoxField
+      name="is_owner_order"
+      value={data.is_owner_order}
+      placeholder="Is Owner Order?"
+    />
+    <CheckBoxField name="tracktor_only" value={data.tracktor_only} placeholder="Tractor Only" />
   </Form>
 </Model>

@@ -92,7 +92,7 @@
           showOptions = false;
         }
       }
-      if (value?.startsWith('=')) {
+      if (typeof value === 'string' && value?.startsWith('=')) {
         try {
           let val = eval(value.slice(1));
           value = `=${val}`;
@@ -143,7 +143,7 @@
       const isValueExist = filtered.includes(value);
       if (!isValueExist && newValue != 'accept') value = '';
     }
-    if (value?.startsWith('=')) {
+    if (typeof value === 'string' && value?.startsWith('=')) {
       let val = eval(value.slice(1));
       value = val;
     }
