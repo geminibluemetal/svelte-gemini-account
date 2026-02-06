@@ -1,7 +1,9 @@
-import { formatDateTime } from "$lib/utils/dateTime";
+import { formatDateTime, getFormattedDate } from "$lib/utils/dateTime";
 import { fetchSinglePartyByName, updatePhoneByPartyName } from "../party/party.dal";
 import { fetchSettings, setSettings } from "../settings/settings.dal";
-import { deleteOrderById, fetchAllOrders, insertOrder, updateOrderById } from "./order.dal";
+import { deleteOrderById, fetchAllOrders, fetchSingleOrderById, insertOrder, updateOrderById, updateSingleOrderColumn } from "./order.dal";
+import { printOut } from "$lib/core/server/print";
+import { formatFixed } from "$lib/utils/number";
 
 export async function getAllOrders() {
   return fetchAllOrders()
@@ -98,4 +100,101 @@ export async function deleteOrder(id) {
   } else {
     return { message: `Order Not Deleted`, ok: false }
   }
+}
+
+export async function orderSinglePrint(data) {
+  const order = fetchSingleOrderById(data.id)
+  await printOut((p) => {
+    p.reset()
+      .beepOn(1, 2)
+      .align('center')
+      .setTextSize(1, 0)
+      .bold(true)
+      .line("Single Cash Bill")
+      .bold(false)
+      .dashedLine(17)
+      .align('left')
+
+      .pairs('Date', getFormattedDate())
+      .pairs('Order', order.order_number)
+      .pairs('Party', order.party_name)
+      .pairs('Address', order.address)
+      .pairs('Phone', order.phone)
+      .pairs('Item', order.item)
+      .pairs('Qty', formatFixed(data.qty))
+      .pairs('Amount', data.amount)
+      .pairs('Tip', data.tip)
+      .pairs('Total', Number(data.amount) + Number(data.tip))
+      .flushPairs()
+
+      .dashedLine(24)
+      .feed(2)
+      .cut();
+  });
+}
+
+export async function orderFullPrint(data) {
+  const order = fetchSingleOrderById(data.id)
+  await printOut((p) => {
+    p.reset()
+      .beepOn(2, 2)
+      .align('center')
+      .setTextSize(1, 0)
+      .bold(true)
+      .line("Full Cash Bill")
+      .bold(false)
+      .dashedLine(17)
+      .align('left')
+
+      .pairs('Date', getFormattedDate())
+      .pairs('Order', order.order_number)
+      .pairs('Party', order.party_name)
+      .pairs('Address', order.address)
+      .pairs('Phone', order.phone)
+      .pairs('Item', order.item)
+      .pairs('Qty', formatFixed(order.total_qty))
+      .pairs('Amount', order.amount)
+      .pairs('Advance', order.advance)
+      .pairs('Discount', order.discount)
+      .pairs('Balance', order.balance)
+      .pairs('Tip', data.tip)
+      .pairs('Total', Number(order.balance) + Number(data.tip))
+      .flushPairs()
+
+      .dashedLine(24)
+      .feed(2)
+      .cut();
+  });
+}
+
+export async function orderPhonePrint(data) {
+  const order = fetchSingleOrderById(data.id)
+  await printOut((p) => {
+    p.reset()
+      .beepOn(1, 1)
+      .setTextSize(1, 0)
+      .align('left')
+
+      // .pairs('Date', getFormattedDate())
+      .pairs('Order', order.order_number)
+      // .pairs('Party', order.party_name)
+      .pairs('Address', order.address)
+      .pairs('Phone', order.phone)
+      .pairs('Item', order.item)
+      .pairs('Qty', formatFixed(order.total_qty))
+      // .pairs('Amount', order.amount)
+      // .pairs('Advance', order.advance)
+      // .pairs('Discount', order.discount)
+      // .pairs('Balance', order.balance)
+      // .pairs('Tip', data.tip)
+      // .pairs('Total', Number(order.balance) + Number(data.tip))
+      .flushPairs()
+
+      .feed(2)
+      .cut();
+  });
+}
+
+export async function signOrderById(id, current) {
+  updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1)
 }

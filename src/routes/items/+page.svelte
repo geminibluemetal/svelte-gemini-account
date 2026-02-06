@@ -35,23 +35,24 @@
   }
 
   async function handleItemDelete(item) {
-    const formData = new FormData();
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      formData.append('id', item.id);
-      fetch('?/delete', {
-        method: 'POST',
-        body: formData
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.type == 'failure') {
-            showToast('Not Deleted', 'danger');
-          } else {
-            showToast('Deleted Success');
-          }
-        });
+      const result = await transportAction('?/delete', { id: item.id });
+      if (result.type === 'failure') showToast('Not Deleted', 'danger');
+      else showToast('Deleted Success');
     }
+  }
+
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+    return await res.json();
   }
 
   function handleFormClose() {

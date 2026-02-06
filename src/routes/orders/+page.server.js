@@ -1,7 +1,7 @@
 import { sseEmit } from '$lib/core/server/sseBus.js'
 import { getAllAddress } from '$lib/entity/address/address.service.js'
 import { getAllItems } from '$lib/entity/items/items.service.js'
-import { createOrder, deleteOrder, getAllOrders, updateOrder } from '$lib/entity/orders/order.service.js'
+import { createOrder, deleteOrder, getAllOrders, orderFullPrint, orderPhonePrint, orderSinglePrint, signOrderById, updateOrder } from '$lib/entity/orders/order.service.js'
 import { getAllParty } from '$lib/entity/party/party.service.js'
 import { formDataToObject } from '$lib/utils/form'
 import { fail } from '@sveltejs/kit'
@@ -48,5 +48,34 @@ export const actions = {
 
     sseEmit({ type: 'ORDERS.LIST' })
     return result
+  },
+
+  // Single Print
+  singlePrint: async ({ request }) => {
+    const formData = await request.formData()
+    const data = formDataToObject(formData)
+    orderSinglePrint(data)
+  },
+
+  // Full Print
+  fullPrint: async ({ request }) => {
+    const formData = await request.formData()
+    const data = formDataToObject(formData)
+    orderFullPrint(data)
+  },
+
+  // Phone Print
+  phonePrint: async ({ request }) => {
+    const formData = await request.formData()
+    const data = formDataToObject(formData)
+    orderPhonePrint(data)
+  },
+
+  // Sign Order
+  sign: async ({ request }) => {
+    const formData = await request.formData()
+    const data = formDataToObject(formData)
+    signOrderById(data.id, data.current)
+    sseEmit({ type: 'ORDERS.LIST' })
   }
 }

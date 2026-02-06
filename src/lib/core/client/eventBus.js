@@ -73,6 +73,17 @@ function isTextInputFocused() {
 function handleKeydown(e) {
   if (!e.key) return;
 
+  const activeElement = document.activeElement;
+  const isEnterKey = e.key === 'Enter' || e.key === 'NumpadEnter';
+
+  // ✅ ALLOW Enter key to work on buttons and form submissions
+  if (isEnterKey) {
+    if (activeElement.tagName === 'BUTTON') return; // Button
+    if (activeElement.tagName === 'INPUT' &&
+      ['submit', 'button'].includes(activeElement.type)) return; // Submit/button input
+    if (activeElement.form) return; // Inside a form
+  }
+
   const isModifierCombo = e.ctrlKey || e.metaKey || e.altKey;
 
   // 🚫 Block shortcuts while typing (allow modifier combos)

@@ -8,6 +8,19 @@ export function fetchAllOrders() {
   return stat.all();
 }
 
+export function fetchSingleOrderById(id) {
+  const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`
+  const stat = db.prepare(query)
+  return stat.get();
+}
+
+export function updateSingleOrderColumn(id, columnName, newValue) {
+  // Use parameterized query to prevent SQL injection
+  const query = `UPDATE ${tableName} SET ${columnName} = ? WHERE id = ?`;
+  const stat = db.prepare(query);
+  return stat.run(newValue, id);
+}
+
 export function insertOrder(data) {
   const query = `
     INSERT INTO orders (

@@ -62,6 +62,36 @@ export class ESCPOSPrinter {
     return this;
   }
 
+  // A very useful feature for receipts (e.g., "Total : $50.00")
+  pairs(label, value, totalWidth = 32) {
+    // Store pairs in cache to calculate max width later
+    if (!this._pairsCache) this._pairsCache = [];
+    this._pairsCache.push({ label, value, totalWidth });
+    return this;
+  }
+  flushPairs() {
+    if (!this._pairsCache || this._pairsCache.length === 0) return this;
+
+    // Find the maximum label length
+    const maxLabelLength = Math.max(...this._pairsCache.map(p => p.label.length));
+
+    // Print each pair with consistent alignment
+    this._pairsCache.forEach(({ label, value }) => {
+      // Pad label to max width
+      const paddedLabel = label.padEnd(maxLabelLength, ' ');
+
+      // Create the line: "label : value"
+      const line = `${paddedLabel} : ${value}`;
+
+      // Add to buffer
+      this.buffer += line + this.LF;
+    });
+
+    // Clear cache
+    this._pairsCache = [];
+    return this;
+  }
+
   dashedLine(length = 32) {
     this.line('-'.repeat(length));
     return this;

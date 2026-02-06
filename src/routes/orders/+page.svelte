@@ -20,7 +20,7 @@
     { name: 'Advance', align: 'right', key: 'advance', display: 'currency' },
     { name: 'Disount', align: 'right', key: 'discount', display: 'currency' },
     { name: 'Balance', align: 'right', key: 'balance', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign' },
+    { name: 'Sign', align: 'center', key: 'sign', display: 'boolean' },
     { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal' },
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
@@ -34,39 +34,65 @@
   const { data } = $props();
 
   const availableOptions = [
+    { key: 'H', description: 'List available Shortcut' },
     { key: '0', description: 'New Item' },
     { key: 'E', description: 'Edit Item' },
     { key: 'D', description: 'Delete Item' },
-    { key: 'H', description: 'List available Shortcut' }
+    { key: 'P', description: 'Print Phone Number only' },
+    { key: 'I', description: 'Single Load Cash Bill Print' },
+    { key: 'O', description: 'Full Load Cash Bill Print' },
+    { key: 'T', description: 'Generate Token For these Order' },
+    { key: '➔', description: 'Sign this order' },
+    { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];
 
   let formOpened = $state(false);
   let helperOpened = $state(false);
   let editableOrder = $state(null);
 
-  function handleItemEdit(item) {
+  function handleOrderEdit(item) {
     formOpened = true;
     editableOrder = item;
   }
 
-  async function handleItemDelete(item) {
-    const formData = new FormData();
+  async function handleOrderDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      formData.append('id', item.id);
-      fetch('?/delete', {
-        method: 'POST',
-        body: formData
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          if (res.type == 'failure') {
-            showToast('Not Deleted', 'danger');
-          } else {
-            showToast('Deleted Success');
-          }
-        });
+      const result = await transportAction('?/delete', { id: item.id });
+      if (result.type === 'failure') showToast('Not Deleted', 'danger');
+      else showToast('Deleted Success');
     }
+  }
+
+  const handleSinglePrint = (item) => {
+    const qty = prompt('Enter Quantity');
+    if (!qty) return;
+    const amount = prompt('Enter Amount');
+    if (!amount) return;
+    const tip = prompt('Enter Tip Amount');
+    transportAction('?/singlePrint', { id: item.id, qty, amount, tip });
+  };
+  const handleFullPrint = (item) => {
+    const tip = prompt('Enter Tip Amount');
+    if (!tip) return;
+    transportAction('?/fullPrint', { id: item.id, tip });
+  };
+  const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item.id });
+  const handleSignOrder = (item) => transportAction('?/sign', { id: item.id, current: item.sign });
+  const handleTokenCreation = (item) => {
+    alert('TODO: Pending token creation direclty from order');
+  };
+
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+    return await res.json();
   }
 
   function handleFormClose() {
@@ -79,8 +105,14 @@
   }
 
   const customEvents = [
-    { key: 'E', handler: handleItemEdit },
-    { key: 'D', handler: handleItemDelete }
+    { key: 'E', handler: handleOrderEdit },
+    { key: 'D', handler: handleOrderDelete },
+    { key: 'P', handler: handlePhonePrint },
+    { key: 'O', handler: handleFullPrint },
+    { key: 'I', handler: handleSinglePrint },
+    { key: 'T', handler: handleTokenCreation },
+    { key: 'Enter', handler: handleSinglePrint },
+    { key: 'ArrowRight', handler: handleSignOrder }
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -102,8 +134,8 @@
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="bg-white p-5 min-w-md">
     {#each availableOptions as o}
-      <div class="m-1 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 mb-2 flex gap-2 items-center">
+        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>
