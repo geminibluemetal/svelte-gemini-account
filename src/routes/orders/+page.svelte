@@ -81,6 +81,10 @@
   }
 
   async function handleOrderDelete(item) {
+    if (item.sign) {
+      showToast('Signed Order Can not delete', 'amber');
+      return;
+    }
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
       const result = await transportAction('?/delete', { id: item.id });
