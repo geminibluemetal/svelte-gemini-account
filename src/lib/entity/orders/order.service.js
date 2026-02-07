@@ -136,8 +136,7 @@ export async function orderSinglePrint(data) {
       .pairs('Total', Number(data.amount) + Number(data.tip))
       .flushPairs()
 
-      .dashedLine(24)
-      .feed(2)
+      .feed(1)
       .cut();
   });
 }
@@ -170,8 +169,7 @@ export async function orderFullPrint(data) {
       .pairs('Total', Number(order.balance) + Number(data.tip))
       .flushPairs()
 
-      .dashedLine(24)
-      .feed(2)
+      .feed(1)
       .cut();
   });
 }
@@ -199,7 +197,7 @@ export async function orderPhonePrint(data) {
       // .pairs('Total', Number(order.balance) + Number(data.tip))
       .flushPairs()
 
-      .feed(2)
+      .feed(1)
       .cut();
   });
 }

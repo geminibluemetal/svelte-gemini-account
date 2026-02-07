@@ -62,7 +62,7 @@ export async function printToken(data) {
     });
 
     // Footer
-    p.dashedLine(24).feed(2).cut();
+    p.flushPairs().feed(1).cut();
   });
 }
 
