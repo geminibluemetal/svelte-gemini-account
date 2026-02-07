@@ -38,10 +38,17 @@
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
       const result = await transportAction('?/delete', { id: item.id });
-      if (result.type === 'failure') showToast('Not Deleted', 'danger');
-      else showToast('Deleted Success');
+      console.log(result);
+      if (result.type === 'failure') {
+        const parsedData = JSON.parse(result.data);
+        let message = parsedData[parsedData[0].message];
+        message = message || 'Not Deleted';
+        showToast(message, 'danger');
+      } else showToast('Deleted Success');
     }
   }
+
+  const handleTokenPrint = (item) => transportAction('?/print', { id: item.id });
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -66,7 +73,8 @@
 
   const customEvents = [
     { key: 'E', handler: handleTokenEdit },
-    { key: 'D', handler: handleTokenDelete }
+    { key: 'D', handler: handleTokenDelete },
+    { key: 'P', handler: handleTokenPrint }
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);

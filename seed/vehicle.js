@@ -325,7 +325,6 @@ export const seedData = [
   { full_number: null, short_number: '6205', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '7558', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '7952', is_company_vehicle: 0, body_capacity: null },
-  { full_number: null, short_number: '4442', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '3769', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '3291', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '7443', is_company_vehicle: 0, body_capacity: null },

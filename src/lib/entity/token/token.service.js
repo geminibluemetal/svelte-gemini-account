@@ -1,39 +1,55 @@
-import { printOut } from "$lib/core/server/print"
-import { formatDateTime, getFormattedTime } from "$lib/utils/dateTime"
-import { fetchAllDeliveryByDate, fetchLastSerialByDate, insertDelivery } from "../delivery/delivery.dal"
+import { printOut } from '$lib/core/server/print';
+import { formatDateTime, getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
+import { formatFixed } from '$lib/utils/number';
+import {
+  fetchAllDeliveryByDate,
+  fetchDeliveryById,
+  fetchLastSerialByDate,
+  insertToken,
+  updateTokenById
+} from '../delivery/delivery.dal';
 
 export async function getAllToken(date = formatDateTime('YY-MM-DD')) {
-  return fetchAllDeliveryByDate(date)
+  return fetchAllDeliveryByDate(date);
 }
 
-export async function createToken(data) {
-  if (!data.vehicle) return { message: "Vehicle is Required", ok: false }
-  if (!data.token_item) return { message: "Item is Required", ok: false }
-  if (!data.token_quantity) return { message: "Quantity is Required", ok: false }
-  if (data.token_quantity && isNaN(Number(data.token_quantity))) return { message: "Quantity should be a number", ok: false }
+export async function createToken(data, takePrint = true) {
+  if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
+  if (!data.token_item) return { message: 'Item is Required', ok: false };
+  if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
+  if (data.token_quantity && isNaN(Number(data.token_quantity)))
+    return { message: 'Quantity should be a number', ok: false };
 
-  let serial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'))
-  serial = Number(serial) + 1
+  let serial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
+  serial = Number(serial) + 1;
 
-  data.serial = serial
-  data.token_time = getFormattedTime()
-  const result = insertDelivery(data)
+  data.serial = serial;
+  data.token_time = getFormattedTime();
+  const result = insertToken(data);
   if (result?.changes) {
-    printToken({
-      ""
-    })
-    return { message: `Token created`, ok: true }
+    if (takePrint) {
+      printToken({
+        Token: serial,
+        Party: data.party_name ? data.party_name : ' - ',
+        Vcle: data.vehicle,
+        Item: data.token_item,
+        Qty: formatFixed(data.token_quantity),
+        Date: getFormattedDate(),
+        Time: getFormattedTime()
+      });
+    }
+    return { message: `Token created`, ok: true };
   }
 }
 
 export async function printToken(data) {
   await printOut((p) => {
     p.reset()
-      .beepOn(1, 2)
+      .beepOn(3, 1)
       .align('center')
       .setTextSize(1, 0)
       .bold(true)
-      .line("Single Cash Bill")
+      .line('Token')
       .bold(false)
       .dashedLine(17)
       .align('left');
@@ -46,36 +62,59 @@ export async function printToken(data) {
     });
 
     // Footer
-    p.dashedLine(24)
-      .feed(2)
-      .cut();
+    p.dashedLine(24).feed(2).cut();
   });
 }
 
-// export async function updateVehicle(data, editId) {
-//   if (!data.short_number) {
-//     return { message: "Short Number is Required", ok: false }
-//   }
+export async function updateToken(data, editId, takePrint = true) {
+  if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
+  if (!data.token_item) return { message: 'Item is Required', ok: false };
+  if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
+  if (data.token_quantity && isNaN(Number(data.token_quantity)))
+    return { message: 'Quantity should be a number', ok: false };
 
-//   const vehicleExist = checkVehicleShortNameExists(data.short_number, editId)
+  const result = updateTokenById(data, editId);
+  if (result?.changes) {
+    if (takePrint) {
+      const token = fetchDeliveryById(editId);
+      printToken({
+        Token: token.serial,
+        Party: token.party_name ? token.party_name : ' - ',
+        Vcle: token.vehicle,
+        Item: token.token_item,
+        Qty: formatFixed(token.token_quantity),
+        Date: getFormattedDate(),
+        Time: getFormattedTime()
+      });
+    }
+    return { message: `Token created`, ok: true };
+  }
+}
 
-//   if (vehicleExist) {
-//     return { message: `'${data.short_number}' is already exists`, ok: false }
-//   }
+export async function deleteToken(id) {
+  const token = fetchDeliveryById(id);
+  if (token.delivery_time) return { message: "Can't Delete Delivered Token", ok: false };
+  if (token.sign) return { message: "Can't Delete Signed Token", ok: false };
 
-//   const result = updateVehicleById(data, editId)
+  const createdDate = new Date(token.created_at);
+  if (getFormattedDate() != getFormattedDate(createdDate))
+    return { message: "Can't delete old token", ok: false };
 
-//   if (result?.changes) {
-//     return { message: `Vehicle updated`, ok: true }
-//   }
-// }
+  let lastSerial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
+  if (token.serial != lastSerial) return { message: 'Can only delete last token', ok: false };
+}
 
-// export async function deleteVehicle(id) {
-//   const result = deleteVehicleById(id)
-
-//   if (result?.changes) {
-//     return { message: `Vehicle Deleted`, ok: true }
-//   } else {
-//     return { message: `Vehicle Not Deleted`, ok: false }
-//   }
-// }
+export async function printTokenById(id) {
+  const token = fetchDeliveryById(id);
+  if (token) {
+    printToken({
+      Token: token.serial,
+      Party: token.party_name ? token.party_name : ' - ',
+      Vcle: token.vehicle,
+      Item: token.token_item,
+      Qty: formatFixed(token.token_quantity),
+      Date: getFormattedDate(),
+      Time: getFormattedTime()
+    });
+  }
+}
