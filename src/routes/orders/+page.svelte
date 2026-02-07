@@ -7,6 +7,8 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
   import { Highlight } from '$lib/utils/highlight';
+  import Form from '$lib/components/Form.svelte';
+  import InputField from '$lib/components/InputField.svelte';
 
   const headers = [
     { name: 'Date', align: 'center', key: 'date', display: 'date' },
@@ -71,9 +73,17 @@
     { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];
 
+  const vehicleList = $derived(data.vehicle.map((v) => v.short_number));
+
   let formOpened = $state(false);
+  let tokenOpened = $state(false);
   let helperOpened = $state(false);
   let editableOrder = $state(null);
+  let quickToken = $state({
+    id: null,
+    vehicle: null,
+    qty: null
+  });
 
   function handleOrderEdit(item) {
     formOpened = true;
@@ -108,8 +118,19 @@
   };
   const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item.id });
   const handleSignOrder = (item) => transportAction('?/sign', { id: item.id, current: item.sign });
-  const handleTokenCreation = (item) => {
-    alert('TODO: Pending token creation direclty from order');
+  const handleTokenCreation = async (item) => {
+    tokenOpened = true;
+    quickToken.id = item.id;
+  };
+
+  const handleQuickTokenSubmit = () => {
+    return async ({ result }) => {
+      if (result.type === 'failure') showToast(result?.data?.message, 'danger');
+      else {
+        showToast(result?.data?.message);
+        tokenOpened = false;
+      }
+    };
   };
 
   async function transportAction(url, data) {
@@ -131,6 +152,10 @@
 
   function toggleHelper() {
     helperOpened = !helperOpened;
+  }
+
+  function toggleToken() {
+    tokenOpened = !tokenOpened;
   }
 
   const customEvents = [
@@ -170,4 +195,34 @@
       </div>
     {/each}
   </div>
+</Model>
+
+<!-- Ask Vehicle and qty to genereate token for orders -->
+<Model open={tokenOpened} onClose={toggleToken} autoFocusTabIndex={2}>
+  <Form
+    action="?/orderToToken"
+    method="POST"
+    cancel={toggleToken}
+    class="max-w-lg"
+    title="Quick Token"
+    enhance={handleQuickTokenSubmit}
+    submitButtonText={['Generate']}
+  >
+    <input type="hidden" name="id" bind:value={quickToken.id} />
+    <InputField
+      name="vehicle"
+      bind:value={quickToken.vehicle}
+      placeholder="Select Vehicle"
+      autoComplete="off"
+      options={vehicleList}
+      silent={true}
+    />
+    <InputField
+      name="qty"
+      bind:value={quickToken.qty}
+      placeholder="Enter Quantity"
+      autoComplete="off"
+      caseMode="none"
+    />
+  </Form>
 </Model>

@@ -38,7 +38,7 @@ export async function createToken(data, takePrint = true) {
         Time: getFormattedTime()
       });
     }
-    return { message: `Token created`, ok: true };
+    return { message: `Token created`, ok: true, lastInsertRowid: result.lastInsertRowid };
   }
 }
 

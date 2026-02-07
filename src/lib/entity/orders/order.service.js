@@ -1,9 +1,11 @@
-import { formatDateTime, getFormattedDate } from "$lib/utils/dateTime";
+import { formatDateTime, getFormattedDate, getFormattedTime } from "$lib/utils/dateTime";
 import { fetchSinglePartyByName, updatePhoneByPartyName } from "../party/party.dal";
 import { fetchSettings, setSettings } from "../settings/settings.dal";
 import { deleteOrderById, fetchAllOrders, fetchSingleOrderById, insertOrder, updateOrderById, updateSingleOrderColumn } from "./order.dal";
 import { printOut } from "$lib/core/server/print";
 import { formatFixed } from "$lib/utils/number";
+import { createToken, printToken } from "../token/token.service";
+import { fetchDeliveryById } from "../delivery/delivery.dal";
 
 export async function getAllOrders() {
   return fetchAllOrders()
@@ -204,4 +206,33 @@ export async function orderPhonePrint(data) {
 
 export async function signOrderById(id, current) {
   updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1)
+}
+
+export async function createTokenFromOrder(id, data) {
+  if (!data.vehicle) return { message: "Vehicle is required", ok: false }
+  if (!data.qty) return { message: "Quantity is required", ok: false }
+  if (data.qty && isNaN(Number(data.qty))) return { message: "Quantity must be a Number", ok: false }
+
+  const order = fetchSingleOrderById(id)
+  const tokenData = {
+    party_name: order.party_name,
+    vehicle: data.vehicle,
+    token_item: order.item,
+    token_quantity: data.qty || order.total_qty,
+  }
+  const result = await createToken(tokenData, false)
+  if (result.lastInsertRowid) {
+    const token = fetchDeliveryById(result.lastInsertRowid)
+    printToken({
+      Token: token.serial,
+      Party: token.party_name ? token.party_name : ' - ',
+      Phone: order.phone || '',
+      Vcle: data.vehicle || 'Vehicle',
+      Item: token.token_item,
+      Qty: formatFixed(data.qty || token.token_quantity),
+      Date: getFormattedDate(),
+      Time: getFormattedTime()
+    });
+    return { message: 'Token Created', ok: true }
+  }
 }
