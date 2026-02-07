@@ -1,16 +1,16 @@
-import db from "$lib/core/server/db";
+import db from '$lib/core/server/db';
 
 const tableName = 'party';
 
 export function fetchAllParty() {
-  const query = `SELECT * FROM ${tableName}`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName}`;
+  const stat = db.prepare(query);
   return stat.all();
 }
 
 export function fetchSinglePartyByName(name) {
-  const query = `SELECT * FROM ${tableName} WHERE name = '${name}'`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName} WHERE name = '${name}'`;
+  const stat = db.prepare(query);
   return stat.get();
 }
 
@@ -30,10 +30,7 @@ export function insertParty(data) {
     VALUES (?, ?)
   `;
   const stat = db.prepare(query);
-  return stat.run(
-    data.name,
-    data.phone || null
-  );
+  return stat.run(data.name, data.phone || null);
 }
 
 export function updatePartyById(data, id) {
@@ -45,11 +42,7 @@ export function updatePartyById(data, id) {
   `;
 
   const stmt = db.prepare(query);
-  return stmt.run(
-    data.name,
-    data.phone || null,
-    id
-  );
+  return stmt.run(data.name, data.phone || null, id);
 }
 export function deletePartyById(id) {
   const query = `DELETE FROM party WHERE id = ?`;

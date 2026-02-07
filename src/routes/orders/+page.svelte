@@ -62,13 +62,13 @@
 
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
-    { key: '0', description: 'New Item' },
-    { key: 'E', description: 'Edit Item' },
-    { key: 'D', description: 'Delete Item' },
+    { key: '0', description: 'New Order' },
+    { key: 'E', description: 'Edit Order' },
+    { key: 'D', description: 'Delete Order' },
     { key: 'P', description: 'Print Phone Number only' },
     { key: 'I', description: 'Single Load Cash Bill Print' },
     { key: 'O', description: 'Full Load Cash Bill Print' },
-    { key: 'T', description: 'Generate Token For these Order' },
+    { key: 'T', description: 'Generate Token For Order' },
     { key: '➔', description: 'Sign this order' },
     { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];

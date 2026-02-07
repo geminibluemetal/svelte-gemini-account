@@ -73,7 +73,7 @@ export class ESCPOSPrinter {
     if (!this._pairsCache || this._pairsCache.length === 0) return this;
 
     // Find the maximum label length
-    const maxLabelLength = Math.max(...this._pairsCache.map(p => p.label.length));
+    const maxLabelLength = Math.max(...this._pairsCache.map((p) => p.label.length));
 
     // Print each pair with consistent alignment
     this._pairsCache.forEach(({ label, value }) => {

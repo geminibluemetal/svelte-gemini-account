@@ -1,7 +1,7 @@
 // src\lib\utils\relativeTime.js
 
 export function timeAgo(date = new Date(), comparableDate = new Date(), locale = 'en') {
-  date = new Date(date)
+  date = new Date(date);
   const now = new Date(comparableDate);
   const diffSec = (date - now) / 1000;
   const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });

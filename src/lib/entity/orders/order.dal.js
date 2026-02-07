@@ -1,4 +1,4 @@
-import db from "$lib/core/server/db";
+import db from '$lib/core/server/db';
 
 const tableName = 'orders';
 
@@ -9,8 +9,8 @@ export function fetchAllOrders() {
 }
 
 export function fetchSingleOrderById(id) {
-  const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`;
+  const stat = db.prepare(query);
   return stat.get();
 }
 

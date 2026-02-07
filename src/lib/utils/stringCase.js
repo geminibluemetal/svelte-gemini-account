@@ -14,10 +14,10 @@ export default {
   title: (str) =>
     typeof str === 'string'
       ? str
-        .toLowerCase()
-        .split(/\s+/)
-        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-        .join(' ')
+          .toLowerCase()
+          .split(/\s+/)
+          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ')
       : str,
 
   // Paragraph style (capitalize first letter only)
@@ -65,15 +65,15 @@ export default {
 
     // Only add hyphen if it's NOT in the original allowedChars (before escaping)
     if (!allowedChars.includes('-')) {
-      separatorsPattern += '\\-';  // Escape hyphen for regex
+      separatorsPattern += '\\-'; // Escape hyphen for regex
     }
 
     // Create the regex
     const normalizeSeparators = new RegExp(`[${separatorsPattern}]+`, 'g');
 
     const words = str
-      .replace(removeSpecials, '')          // remove unwanted specials
-      .replace(normalizeSeparators, ' ')    // convert _ (and - if not allowed) to space
+      .replace(removeSpecials, '') // remove unwanted specials
+      .replace(normalizeSeparators, ' ') // convert _ (and - if not allowed) to space
       .replace(/\s+/g, ' ')
       .split(/\s+/);
 
@@ -84,5 +84,4 @@ export default {
       })
       .join(' ');
   }
-
 };

@@ -8,12 +8,7 @@ let initialized = false;
  * Example: "Ctrl+Shift+K" → "ctrl+k+shift"
  */
 function normalizeShortcut(shortcut) {
-  return shortcut
-    .toLowerCase()
-    .replace(/\s+/g, '')
-    .split('+')
-    .sort()
-    .join('+');
+  return shortcut.toLowerCase().replace(/\s+/g, '').split('+').sort().join('+');
 }
 
 /**
@@ -53,15 +48,7 @@ function isTextInputFocused() {
   // input types that accept typing
   if (el.tagName === 'INPUT') {
     const type = el.type;
-    return ![
-      'button',
-      'submit',
-      'checkbox',
-      'radio',
-      'range',
-      'file',
-      'color'
-    ].includes(type);
+    return !['button', 'submit', 'checkbox', 'radio', 'range', 'file', 'color'].includes(type);
   }
 
   return false;
@@ -79,8 +66,8 @@ function handleKeydown(e) {
   // ✅ ALLOW Enter key to work on buttons and form submissions
   if (isEnterKey) {
     if (activeElement.tagName === 'BUTTON') return; // Button
-    if (activeElement.tagName === 'INPUT' &&
-      ['submit', 'button'].includes(activeElement.type)) return; // Submit/button input
+    if (activeElement.tagName === 'INPUT' && ['submit', 'button'].includes(activeElement.type))
+      return; // Submit/button input
     if (activeElement.form) return; // Inside a form
   }
 

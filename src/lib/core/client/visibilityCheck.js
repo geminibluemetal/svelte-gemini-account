@@ -50,10 +50,10 @@ export const scrollToMiddle = (element, container) => {
   const containerHeight = container.clientHeight;
 
   // Calculate scroll position to center the element
-  const scrollPosition = elementTop - (containerHeight / 2) + (elementHeight / 2);
+  const scrollPosition = elementTop - containerHeight / 2 + elementHeight / 2;
 
   // Apply scroll with optional smooth behavior
   container.scrollTo({
-    top: scrollPosition,
+    top: scrollPosition
   });
 };

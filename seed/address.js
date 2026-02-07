@@ -14,1195 +14,1195 @@ CREATE TABLE IF NOT EXISTS address (
 
 export const seedData = [
   {
-    name: "102 Reddiyur",
+    name: '102 Reddiyur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "A1 City",
+    name: 'A1 City',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Alangayam",
+    name: 'Alangayam',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Alasanthapuram",
+    name: 'Alasanthapuram',
     delivery_025: null,
     delivery_050_100: 1400,
     delivery_max: 800
   },
   {
-    name: "Ambalur",
+    name: 'Ambalur',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Ambur Pettai",
+    name: 'Ambur Pettai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Andiyappanur",
+    name: 'Andiyappanur',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Armanibenta",
+    name: 'Armanibenta',
     delivery_025: null,
     delivery_050_100: 2200,
     delivery_max: 1600
   },
   {
-    name: "Asanampattu",
+    name: 'Asanampattu',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 1100
   },
   {
-    name: "Avaranguppam",
+    name: 'Avaranguppam',
     delivery_025: null,
     delivery_050_100: 1400,
     delivery_max: 900
   },
   {
-    name: "Bakirthaka",
+    name: 'Bakirthaka',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Balapanur",
+    name: 'Balapanur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Bankoor",
+    name: 'Bankoor',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Basheerabad",
+    name: 'Basheerabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Bethavepampattu",
+    name: 'Bethavepampattu',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Bethur",
+    name: 'Bethur',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Chekumedu",
+    name: 'Chekumedu',
     delivery_025: 300,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Chennampettai",
+    name: 'Chennampettai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Chetiyapanur",
+    name: 'Chetiyapanur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Chikanankuppam",
+    name: 'Chikanankuppam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Chinnakalupalli",
+    name: 'Chinnakalupalli',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Chinnamottur",
+    name: 'Chinnamottur',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "CV Patrai",
+    name: 'CV Patrai',
     delivery_025: 500,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Echangal",
+    name: 'Echangal',
     delivery_025: 600,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Eklaspuram",
+    name: 'Eklaspuram',
     delivery_025: 600,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Ezhalaraipatti",
+    name: 'Ezhalaraipatti',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Giri Samuthiram",
+    name: 'Giri Samuthiram',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Goundappanur",
+    name: 'Goundappanur',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Gunreddyor",
+    name: 'Gunreddyor',
     delivery_025: 600,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Idayampallam",
+    name: 'Idayampallam',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Ilayanagaram",
+    name: 'Ilayanagaram',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Indra Nagar",
+    name: 'Indra Nagar',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Irunapattu",
+    name: 'Irunapattu',
     delivery_025: 1000,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Jabrabad",
+    name: 'Jabrabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Jalthi",
+    name: 'Jalthi',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Jampallam",
+    name: 'Jampallam',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Jamunamathur",
+    name: 'Jamunamathur',
     delivery_025: null,
     delivery_050_100: 2500,
     delivery_max: 1600
   },
   {
-    name: "Janathapuram",
+    name: 'Janathapuram',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Jolarpet",
+    name: 'Jolarpet',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kaburabad",
+    name: 'Kaburabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kacheri Road",
+    name: 'Kacheri Road',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kadharpet",
+    name: 'Kadharpet',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kalendira",
+    name: 'Kalendira',
     delivery_025: 500,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Kallupalli",
+    name: 'Kallupalli',
     delivery_025: 500,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Kalrapatti",
+    name: 'Kalrapatti',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Kamal Kuttai",
+    name: 'Kamal Kuttai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kambangudi Malai",
+    name: 'Kambangudi Malai',
     delivery_025: null,
     delivery_050_100: 3500,
     delivery_max: 300
   },
   {
-    name: "Kammiyampattu",
+    name: 'Kammiyampattu',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kanavaipudhur",
+    name: 'Kanavaipudhur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Karimabad",
+    name: 'Karimabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Katteri",
+    name: 'Katteri',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kavalur",
+    name: 'Kavalur',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1100
   },
   {
-    name: "Kaveripattu",
+    name: 'Kaveripattu',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Kethanndapaatti",
+    name: 'Kethanndapaatti',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kizhulur",
+    name: 'Kizhulur',
     delivery_025: null,
     delivery_050_100: 700,
     delivery_max: 450
   },
   {
-    name: "KK Kottai",
+    name: 'KK Kottai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "KK Theru",
+    name: 'KK Theru',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kodayanji",
+    name: 'Kodayanji',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Kodiyoor (Konambatti)",
+    name: 'Kodiyoor (Konambatti)',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Konamedu",
+    name: 'Konamedu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Konnampatti",
+    name: 'Konnampatti',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kootroad (konambatti)",
+    name: 'Kootroad (konambatti)',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kooval Kuttai",
+    name: 'Kooval Kuttai',
     delivery_025: 500,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Krishnavaram (kursilapattu)",
+    name: 'Krishnavaram (kursilapattu)',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Kunnathur",
+    name: 'Kunnathur',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Kurisilapattu",
+    name: 'Kurisilapattu',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Kurumbatheru",
+    name: 'Kurumbatheru',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kurumpatti (mittur)",
+    name: 'Kurumpatti (mittur)',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Lakshmipuram",
+    name: 'Lakshmipuram',
     delivery_025: 1000,
     delivery_050_100: 1400,
     delivery_max: 800
   },
   {
-    name: "Lalayeri",
+    name: 'Lalayeri',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Madanancheri",
+    name: 'Madanancheri',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Madapalli",
+    name: 'Madapalli',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Madavalam",
+    name: 'Madavalam',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Malai Rediyor",
+    name: 'Malai Rediyor',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1100
   },
   {
-    name: "Mallagunda",
+    name: 'Mallagunda',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Mallakuppam",
+    name: 'Mallakuppam',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Mandalavadi",
+    name: 'Mandalavadi',
     delivery_025: 600,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Mandharakuttai",
+    name: 'Mandharakuttai',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1100
   },
   {
-    name: "Mankamarathupallam",
+    name: 'Mankamarathupallam',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Marimani Kuppam",
+    name: 'Marimani Kuppam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Mayil Paarai",
+    name: 'Mayil Paarai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Mel Nimmiyampattu",
+    name: 'Mel Nimmiyampattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Metupalayam",
+    name: 'Metupalayam',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Mitnanguppam",
+    name: 'Mitnanguppam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Mittur",
+    name: 'Mittur',
     delivery_025: 700,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Mullai",
+    name: 'Mullai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Nekkunthi",
+    name: 'Nekkunthi',
     delivery_025: 500,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Naneri",
+    name: 'Naneri',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Narasingapuram",
+    name: 'Narasingapuram',
     delivery_025: 800,
     delivery_050_100: 900,
     delivery_max: 600
   },
   {
-    name: "Narayanapuram",
+    name: 'Narayanapuram',
     delivery_025: 1000,
     delivery_050_100: 1400,
     delivery_max: 800
   },
   {
-    name: "Natrampalli",
+    name: 'Natrampalli',
     delivery_025: 1000,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Nethaji Nagar",
+    name: 'Nethaji Nagar',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Newtown",
+    name: 'Newtown',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Nimmiyampattu",
+    name: 'Nimmiyampattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Old Vaniyambadi",
+    name: 'Old Vaniyambadi',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Omakuppam",
+    name: 'Omakuppam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Paapaneri",
+    name: 'Paapaneri',
     delivery_025: 300,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Pachur (natrampalli)",
+    name: 'Pachur (natrampalli)',
     delivery_025: 1000,
     delivery_050_100: 1500,
     delivery_max: 900
   },
   {
-    name: "Pallipattu",
+    name: 'Pallipattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Papanoor Medu",
+    name: 'Papanoor Medu',
     delivery_025: null,
     delivery_050_100: 1400,
     delivery_max: 800
   },
   {
-    name: "Pasalikuttai",
+    name: 'Pasalikuttai',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Patha Pettai",
+    name: 'Patha Pettai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Periya Vellakuttai",
+    name: 'Periya Vellakuttai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Peranampattu",
+    name: 'Peranampattu',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 900
   },
   {
-    name: "Perumalpettai",
+    name: 'Perumalpettai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Perumapattu",
+    name: 'Perumapattu',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Ponneri",
+    name: 'Ponneri',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Poomaram",
+    name: 'Poomaram',
     delivery_025: 600,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Poongulam",
+    name: 'Poongulam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 800
   },
   {
-    name: "Pudhur Vnb",
+    name: 'Pudhur Vnb',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Pudupettai",
+    name: 'Pudupettai',
     delivery_025: 1000,
     delivery_050_100: 1500,
     delivery_max: 900
   },
   {
-    name: "Pudurnadu",
+    name: 'Pudurnadu',
     delivery_025: null,
     delivery_050_100: 2600,
     delivery_max: null
   },
   {
-    name: "Pulavar Palli",
+    name: 'Pulavar Palli',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Pullakuttai",
+    name: 'Pullakuttai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Puthukovil",
+    name: 'Puthukovil',
     delivery_025: 800,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Ramanayakanpettai",
+    name: 'Ramanayakanpettai',
     delivery_025: 1000,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Ranipettai",
+    name: 'Ranipettai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Reddyvalasai",
+    name: 'Reddyvalasai',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Rms Pudur",
+    name: 'Rms Pudur',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Sankarapuram",
+    name: 'Sankarapuram',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Sathiram",
+    name: 'Sathiram',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1100
   },
   {
-    name: "Sennampettai",
+    name: 'Sennampettai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Shakirabad",
+    name: 'Shakirabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Sorkalnatham",
+    name: 'Sorkalnatham',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Sugarmill",
+    name: 'Sugarmill',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Sunnambu Pallam",
+    name: 'Sunnambu Pallam',
     delivery_025: 500,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Thamanerimuthur",
+    name: 'Thamanerimuthur',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Thekkupattu",
+    name: 'Thekkupattu',
     delivery_025: 800,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Thimanur",
+    name: 'Thimanur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Thimmampettai",
+    name: 'Thimmampettai',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Thiriyalam",
+    name: 'Thiriyalam',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Thumberi",
+    name: 'Thumberi',
     delivery_025: 1000,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Tirupathur",
+    name: 'Tirupathur',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Utheynthiram",
+    name: 'Utheynthiram',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vadacheri",
+    name: 'Vadacheri',
     delivery_025: 600,
     delivery_050_100: 700,
     delivery_max: 500
   },
   {
-    name: "Vadakkupattu",
+    name: 'Vadakkupattu',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Valayampattu",
+    name: 'Valayampattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vallipattu",
+    name: 'Vallipattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vaniyambadi",
+    name: 'Vaniyambadi',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Velathigamanibenta",
+    name: 'Velathigamanibenta',
     delivery_025: null,
     delivery_050_100: 2200,
     delivery_max: 1600
   },
   {
-    name: "Vellakkal",
+    name: 'Vellakkal',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Vellakuttai",
+    name: 'Vellakuttai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vengalapuram",
+    name: 'Vengalapuram',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Vengatarajapuram",
+    name: 'Vengatarajapuram',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 800
   },
   {
-    name: "Vengayapalli",
+    name: 'Vengayapalli',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Vepalampatti",
+    name: 'Vepalampatti',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vepamarasalai",
+    name: 'Vepamarasalai',
     delivery_025: 300,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vepamatta Yeri",
+    name: 'Vepamatta Yeri',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Veppampattu",
+    name: 'Veppampattu',
     delivery_025: 500,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Vijilapuram",
+    name: 'Vijilapuram',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Yelagiri",
+    name: 'Yelagiri',
     delivery_025: null,
     delivery_050_100: 2500,
     delivery_max: 1600
   },
   {
-    name: "Thirumanjolai",
+    name: 'Thirumanjolai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kaja Nagar",
+    name: 'Kaja Nagar',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Sunnambukar Theru",
+    name: 'Sunnambukar Theru',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Samanthi Kuppam",
+    name: 'Samanthi Kuppam',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Koodapattu",
+    name: 'Koodapattu',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 800
   },
   {
-    name: "Marapattu",
+    name: 'Marapattu',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kuvalkuttai",
+    name: 'Kuvalkuttai',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 900
   },
   {
-    name: "Jeeva Nagar",
+    name: 'Jeeva Nagar',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 800
   },
   {
-    name: "Chettikuttai",
+    name: 'Chettikuttai',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Palnanguppam",
+    name: 'Palnanguppam',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Ambur",
+    name: 'Ambur',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Marati Palayam",
+    name: 'Marati Palayam',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Kurumpatti (Vallipattu)",
+    name: 'Kurumpatti (Vallipattu)',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Kudapattu",
+    name: 'Kudapattu',
     delivery_025: null,
     delivery_050_100: 1400,
     delivery_max: 800
   },
   {
-    name: "Jangalapuram",
+    name: 'Jangalapuram',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Nayakkanur",
+    name: 'Nayakkanur',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1100
   },
   {
-    name: "Periya Motur",
+    name: 'Periya Motur',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "A Kotavoor",
+    name: 'A Kotavoor',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 1000
   },
   {
-    name: "Kullapannur",
+    name: 'Kullapannur',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vasanthapuram",
+    name: 'Vasanthapuram',
     delivery_025: null,
     delivery_050_100: 2000,
     delivery_max: 1500
   },
   {
-    name: "Kunthanimedu",
+    name: 'Kunthanimedu',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Arapandakuppam",
+    name: 'Arapandakuppam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kottai",
+    name: 'Kottai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 800
   },
   {
-    name: "Kaukapattu",
+    name: 'Kaukapattu',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Periya Pattai",
+    name: 'Periya Pattai',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Vinnamangalam",
+    name: 'Vinnamangalam',
     delivery_025: 600,
     delivery_050_100: 800,
     delivery_max: 500
   },
   {
-    name: "Alangayam(Pudhur)",
+    name: 'Alangayam(Pudhur)',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 650
   },
   {
-    name: "Vetuvanam",
+    name: 'Vetuvanam',
     delivery_025: null,
     delivery_050_100: 3000,
     delivery_max: 2000
   },
   {
-    name: "Katambur",
+    name: 'Katambur',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 2000
   },
   {
-    name: "Korate",
+    name: 'Korate',
     delivery_025: null,
     delivery_050_100: 1600,
     delivery_max: 850
   },
   {
-    name: "Thuthipattu",
+    name: 'Thuthipattu',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "Matha Kadappa",
+    name: 'Matha Kadappa',
     delivery_025: null,
     delivery_050_100: 2200,
     delivery_max: 1600
   },
   {
-    name: "Thurinji Kuppam",
+    name: 'Thurinji Kuppam',
     delivery_025: 400,
     delivery_050_100: 600,
     delivery_max: 450
   },
   {
-    name: "Perampattu",
+    name: 'Perampattu',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 1000
   },
   {
-    name: "Paravakutti",
+    name: 'Paravakutti',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 1400
   },
   {
-    name: "Samuthiram",
+    name: 'Samuthiram',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 1400
   },
   {
-    name: "Kadambur",
+    name: 'Kadambur',
     delivery_025: 1200,
     delivery_050_100: 1200,
     delivery_max: 800
   },
   {
-    name: "Balpanatham",
+    name: 'Balpanatham',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 700
   },
   {
-    name: "NaduPatrai",
+    name: 'NaduPatrai',
     delivery_025: 500,
     delivery_050_100: 600,
     delivery_max: 500
   },
   {
-    name: "Savlour",
+    name: 'Savlour',
     delivery_025: null,
     delivery_050_100: 1200,
     delivery_max: 800
   },
   {
-    name: "Alingikulam",
+    name: 'Alingikulam',
     delivery_025: 500,
     delivery_050_100: 800,
     delivery_max: 600
   },
   {
-    name: "Thigapalaiyam",
+    name: 'Thigapalaiyam',
     delivery_025: 800,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Kudiyana Kuppam",
+    name: 'Kudiyana Kuppam',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "Sikaranapalli",
+    name: 'Sikaranapalli',
     delivery_025: null,
     delivery_050_100: 1000,
     delivery_max: 600
   },
   {
-    name: "KodumamPalli",
+    name: 'KodumamPalli',
     delivery_025: null,
     delivery_050_100: 1500,
     delivery_max: 1000
   },
   {
-    name: "Salamabad",
+    name: 'Salamabad',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Ikbal Road",
+    name: 'Ikbal Road',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400
   },
   {
-    name: "Thora Yari",
+    name: 'Thora Yari',
     delivery_025: 400,
     delivery_050_100: 500,
     delivery_max: 400

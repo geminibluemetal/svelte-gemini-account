@@ -17,9 +17,7 @@ function getPathFromKey(key) {
   return key
     .replace(/\]/g, '')
     .split('[')
-    .map(part =>
-      part === '' ? null : isNaN(part) ? part : Number(part)
-    );
+    .map((part) => (part === '' ? null : isNaN(part) ? part : Number(part)));
 }
 
 function setValue(target, path, value) {

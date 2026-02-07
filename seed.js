@@ -20,9 +20,7 @@ async function runSeeds() {
     const files = await fs.readdir(seedDir);
 
     // Filter for .js files
-    const seedFiles = files
-      .filter(file => file.endsWith('.js') && file !== 'index.js')
-      .sort();
+    const seedFiles = files.filter((file) => file.endsWith('.js') && file !== 'index.js').sort();
 
     console.log(`📁 Found ${seedFiles.length} seed files`);
 
@@ -44,10 +42,14 @@ async function runSeeds() {
         }
 
         // Check if table already exists
-        const tableCheck = db.prepare(`
+        const tableCheck = db
+          .prepare(
+            `
           SELECT name FROM sqlite_master
           WHERE type='table' AND name=?;
-        `).get(module.tableName);
+        `
+          )
+          .get(module.tableName);
 
         if (tableCheck) {
           console.log(`   ⏭️  Table '${module.tableName}' already exists, skipping`);
@@ -77,14 +79,13 @@ async function runSeeds() {
 
             // Insert all seed data
             for (const data of module.seedData) {
-              const values = columns.map(col => data[col]);
+              const values = columns.map((col) => data[col]);
               stmt.run(...values);
             }
           }
         }
 
         console.log(`   ✅ '${module.tableName}' seeded successfully`);
-
       } catch (error) {
         console.error(`   ❌ Error in ${file}:`, error.message);
         // Continue with other seeds instead of throwing
@@ -93,7 +94,6 @@ async function runSeeds() {
     }
 
     console.log('\n🎉 All seeds completed!');
-
   } catch (error) {
     console.error('💥 Seed process failed:', error);
     process.exit(1);
@@ -102,4 +102,4 @@ async function runSeeds() {
   }
 }
 
-runSeeds()
+runSeeds();

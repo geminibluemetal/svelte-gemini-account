@@ -1,5 +1,5 @@
-import { getFormattedDate } from "$lib/utils/dateTime";
-import { formatFixed, formatNumber } from "$lib/utils/number";
+import { getFormattedDate } from '$lib/utils/dateTime';
+import { formatFixed, formatNumber } from '$lib/utils/number';
 
 const formatters = {
   date: function (value) {
@@ -12,7 +12,7 @@ const formatters = {
     return formatFixed(value);
   },
   boolean: function (value) {
-    return value ? '✅' : '❌'
+    return value ? '✅' : '❌';
   }
 };
 

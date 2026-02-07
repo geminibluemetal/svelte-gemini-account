@@ -38,7 +38,6 @@
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
       const result = await transportAction('?/delete', { id: item.id });
-      console.log(result);
       if (result.type === 'failure') {
         const parsedData = JSON.parse(result.data);
         let message = parsedData[parsedData[0].message];

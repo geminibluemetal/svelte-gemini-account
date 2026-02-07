@@ -49,7 +49,6 @@ export const actions = {
     const result = await deleteToken(data?.id);
 
     if (!result?.ok) {
-      console.log(result);
       return fail(400, { message: result.message });
     }
 

@@ -1,16 +1,16 @@
-import db from "$lib/core/server/db";
+import db from '$lib/core/server/db';
 
 const tableName = 'address';
 
 export function fetchAllAddress() {
-  const query = `SELECT * FROM ${tableName}`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName}`;
+  const stat = db.prepare(query);
   return stat.all();
 }
 
 export function fetchSingleAddressByName(name) {
-  const query = `SELECT * FROM ${tableName} WHERE name = '${name}'`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName} WHERE name = '${name}'`;
+  const stat = db.prepare(query);
   return stat.get();
 }
 
@@ -24,7 +24,7 @@ export function insertAddress(data) {
     data.name,
     data.delivery_025 || null,
     data.delivery_050_100 || null,
-    data.delivery_max || null,
+    data.delivery_max || null
   );
 }
 

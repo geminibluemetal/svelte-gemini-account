@@ -1,7 +1,7 @@
 // /utils/serialize.js
-import { ObjectId } from "mongodb";
+import { ObjectId } from 'mongodb';
 
-const hiddenFields = ["password", "token", "OTP", "secret", "hashed_password"]
+const hiddenFields = ['password', 'token', 'OTP', 'secret', 'hashed_password'];
 
 /**
  * Serialize MongoDB document(s) for sending to client
@@ -22,8 +22,10 @@ export function serializeDoc(doc) {
     } else if (value instanceof Date) {
       result[key] = value.toISOString();
     } else if (Array.isArray(value)) {
-      result[key] = value.map((v) => (v && typeof v === "object" ? serializeDoc(v, hiddenFields) : v));
-    } else if (value && typeof value === "object") {
+      result[key] = value.map((v) =>
+        v && typeof v === 'object' ? serializeDoc(v, hiddenFields) : v
+      );
+    } else if (value && typeof value === 'object') {
       result[key] = serializeDoc(value, hiddenFields);
     } else {
       result[key] = value;
@@ -45,7 +47,7 @@ export function unserializeDoc(doc) {
   const isoDateRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/i;
 
   for (const [key, value] of Object.entries(doc)) {
-    if (typeof value === "string") {
+    if (typeof value === 'string') {
       if (ObjectId.isValid(value) && (value.length === 12 || value.length === 24)) {
         result[key] = new ObjectId(value);
       } else if (isoDateRegex.test(value)) {
@@ -54,8 +56,8 @@ export function unserializeDoc(doc) {
         result[key] = value;
       }
     } else if (Array.isArray(value)) {
-      result[key] = value.map((v) => (v && typeof v === "object" ? unserializeDoc(v) : v));
-    } else if (value && typeof value === "object") {
+      result[key] = value.map((v) => (v && typeof v === 'object' ? unserializeDoc(v) : v));
+    } else if (value && typeof value === 'object') {
       result[key] = unserializeDoc(value);
     } else {
       result[key] = value;

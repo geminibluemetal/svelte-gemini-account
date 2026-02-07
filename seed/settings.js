@@ -5,7 +5,5 @@ export const tableSchema = `
 CREATE TABLE IF NOT EXISTS settings (
     last_order_number INTEGER NOT NULL
 );
-`
-export const seedData = [
-  { last_order_number: 0 }
-]
+`;
+export const seedData = [{ last_order_number: 0 }];

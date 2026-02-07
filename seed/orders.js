@@ -26,4 +26,4 @@ CREATE TABLE IF NOT EXISTS orders (
     delivery_sheet_verified INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-`
+`;

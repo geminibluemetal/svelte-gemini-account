@@ -1,16 +1,16 @@
-import db from "$lib/core/server/db";
+import db from '$lib/core/server/db';
 
 const tableName = 'vehicle';
 
 export function fetchAllVehicle() {
-  const query = `SELECT * FROM ${tableName}`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName}`;
+  const stat = db.prepare(query);
   return stat.all();
 }
 
 export function fetchSingleVehicleByShortName(short_number) {
-  const query = `SELECT * FROM ${tableName} WHERE short_number = '${short_number}'`
-  const stat = db.prepare(query)
+  const query = `SELECT * FROM ${tableName} WHERE short_number = '${short_number}'`;
+  const stat = db.prepare(query);
   return stat.get();
 }
 
@@ -24,7 +24,7 @@ export function insertVehicle(data) {
     data.full_number || null,
     data.short_number || null,
     data.is_company_vehicle ? 1 : 0, // Convert boolean to integer
-    data.body_capacity || null,
+    data.body_capacity || null
   );
 }
 
