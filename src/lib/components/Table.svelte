@@ -2,6 +2,7 @@
   import display from '$lib/core/client/display';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
+  import { SearchX, Table, Table2, TableProperties } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
 
   const {
@@ -129,55 +130,63 @@
         <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
       {/if}
 
-      <!-- BODY -->
-      {#each items as item, row (row)}
-        {#if !hideSerial}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-          <div
-            class="border-r border-b px-1 border-gray-500 text-center
+      {#if items.length == 0}
+        <div class="col-span-full font-bold h-20 flex justify-center items-center">
+          <span class="text-gray-500">
+            <SearchX class="inline" /> No Data Found
+          </span>
+        </div>
+      {:else}
+        <!-- BODY -->
+        {#each items as item, row (row)}
+          {#if !hideSerial}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+            <div
+              class="border-r border-b px-1 border-gray-500 text-center
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmousemove={() => (overRow = row)}
-          >
-            {row + 1}
-          </div>
-        {/if}
+              onmousemove={() => (overRow = row)}
+            >
+              {row + 1}
+            </div>
+          {/if}
 
-        {#each headers as header, col (col)}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-          {@const color = header?.color ? header.color(item[header.key], item) : null}
-          <div
-            class="border-b px-1 border-gray-500
+          {#each headers as header, col (col)}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+            {@const color = header?.color ? header.color(item[header.key], item) : null}
+            <div
+              class="border-b px-1 border-gray-500
             {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
             {header?.align ? `text-${header.align}` : 'text-left'}
             {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmousemove={() => (overRow = row)}
-            data-over-row={row}
-            style="background: {color?.background}; color: {color?.foreground}"
-          >
-            {#if header?.display && header.display instanceof Function}
-              {header.display(item[header.key], item)}
-            {:else if item[header.key] != null && item[header.key] !== '' && item[header.key] !== 0 && item[header.key] !== '0'}
-              {#if header?.display}
-                {display(header.display, item[header.key])}
-              {:else}
-                {item[header.key]}
+              onmousemove={() => (overRow = row)}
+              data-over-row={row}
+              style="background: {color?.background}; color: {color?.foreground}"
+            >
+              {#if header?.display && header.display instanceof Function}
+                {header.display(item[header.key], item)}
+              {:else if item[header.key] != null && item[header.key] !== '' && item[header.key] !== 0 && item[header.key] !== '0'}
+                {#if header?.display}
+                  {display(header.display, item[header.key])}
+                {:else}
+                  {item[header.key]}
+                {/if}
               {/if}
-            {/if}
-          </div>
-        {/each}
+            </div>
+          {/each}
 
-        <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <!-- svelte-ignore a11y_mouse_events_have_key_events -->
-        {#if !hideAction}
-          <div
-            class="border-b px-1 border-gray-500 text-center
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <!-- svelte-ignore a11y_mouse_events_have_key_events -->
+          {#if !hideAction}
+            <div
+              class="border-b px-1 border-gray-500 text-center
           {overRow == row ? 'bg-black/20' : 'bg-white'}"
-            onmousemove={() => (overRow = row)}
-          ></div>
-        {/if}
-      {/each}
+              onmousemove={() => (overRow = row)}
+            ></div>
+          {/if}
+        {/each}
+      {/if}
 
       {#if bottomSpace}
         <div class="col-span-full h-[50dvh]"></div>

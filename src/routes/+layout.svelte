@@ -13,6 +13,7 @@
   let { open } = $state(false);
 
   const toggleOpen = () => (open = !open);
+  const gotoHome = () => goto('/');
 
   // store handlers so off() works correctly
   const shortcutHandlers = [];
@@ -22,6 +23,7 @@
 
     // sidebar toggle
     keyboardEventBus.on('Alt+X', toggleOpen);
+    keyboardEventBus.on('Alt+H', gotoHome);
 
     // dynamic route shortcuts
     apps.forEach((app) => {
@@ -35,6 +37,7 @@
     stopSSE();
 
     keyboardEventBus.off('Alt+X', toggleOpen);
+    keyboardEventBus.off('Alt+H', gotoHome);
 
     shortcutHandlers.forEach(({ key, handler }) => {
       keyboardEventBus.off(`Alt+${key}`, handler);

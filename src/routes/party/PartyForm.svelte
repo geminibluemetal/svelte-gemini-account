@@ -4,7 +4,7 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
 
-  const { open, onClose, item, allParty } = $props();
+  const { open, onClose, item } = $props();
   let initialData = {
     name: '',
     phone: ''

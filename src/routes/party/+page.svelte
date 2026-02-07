@@ -80,7 +80,7 @@
 </script>
 
 <Table title="Party List" {headers} items={data.party} {customEvents} />
-<PartyForm open={formOpened} onClose={handleFormClose} item={editableParty} allParty={data.items} />
+<PartyForm open={formOpened} onClose={handleFormClose} item={editableParty} />
 
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="bg-white p-5 min-w-md">
