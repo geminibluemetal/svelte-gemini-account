@@ -82,7 +82,7 @@
 {#if href}
   <!-- Anchor Button -->
   <a
-    href={disabled ? undefined : href}
+    {href}
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]}
     {radiusStyles[radius || size]} {userClass}"
     {...props}

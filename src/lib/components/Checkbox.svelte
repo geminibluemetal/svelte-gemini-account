@@ -1,5 +1,4 @@
 <script>
-  import { Check } from 'lucide-svelte';
   let { value = $bindable(false), varient = 'accent', ...props } = $props();
 
   let varientStyle = {

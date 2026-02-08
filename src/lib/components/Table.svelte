@@ -13,7 +13,9 @@
     hideAction = true,
     bottomSpace = false,
     moveToEnd = false,
-    customEvents = []
+    customEvents = [],
+    rowHighlight = () => {},
+    customCellHighlight = () => {}
   } = $props();
 
   let overRow = $state(-1);
@@ -139,12 +141,14 @@
       {:else}
         <!-- BODY -->
         {#each items as item, row (row)}
+          {@const rowColor = rowHighlight(item)}
+          {@const groupColor = customCellHighlight(item)}
           {#if !hideSerial}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             <div
               class="border-r border-b px-1 border-gray-500 text-center
-            {overRow == row ? 'bg-black/20' : 'bg-white'}"
+                {overRow == row ? 'bg-black/20' : rowColor?.background}"
               onmousemove={() => (overRow = row)}
             >
               {row + 1}
@@ -157,12 +161,18 @@
             {@const color = header?.color ? header.color(item[header.key], item) : null}
             <div
               class="border-b px-1 border-gray-500
-            {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
-            {header?.align ? `text-${header.align}` : 'text-left'}
-            {overRow == row ? 'bg-black/20' : 'bg-white'}"
+                {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
+                {header?.align ? `text-${header.align}` : 'text-left'}
+                {color?.background
+                ? color?.background
+                : groupColor?.background && groupColor?.cells.includes(col)
+                  ? groupColor?.background
+                  : overRow == row
+                    ? 'bg-black/20'
+                    : rowColor?.background}
+                {color?.foreground || rowColor?.foreground}"
               onmousemove={() => (overRow = row)}
               data-over-row={row}
-              style="background: {color?.background}; color: {color?.foreground}"
             >
               {#if header?.display && header.display instanceof Function}
                 {header.display(item[header.key], item)}
@@ -181,7 +191,7 @@
           {#if !hideAction}
             <div
               class="border-b px-1 border-gray-500 text-center
-          {overRow == row ? 'bg-black/20' : 'bg-white'}"
+                {overRow == row ? 'bg-black/20' : rowColor?.background}"
               onmousemove={() => (overRow = row)}
             ></div>
           {/if}

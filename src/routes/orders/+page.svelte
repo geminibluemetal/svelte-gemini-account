@@ -6,7 +6,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
-  import { Highlight } from '$lib/utils/highlight';
+  import { HighlightCell, HighlightRow } from '$lib/utils/highlight';
   import Form from '$lib/components/Form.svelte';
   import InputField from '$lib/components/InputField.svelte';
 
@@ -31,30 +31,46 @@
   ];
 
   function notesDisplay(value, item) {
-    return `${item.tracktor_only ? '(🚜)' : ''} ${value}`;
+    let prefix = '';
+    prefix += item.tracktor_only ? '(🚜)' : '';
+    prefix += item.status == 'Loading' ? '(🪏)' : '';
+    return `${prefix} ${value}`;
   }
 
   function OrderNumberColor(value, item) {
-    return item.is_owner_order == 1 ? Highlight.red : null;
+    return item.is_owner_order == 1 ? HighlightCell.red : null;
   }
 
   function SignColor(value) {
-    return value == 1 ? Highlight.green : null;
+    return value == 1 ? HighlightCell.green : null;
+  }
+
+  function rowHighlight(item) {
+    switch (item.status) {
+      case 'Partial':
+        return HighlightRow.yellow;
+      case 'Delivered':
+        return HighlightRow.emerald; // Enhanced Green Color
+      case 'Cancelled':
+        return HighlightRow.red;
+      case 'Finished':
+        return HighlightRow.blue;
+    }
   }
 
   function AmountTypeColor(value) {
     // COD, AC, Cash, Paytm, Gpay
     switch (value) {
       case 'COD':
-        return Highlight.purple;
+        return HighlightCell.purple;
       case 'AC':
-        return Highlight.yellow;
+        return HighlightCell.yellow;
       case 'Cash':
-        return Highlight.green;
+        return HighlightCell.green;
       case 'Paytm':
-        return Highlight.red;
+        return HighlightCell.red;
       case 'Gpay':
-        return Highlight.blue;
+        return HighlightCell.blue;
     }
   }
 
@@ -66,10 +82,10 @@
     { key: 'E', description: 'Edit Order' },
     { key: 'D', description: 'Delete Order' },
     { key: 'P', description: 'Print Phone Number only' },
-    { key: 'I', description: 'Single Load Cash Bill Print' },
-    { key: 'O', description: 'Full Load Cash Bill Print' },
-    { key: 'T', description: 'Generate Token For Order' },
-    { key: '➔', description: 'Sign this order' },
+    { key: 'I', description: 'Single Load, Cash Bill Print' },
+    { key: 'O', description: 'Full Load, Cash Bill Print' },
+    { key: 'T', description: 'Generate Token Directly' },
+    { key: '➔', description: 'Sign Order Advance Amount' },
     { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];
 
@@ -183,7 +199,14 @@
   });
 </script>
 
-<Table title="Order Book" {headers} items={data.orders} hideSerial={true} {customEvents}></Table>
+<Table
+  title="Order Book"
+  {headers}
+  items={data.orders}
+  hideSerial={true}
+  {customEvents}
+  {rowHighlight}
+></Table>
 <OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="bg-white p-5 min-w-md">

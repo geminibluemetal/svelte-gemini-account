@@ -1,5 +1,5 @@
 <script>
-  import { PlusCircle, Loader2Icon, Split } from 'lucide-svelte';
+  import { PlusCircle, Loader2Icon } from 'lucide-svelte';
   import stringCase from '$lib/utils/stringCase';
 
   const dummyFunction = () => {};
@@ -8,7 +8,7 @@
   // Props
   // -------------------------------------
   let {
-    value = $bindable(''),
+    value = $bindable(),
     onPrefixClick = dummyFunction,
     onSuffixClick = dummyFunction,
     prefix = null,
@@ -101,6 +101,7 @@
         }
       }
       onEnter(e);
+      onValueSelected(value);
     } else if (e.key === 'Escape') {
       // Close dropdown without selecting
       showOptions = false;
@@ -114,6 +115,7 @@
     e.preventDefault();
     value = filtered[index];
     showOptions = false;
+    onValueSelected(value);
   }
 
   function handleInput(e) {
@@ -147,6 +149,7 @@
       let val = eval(value.slice(1));
       value = val;
     }
+    onValueSelected(value);
   }
 
   async function handleCreateOption(e) {
@@ -155,10 +158,6 @@
     optionCreateError = !(await createOption(value));
     optionLoading = false;
   }
-
-  $effect(() => {
-    onValueSelected(value);
-  });
 </script>
 
 <div

@@ -1,5 +1,5 @@
 <script>
-  import { tick, onMount, onDestroy } from 'svelte';
+  import { tick } from 'svelte';
   import Teleport from './Teleport.svelte';
 
   /* props */

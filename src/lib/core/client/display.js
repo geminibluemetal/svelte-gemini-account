@@ -12,7 +12,7 @@ const formatters = {
     return formatFixed(value);
   },
   boolean: function (value) {
-    return value ? '✅' : '❌';
+    return value ? '✓' : '✕';
   }
 };
 

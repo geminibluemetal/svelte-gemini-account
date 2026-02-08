@@ -2,14 +2,7 @@
 
 <script>
   import stringCase from '$lib/utils/stringCase';
-  let {
-    fields = [],
-    length = 3,
-    title = '',
-    value = $bindable([]),
-    disabled = false,
-    fieldName = ''
-  } = $props();
+  let { fields = [], length = 3, title = '', value = $bindable([]), fieldName = '' } = $props();
 
   // Track if we've initialized
   let initialized = $state(false);

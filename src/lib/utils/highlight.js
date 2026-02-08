@@ -1,133 +1,145 @@
-// export const Highlight = {
-//   red: {
-//     foreground: 'rgb(156, 0, 6)',      // Excel dark red
-//     background: 'rgb(255, 199, 206)',  // Excel light red
-//   },
-//   green: {
-//     foreground: 'rgb(0, 97, 0)',       // Excel dark green
-//     background: 'rgb(198, 239, 206)',  // Excel light green
-//   },
-//   blue: {
-//     foreground: 'rgb(0, 0, 156)',      // Slightly darker blue for distinction
-//     background: 'rgb(217, 225, 242)',  // Excel light blue
-//   },
-//   yellow: {
-//     foreground: 'rgb(153, 102, 0)',    // More golden yellow (not olive)
-//     background: 'rgb(255, 255, 204)',  // Excel light yellow
-//   },
-//   orange: {
-//     foreground: 'rgb(204, 85, 0)',     // More vibrant orange
-//     background: 'rgb(255, 217, 204)',  // Excel light orange
-//   },
-//   purple: {
-//     foreground: 'rgb(112, 48, 160)',   // Excel dark purple
-//     background: 'rgb(228, 209, 242)',  // Excel light purple
-//   },
-//   cyan: {
-//     foreground: 'rgb(0, 128, 128)',    // Pure cyan (equal green/blue)
-//     background: 'rgb(204, 255, 255)',  // Light cyan
-//   },
-//   magenta: {
-//     foreground: 'rgb(192, 0, 192)',    // Brighter magenta
-//     background: 'rgb(255, 204, 255)',  // Light magenta
-//   },
-//   teal: {
-//     foreground: 'rgb(0, 128, 96)',     // Teal (more green than cyan)
-//     background: 'rgb(204, 255, 238)',  // Light teal (green-tinted)
-//   },
-//   gray: {
-//     foreground: 'rgb(96, 96, 96)',     // Darker gray for better contrast
-//     background: 'rgb(242, 242, 242)',  // Excel light gray
-//   },
-//   brown: {
-//     foreground: 'rgb(128, 64, 0)',     // Warmer brown
-//     background: 'rgb(255, 229, 204)',  // Excel light brown
-//   },
-//   pink: {
-//     foreground: 'rgb(204, 0, 102)',    // Excel dark pink
-//     background: 'rgb(255, 204, 229)',  // Excel light pink
-//   },
-//   lime: {
-//     foreground: 'rgb(76, 153, 0)',     // Lime green (brighter than regular green)
-//     background: 'rgb(230, 255, 204)',  // Light lime
-//   },
-//   indigo: {
-//     foreground: 'rgb(75, 0, 130)',     // Indigo (between blue and purple)
-//     background: 'rgb(229, 204, 255)',  // Light indigo
-//   },
-//   coral: {
-//     foreground: 'rgb(255, 102, 102)',  // Coral (pinkish red)
-//     background: 'rgb(255, 229, 229)',  // Light coral
-//   },
-//   olive: {
-//     foreground: 'rgb(128, 128, 0)',    // Olive (darker yellow-green)
-//     background: 'rgb(255, 255, 204)',  // Light olive
-//   },
-// }
-
-export const Highlight = {
+export const HighlightCell = {
   red: {
-    foreground: 'rgb(120, 0, 5)', // darker red
-    background: 'rgb(240, 170, 180)' // darker light red
+    foreground: 'text-red-800', // Fixed: should be text-red-800, not bg-red-800
+    background: 'bg-red-300'
   },
   green: {
-    foreground: 'rgb(0, 75, 0)', // darker green
-    background: 'rgb(170, 220, 180)' // darker light green
+    foreground: 'text-green-800',
+    background: 'bg-green-300'
   },
   blue: {
-    foreground: 'rgb(0, 0, 120)', // darker blue
-    background: 'rgb(190, 205, 235)' // darker light blue
+    foreground: 'text-blue-800',
+    background: 'bg-blue-300'
   },
   yellow: {
-    foreground: 'rgb(120, 80, 0)', // darker golden yellow
-    background: 'rgb(245, 245, 180)' // darker light yellow
+    foreground: 'text-yellow-800',
+    background: 'bg-yellow-300'
   },
   orange: {
-    foreground: 'rgb(170, 70, 0)', // darker orange
-    background: 'rgb(245, 195, 175)' // darker light orange
+    foreground: 'text-orange-800',
+    background: 'bg-orange-300'
   },
   purple: {
-    foreground: 'rgb(90, 35, 130)', // darker purple
-    background: 'rgb(205, 185, 225)' // darker light purple
+    foreground: 'text-purple-800',
+    background: 'bg-purple-300'
   },
   cyan: {
-    foreground: 'rgb(0, 95, 95)', // darker cyan
-    background: 'rgb(175, 235, 235)' // darker light cyan
+    foreground: 'text-cyan-800',
+    background: 'bg-cyan-300'
   },
-  magenta: {
-    foreground: 'rgb(150, 0, 150)', // darker magenta
-    background: 'rgb(235, 180, 235)' // darker light magenta
-  },
+  // Teal exists (replaces your teal entry)
   teal: {
-    foreground: 'rgb(0, 95, 70)', // darker teal
-    background: 'rgb(175, 235, 215)' // darker light teal
+    foreground: 'text-teal-800',
+    background: 'bg-teal-300'
   },
+  // Magenta doesn't exist, use Fuchsia
+  fuchsia: {
+    foreground: 'text-fuchsia-800',
+    background: 'bg-fuchsia-300'
+  },
+  // Gray exists
   gray: {
-    foreground: 'rgb(70, 70, 70)', // darker gray
-    background: 'rgb(220, 220, 220)' // darker light gray
+    foreground: 'text-gray-800',
+    background: 'bg-gray-300'
   },
-  brown: {
-    foreground: 'rgb(95, 45, 0)', // darker brown
-    background: 'rgb(240, 205, 175)' // darker light brown
+  // Brown doesn't exist, use Amber or Warm Gray
+  amber: {
+    foreground: 'text-amber-800',
+    background: 'bg-amber-300'
   },
   pink: {
-    foreground: 'rgb(165, 0, 85)', // darker pink
-    background: 'rgb(245, 185, 215)' // darker light pink
+    foreground: 'text-pink-800',
+    background: 'bg-pink-300'
   },
   lime: {
-    foreground: 'rgb(60, 120, 0)', // darker lime
-    background: 'rgb(210, 240, 175)' // darker light lime
+    foreground: 'text-lime-800',
+    background: 'bg-lime-300'
   },
   indigo: {
-    foreground: 'rgb(55, 0, 100)', // darker indigo
-    background: 'rgb(205, 180, 235)' // darker light indigo
+    foreground: 'text-indigo-800',
+    background: 'bg-indigo-300'
   },
-  coral: {
-    foreground: 'rgb(200, 70, 70)', // darker coral
-    background: 'rgb(245, 200, 200)' // darker light coral
+  // Coral doesn't exist, use Rose
+  rose: {
+    foreground: 'text-rose-800',
+    background: 'bg-rose-300'
   },
-  olive: {
-    foreground: 'rgb(95, 95, 0)', // darker olive
-    background: 'rgb(240, 240, 180)' // darker light olive
+  // Olive doesn't exist, use Emerald
+  emerald: {
+    foreground: 'text-emerald-800',
+    background: 'bg-emerald-300'
+  },
+  // Additional valid Tailwind colors you could add:
+  sky: {
+    foreground: 'text-sky-800',
+    background: 'bg-sky-300'
+  },
+  violet: {
+    foreground: 'text-violet-800',
+    background: 'bg-violet-300'
+  }
+};
+
+export const HighlightRow = {
+  red: {
+    background: 'bg-red-200'
+  },
+  green: {
+    background: 'bg-green-200'
+  },
+  blue: {
+    background: 'bg-blue-200'
+  },
+  yellow: {
+    background: 'bg-yellow-200'
+  },
+  orange: {
+    background: 'bg-orange-200'
+  },
+  purple: {
+    background: 'bg-purple-200'
+  },
+  cyan: {
+    background: 'bg-cyan-200'
+  },
+  // Teal exists (replaces your teal entry)
+  teal: {
+    background: 'bg-teal-200'
+  },
+  // Magenta doesn't exist, use Fuchsia
+  fuchsia: {
+    background: 'bg-fuchsia-200'
+  },
+  // Gray exists
+  gray: {
+    background: 'bg-gray-200'
+  },
+  // Brown doesn't exist, use Amber or Warm Gray
+  amber: {
+    background: 'bg-amber-200'
+  },
+  pink: {
+    background: 'bg-pink-200'
+  },
+  lime: {
+    background: 'bg-lime-200'
+  },
+  indigo: {
+    background: 'bg-indigo-200'
+  },
+  // Coral doesn't exist, use Rose
+  rose: {
+    background: 'bg-rose-200'
+  },
+  // Olive doesn't exist, use Emerald
+  emerald: {
+    background: 'bg-emerald-200'
+  },
+  // Additional valid Tailwind colors you could add:
+  sky: {
+    background: 'bg-sky-200'
+  },
+  violet: {
+    background: 'bg-violet-200'
   }
 };

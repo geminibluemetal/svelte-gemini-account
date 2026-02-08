@@ -48,7 +48,7 @@
   });
 </script>
 
-<Model {open} onClose={handleClose} autoFocusTabIndex={!!item ? 2 : 1}>
+<Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
   <Form
     action="?/form"
     method="POST"

@@ -8,6 +8,14 @@ export function fetchAllOrders() {
   return stat.all();
 }
 
+export function fetchOrdersByStatus(statusArray) {
+  // Create placeholders for each status (?, ?, ?, etc.)
+  const placeholders = statusArray.map(() => '?').join(',');
+  const query = `SELECT * FROM ${tableName} WHERE status IN (${placeholders})`;
+  const stat = db.prepare(query);
+  return stat.all(...statusArray);
+}
+
 export function fetchSingleOrderById(id) {
   const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`;
   const stat = db.prepare(query);

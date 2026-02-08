@@ -27,7 +27,7 @@
 
   export { submit };
 
-  function handleCancel(e) {
+  function handleCancel() {
     if (cancel) cancel();
     else window.history.back();
   }

@@ -1,85 +1,36 @@
-// import fs from 'fs';
-// import path from 'path';
-// import { exec } from 'child_process';
-// import { promisify } from 'util';
-// import { ESCPOSPrinter } from '$lib'; // Ensure path is correct
+import db from '$lib/core/server/db';
 
-// const execAsync = promisify(exec);
+// CORRECT: Prepare ALL statements OUTSIDE the transaction
+const getBalance = db.prepare('SELECT balance FROM users WHERE id = ?');
+const updateBalance = db.prepare('UPDATE users SET balance = balance + ? WHERE id = ?');
+const recordTx = db.prepare('INSERT INTO transactions (user_id, amount, type) VALUES (?, ?, ?)');
 
-// async function runMasterTest() {
-//   const printerPath = '\\\\localhost\\THERMAL';
-//   const tempFileName = 'master_test.txt';
-//   const tempPath = path.join(process.cwd(), tempFileName);
+function correctTransaction(user1Id, user2Id, amount) {
+  const transaction = db.transaction(() => {
+    // Get current balances
+    const user1Balance = getBalance.get(user1Id).balance;
+    const user2Balance = getBalance.get(user2Id).balance;
 
-//   console.log('--- Starting Print Job ---');
+    // Check if user1 has enough balance
+    if (user1Balance < amount) {
+      throw new Error('Insufficient funds');
+    }
 
-//   try {
-//     const printer = new ESCPOSPrinter();
+    // Update balances - USE THE SAME PREPARED STATEMENT
+    updateBalance.run(-amount, user1Id); // Subtract from user1
+    updateBalance.run(amount, user2Id); // Add to user2
 
-//     // 1. Build Buffer
-//     console.log('Generating buffer...');
-//     printer
-//       .reset()
-//       // .beepOn(3, 3)
-//       // .align('center')
-//       .setTextSize(1, 1)
-//       .bold(true)
-//       // .line("Gowtham")
-//       // .bold(false)
-//       // .line("Full Options Template")
-//       // .dashedLine()
-//       // .align('left')
-//       // .underline(1).line("Underlined Text").underline(0)
-//       // .reverse(true).line(" REVERSE MODE ON ").reverse(false)
-//       // .bold(true).line("BOLD TEXT MODE").bold(false)
-//       // .dashedLine()
-//       // .line("INVENTORY CHECK")
-//       .tableRow('Apple', 'Qty: 10', 48)
-//       .tableRow('Banana', 'Qty: 05', 48)
-//       .tableRow('Dragonfruit', 'Qty: 25', 48)
-//       // .dashedLine()
-//       // .align('center')
-//       .line('NATIVE BARCODE')
-//       .barcode('12345678')
-//       .line('NATIVE QR CODE')
-//       .feed(4)
-//       .cut();
+    // Record transactions
+    recordTx.run(user1Id, -amount, 'transfer');
+    recordTx.run(user2Id, amount, 'transfer');
+  });
 
-//     const buffer = printer.getBuffer();
-//     console.log(`Buffer created (${buffer.length} bytes)`);
-
-//     // 2. Write File
-//     console.log(`Writing temp file to: ${tempPath}`);
-//     fs.writeFileSync(tempPath, buffer, 'binary');
-
-//     // 3. Execute Copy Command
-//     const command = `copy /b "${tempPath}" "${printerPath}"`;
-//     console.log(`Executing command: ${command}`);
-
-//     const { stdout, stderr } = await execAsync(command);
-
-//     if (stderr) {
-//       console.error('OS Command Stderr:', stderr);
-//     }
-//     console.log('OS Command Stdout:', stdout);
-
-//     // 4. Cleanup
-//     if (fs.existsSync(tempPath)) {
-//       fs.unlinkSync(tempPath);
-//       console.log('Temp file deleted.');
-//     }
-
-//     console.log('--- Print Job Finished Successfully ---');
-//   } catch (err) {
-//     console.error('--- CRITICAL PRINT ERROR ---');
-//     console.error('Message:', err.message);
-//     console.error('Stack:', err.stack);
-
-//     // Final attempt to clean up if error happened after file creation
-//     if (fs.existsSync(tempPath)) {
-//       fs.unlinkSync(tempPath);
-//     }
-//   }
-// }
-
-// // runMasterTest();
+  try {
+    transaction();
+    console.log('Transaction completed successfully');
+    return true;
+  } catch (error) {
+    console.error('Transaction failed:', error.message);
+    return false;
+  }
+}

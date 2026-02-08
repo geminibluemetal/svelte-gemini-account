@@ -7,21 +7,38 @@
 
   const { open, onClose, item, options } = $props();
   let initialData = {
+    order_number: '',
     party_name: '',
-    token_item: '',
-    token_quantity: '',
-    vehicle: '',
+    address: '',
+    delivered_item: '',
+    delivered_quantity: 0,
+    amount_type_1: '',
+    amount_1: null,
+    amount_type_2: '',
+    amount_2: null,
     is_cancelled: 0
   };
 
   let data = $state(initialData);
 
+  const orderList = $derived(options.orders.map((o) => o.order_number.toString()));
   const partyList = $derived(options.party.map((p) => p.name));
+  const addressList = $derived(options.address.map((a) => a.name));
   const vehicleList = $derived(options.vehicle.map((v) => v.short_number));
   const itemsList = $derived(options.item.map((i) => i.name));
 
   function handleClose() {
     onClose();
+  }
+
+  function handleOrderNumberSelection(value) {
+    const selectedOrder = options.orders.find((o) => o.order_number == value);
+    data.party_name = '';
+    data.address = '';
+    data.delivered_item = '';
+    if (selectedOrder?.party_name) data.party_name = selectedOrder.party_name;
+    if (selectedOrder?.address) data.address = selectedOrder.address;
+    if (selectedOrder?.item) data.delivered_item = selectedOrder.item;
   }
 
   function handleFormSubmit() {
@@ -46,13 +63,22 @@
     method="POST"
     cancel={handleClose}
     class="max-w-lg"
-    title={item ? 'Update Token' : 'Create Token'}
-    isEdit={!!item}
+    title="Delivery Entry"
+    submitButtonText={['Entry']}
     enhance={handleFormSubmit}
   >
     {#if !!item}
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
+    <InputField
+      name="order_number"
+      value={data.order_number}
+      placeholder="Order Number"
+      autoComplete="off"
+      options={orderList}
+      silent={true}
+      onValueSelected={handleOrderNumberSelection}
+    />
     <InputField
       name="party_name"
       value={data.party_name}
@@ -62,16 +88,16 @@
       silent={true}
     />
     <InputField
-      name="vehicle"
-      value={data.vehicle}
-      placeholder="Vehicle"
+      name="address"
+      value={data.address}
+      placeholder="Address"
       autoComplete="off"
-      options={vehicleList}
+      options={addressList}
       silent={true}
     />
     <InputField
-      name="token_item"
-      value={data.token_item}
+      name="delivered_item"
+      value={data.delivered_item}
       placeholder="Item"
       autoComplete="off"
       caseMode="smartTitleChars"
@@ -80,8 +106,8 @@
       silent={true}
     />
     <InputField
-      name="token_quantity"
-      value={data.token_quantity}
+      name="delivered_quantity"
+      value={data.delivered_quantity}
       placeholder="Quantity"
       autoComplete="off"
       caseMode="none"

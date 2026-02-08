@@ -4,6 +4,7 @@ import { fetchSettings, setSettings } from '../settings/settings.dal';
 import {
   deleteOrderById,
   fetchAllOrders,
+  fetchOrdersByStatus,
   fetchSingleOrderById,
   insertOrder,
   updateOrderById,
@@ -16,6 +17,10 @@ import { fetchDeliveryById } from '../delivery/delivery.dal';
 
 export async function getAllOrders() {
   return fetchAllOrders();
+}
+
+export async function getAllAvailableOrders() {
+  return fetchOrdersByStatus(['New', 'Loading', 'Partial']);
 }
 
 export async function createOrder(data) {
