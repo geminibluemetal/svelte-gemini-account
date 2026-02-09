@@ -1,6 +1,10 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import { getAllAddress } from '$lib/entity/address/address.service.js';
-import { signDeliveryById, updateDelivery, updateDeliveryAmount } from '$lib/entity/delivery/delivery.service.js';
+import {
+  signDeliveryById,
+  updateDelivery,
+  updateDeliveryAmount
+} from '$lib/entity/delivery/delivery.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
 import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
@@ -32,6 +36,7 @@ export const actions = {
     }
 
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'ORDERS.LIST' });
     return result;
   },
 

@@ -5,6 +5,7 @@ const tableName = 'delivery'; // Token also uses delivery table
 export function fetchAllDeliveryByDate(date) {
   const query = `SELECT * FROM ${tableName} WHERE DATE(created_at) = '${date}';`;
   const stat = db.prepare(query);
+  db.pragma('wal_checkpoint(TRUNCATE)');
   return stat.all();
 }
 
@@ -80,7 +81,9 @@ export function updateTokenById(data, id) {
 
 export function updateDeliveryById(data, id) {
   // --- Prepared Statements ---
-  const getOldDeliveryStmt = db.prepare(`SELECT order_number, delivery_quantity FROM delivery WHERE id = ?`);
+  const getOldDeliveryStmt = db.prepare(
+    `SELECT order_number, delivery_quantity FROM delivery WHERE id = ?`
+  );
 
   const updateDeliveryStmt = db.prepare(`
     UPDATE delivery SET
@@ -91,7 +94,9 @@ export function updateDeliveryById(data, id) {
     WHERE id = ?
   `);
 
-  const getOrderDataStmt = db.prepare(`SELECT id, total_qty, delivered_qty FROM orders WHERE order_number = ?`);
+  const getOrderDataStmt = db.prepare(
+    `SELECT id, total_qty, delivered_qty FROM orders WHERE order_number = ?`
+  );
 
   const updateOrderStatsStmt = db.prepare(`
     UPDATE orders SET delivered_qty = ?, balance_qty = ?, status = ? WHERE id = ?
@@ -128,14 +133,21 @@ export function updateDeliveryById(data, id) {
     if (!oldDelivery) throw new Error(`Delivery ID ${txId} not found.`);
 
     // 2. Determine New Data (Converting inputs to Numbers immediately)
-    const newOrderNumber = txData.hasOwnProperty('order_number') ? txData.order_number : oldDelivery.order_number;
+    const newOrderNumber = txData.hasOwnProperty('order_number')
+      ? txData.order_number
+      : oldDelivery.order_number;
 
     // FIX: Force conversion to Number
-    const newQty = Number(txData.hasOwnProperty('delivery_quantity') ? txData.delivery_quantity : oldDelivery.delivery_quantity) || 0;
+    const newQty =
+      Number(
+        txData.hasOwnProperty('delivery_quantity')
+          ? txData.delivery_quantity
+          : oldDelivery.delivery_quantity
+      ) || 0;
     const oldQty = Number(oldDelivery.delivery_quantity) || 0;
 
     // 3. IF ORDER CHANGED OR REMOVED: Revert the old order
-    if (oldDelivery.order_number && (oldDelivery.order_number !== newOrderNumber)) {
+    if (oldDelivery.order_number && oldDelivery.order_number !== newOrderNumber) {
       syncOrder(oldDelivery.order_number, -oldQty);
     }
     // IF SAME ORDER BUT QTY CHANGED: Adjust the difference
@@ -151,9 +163,14 @@ export function updateDeliveryById(data, id) {
 
     // 5. Update the Delivery table
     updateDeliveryStmt.run(
-      newOrderNumber, txData.party_name ?? null, txData.address ?? null,
-      txData.delivery_time ?? null, txData.delivery_item ?? null, newQty,
-      txData.amount_type_1 ?? null, txData.is_cancelled !== undefined ? (txData.is_cancelled ? 1 : 0) : null,
+      newOrderNumber,
+      txData.party_name ?? null,
+      txData.address ?? null,
+      txData.delivery_time ?? null,
+      txData.delivery_item ?? null,
+      newQty,
+      txData.amount_type_1 ?? null,
+      txData.is_cancelled !== undefined ? (txData.is_cancelled ? 1 : 0) : null,
       txId
     );
 
@@ -163,7 +180,7 @@ export function updateDeliveryById(data, id) {
   try {
     return executeTransaction(data, id);
   } catch (err) {
-    console.error("Transaction Aborted:", err.message);
+    console.error('Transaction Aborted:', err.message);
     throw err;
   }
 }
@@ -191,7 +208,6 @@ export function updateDeliveryAmountById(data, id) {
 }
 
 export function updateSingleDeliveryColumn(id, columnName, newValue) {
-  console.log(id, columnName, newValue)
   // Use parameterized query to prevent SQL injection
   const query = `UPDATE ${tableName} SET ${columnName} = ? WHERE id = ?`;
   const stat = db.prepare(query);

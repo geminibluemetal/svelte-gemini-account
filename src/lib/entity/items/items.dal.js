@@ -5,6 +5,7 @@ const tableName = 'items';
 export function fetchAllItems() {
   const query = `SELECT * FROM ${tableName}`;
   const stat = db.prepare(query);
+  db.pragma('wal_checkpoint(TRUNCATE)');
   return stat.all();
 }
 
