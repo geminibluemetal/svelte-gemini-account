@@ -9,6 +9,33 @@
   import { HighlightCell, HighlightRow } from '$lib/utils/highlight';
   import Form from '$lib/components/Form.svelte';
   import InputField from '$lib/components/InputField.svelte';
+  import Button from '$lib/components/Button.svelte';
+  import Badge from '$lib/components/Badge.svelte';
+
+  const { data } = $props();
+  let view = $state('pending');
+  let formOpened = $state(false);
+  let tokenOpened = $state(false);
+  let helperOpened = $state(false);
+  let editableOrder = $state(null);
+  let quickToken = $state({
+    id: null,
+    vehicle: null,
+    qty: null
+  });
+  const vehicleList = $derived(data.vehicle.map((v) => v.short_number));
+  const viewList = $derived({
+    all: data.orders,
+    new: data.orders.filter((o) => o.status == 'New'),
+    loading: data.orders.filter((o) => o.status == 'Loading'),
+    partial: data.orders.filter((o) => o.status == 'Partial'),
+    delivered: data.orders.filter((o) => o.status == 'Delivered'),
+    cancelled: data.orders.filter((o) => o.status == 'Cancelled'),
+    finished: data.orders.filter((o) => o.status == 'Finished'),
+    pending: data.orders.filter(
+      (o) => o.status == 'New' || o.status == 'Loading' || o.status == 'Partial'
+    )
+  });
 
   const headers = [
     { name: 'Date', align: 'center', key: 'date', display: 'date' },
@@ -28,6 +55,23 @@
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
     { name: 'DSV', align: 'center', key: 'delivery_sheet_verified' }
+  ];
+
+  const availableOptions = [
+    { key: 'H', description: 'List available Shortcut' },
+    { key: '0', description: 'New Order' },
+    { key: 'E', description: 'Edit Order' },
+    // { key: 'D', description: 'Delete Order' },
+    { key: 'P', description: 'Print Phone Number only' },
+    { key: 'I', description: 'Single Load, Cash Bill Print' },
+    { key: 'O', description: 'Full Load, Cash Bill Print' },
+    { key: 'T', description: 'Generate Token Directly' },
+    { key: '➔', description: 'Sign Order Advance Amount' },
+    { key: 'L', description: 'Set Loading status for Order' },
+    { key: 'C', description: 'Set Cancelled status for Order' },
+    { key: 'F', description: 'Set Finished status for Order' },
+    { key: 'R', description: 'Reset Current status Automatically' },
+    { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];
 
   function notesDisplay(value, item) {
@@ -73,37 +117,6 @@
         return HighlightCell.blue;
     }
   }
-
-  const { data } = $props();
-
-  const availableOptions = [
-    { key: 'H', description: 'List available Shortcut' },
-    { key: '0', description: 'New Order' },
-    { key: 'E', description: 'Edit Order' },
-    // { key: 'D', description: 'Delete Order' },
-    { key: 'P', description: 'Print Phone Number only' },
-    { key: 'I', description: 'Single Load, Cash Bill Print' },
-    { key: 'O', description: 'Full Load, Cash Bill Print' },
-    { key: 'T', description: 'Generate Token Directly' },
-    { key: '➔', description: 'Sign Order Advance Amount' },
-    { key: 'L', description: 'Set Loading status for Order' },
-    { key: 'C', description: 'Set Cancelled status for Order' },
-    { key: 'F', description: 'Set Finished status for Order' },
-    { key: 'R', description: 'Reset Current status Automatically' },
-    { key: 'Enter', description: 'Single Load Cash Bill Print' }
-  ];
-
-  const vehicleList = $derived(data.vehicle.map((v) => v.short_number));
-
-  let formOpened = $state(false);
-  let tokenOpened = $state(false);
-  let helperOpened = $state(false);
-  let editableOrder = $state(null);
-  let quickToken = $state({
-    id: null,
-    vehicle: null,
-    qty: null
-  });
 
   function handleOrderEdit(item) {
     formOpened = true;
@@ -214,11 +227,106 @@
 <Table
   title="Order Book"
   {headers}
-  items={data.orders}
+  items={viewList[view]}
   hideSerial={true}
   {customEvents}
   {rowHighlight}
-></Table>
+>
+  {#snippet right()}
+    <span class="capitalize mr-2">{view}</span>
+  {/snippet}
+  {#snippet sidebar()}
+    <div>
+      <div class="p-1 flex flex-col gap-2">
+        {#if true}
+          <Button color="danger"><span class="w-full">Clear</span></Button>
+        {/if}
+        {#if viewList.all.length}
+          <Button color="primary" onclick={() => (view = 'all')}>
+            <span class="w-full">All</span>
+          </Button>
+        {/if}
+        {#if viewList.new.length}
+          <Button color="primary" onclick={() => (view = 'new')}>
+            <span class="w-full">New</span>
+          </Button>
+        {/if}
+        {#if viewList.loading.length}
+          <Button color="primary" onclick={() => (view = 'loading')}>
+            <span class="w-full">Loading</span>
+          </Button>
+        {/if}
+        {#if viewList.partial.length}
+          <Button color="primary" onclick={() => (view = 'partial')}>
+            <span class="w-full">Parital</span>
+          </Button>
+        {/if}
+        {#if viewList.pending.length}
+          <Button color="primary" onclick={() => (view = 'pending')}>
+            <span class="w-full">Pending</span>
+          </Button>
+        {/if}
+        {#if viewList.delivered.length}
+          <Button color="primary" onclick={() => (view = 'delivered')}>
+            <span class="w-full">Delivered</span>
+          </Button>
+        {/if}
+        {#if viewList.cancelled.length}
+          <Button color="primary" onclick={() => (view = 'cancelled')}>
+            <span class="w-full">Cancelled</span>
+          </Button>
+        {/if}
+        {#if viewList.finished.length}
+          <Button color="primary" onclick={() => (view = 'finished')}>
+            <span class="w-full">Finished</span>
+          </Button>
+        {/if}
+      </div>
+      <div class="p-1 dark flex flex-col gap-2">
+        {#if viewList.all.length}
+          <Badge class="flex justify-between gap-2">
+            <span>All</span> <span>{viewList.all.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.new.length}
+          <Badge class="flex justify-between gap-2">
+            <span>New</span> <span>{viewList.new.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.loading.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Loading</span> <span>{viewList.loading.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.loading.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Parital</span> <span>{viewList.loading.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.pending.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Pending</span> <span>{viewList.pending.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.delivered.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Delivered</span> <span>{viewList.delivered.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.cancelled.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Cancelled</span> <span>{viewList.cancelled.length}</span>
+          </Badge>
+        {/if}
+        {#if viewList.finished.length}
+          <Badge class="flex justify-between gap-2">
+            <span>Finished</span> <span>{viewList.finished.length}</span>
+          </Badge>
+        {/if}
+      </div>
+    </div>
+  {/snippet}
+</Table>
 <OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="bg-white p-5 min-w-md">

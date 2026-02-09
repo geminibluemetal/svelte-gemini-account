@@ -238,6 +238,7 @@ export async function orderStatusReset(id) {
   if (order.delivered_qty == order.total_qty && order.balance_qty == 0) updateSingleOrderColumn(id, 'status', 'Delivered');
   else if (order.total_qty == order.balance_qty && order.delivered_qty == 0) updateSingleOrderColumn(id, 'status', 'New');
   else if (order.total_qty != order.balance_qty != order.delivered_qty) updateSingleOrderColumn(id, 'status', 'Partial');
+  else updateSingleOrderColumn(id, 'status', 'New');
 }
 
 export async function createTokenFromOrder(id, data) {
