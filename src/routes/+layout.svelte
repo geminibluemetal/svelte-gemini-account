@@ -22,7 +22,7 @@
     startSSE();
 
     // sidebar toggle
-    keyboardEventBus.on('Alt+X', toggleOpen);
+    // keyboardEventBus.on('Alt+X', toggleOpen);
     keyboardEventBus.on('Alt+H', gotoHome);
 
     // dynamic route shortcuts
@@ -36,7 +36,7 @@
   onDestroy(() => {
     stopSSE();
 
-    keyboardEventBus.off('Alt+X', toggleOpen);
+    // keyboardEventBus.off('Alt+X', toggleOpen);
     keyboardEventBus.off('Alt+H', gotoHome);
 
     shortcutHandlers.forEach(({ key, handler }) => {
@@ -56,12 +56,12 @@
   </div>
 
   <!-- sidebar wrapper -->
-  <div
+  <!-- <div
     class="overflow-hidden transition-[width] duration-300 ease-in-out"
     class:w-40={open}
     class:w-0={!open}
   >
-    <aside class="w-40 h-full p-2 flex flex-col gap-2 bg-white border-l-2">
+    <aside class="w-40 h-full p-2 flex flex-col gap-2 bg-white border-l-2 overflow-auto">
       {#each apps as app}
         <a
           href={app.url}
@@ -80,6 +80,6 @@
         <span class="text-xs px-2 py-1 bg-black/10 rounded self-start inline-block"> Alt + X </span>
       </button>
     </aside>
-  </div>
+  </div> -->
 </div>
 <Toast />

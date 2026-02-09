@@ -13,7 +13,7 @@
   </p>
 
   <!-- App Tiles -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl w-full">
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-3xl w-full">
     {#each apps as app}
       <a
         href={app.url}
@@ -24,6 +24,9 @@
         </div>
         <div class="font-semibold text-slate-800">
           {app.name}
+        </div>
+        <div class="text-xs bg-gray-200 px-1 py-0.5 rounded mt-2">
+          Alt + {app.key}
         </div>
       </a>
     {/each}
