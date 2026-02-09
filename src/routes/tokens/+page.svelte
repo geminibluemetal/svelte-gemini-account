@@ -6,6 +6,8 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
+  import Badge from '$lib/components/Badge.svelte';
+  import Button from '$lib/components/Button.svelte';
 
   const { data } = $props();
   const headers = [
@@ -28,6 +30,13 @@
   let formOpened = $state(false);
   let helperOpened = $state(false);
   let editableToken = $state(null);
+  let view = $state('all');
+
+  const viewList = $derived({
+    all: data.token,
+    closed: data.token.filter((t) => t.delivery_item && t.delivery_quantity),
+    opened: data.token.filter((t) => !t.delivery_item || !t.delivery_quantity)
+  });
 
   function handleTokenEdit(item) {
     formOpened = true;
@@ -61,6 +70,10 @@
     return await res.json();
   }
 
+  const viewAllToken = () => (view = 'all');
+  const viewOpenedToken = () => (view = 'opened');
+  const viewClosedToken = () => (view = 'closed');
+
   function handleFormClose() {
     formOpened = false;
     editableToken = null;
@@ -90,7 +103,31 @@
   });
 </script>
 
-<Table title="Token" {headers} items={data.token} {customEvents} hideSerial={true} />
+<Table title="Token" {headers} items={viewList[view]} {customEvents} hideSerial={true}>
+  {#snippet right()}
+    <span class="capitalize px-2">{view}</span>
+  {/snippet}
+  {#snippet sidebar()}
+    <div>
+      <div class="p-3 flex flex-col gap-2">
+        <Button color="primary" onclick={viewAllToken}>All Tokens</Button>
+        <Button color="primary" onclick={viewOpenedToken}>Opened Tokens</Button>
+        <Button color="primary" onclick={viewClosedToken}>Closed Tokens</Button>
+      </div>
+      <div class="p-3 dark flex flex-col gap-2">
+        <Badge class="flex justify-between gap-2">
+          <span>Total</span> <span>{viewList.all.length}</span>
+        </Badge>
+        <Badge class="flex justify-between gap-2">
+          <span>Opened</span> <span>{viewList.opened.length}</span>
+        </Badge>
+        <Badge class="flex justify-between gap-2">
+          <span>Closed</span> <span>{viewList.closed.length}</span>
+        </Badge>
+      </div>
+    </div>
+  {/snippet}
+</Table>
 <TokenForm open={formOpened} onClose={handleFormClose} item={editableToken} options={data} />
 
 <Model open={helperOpened} onClose={toggleHelper}>

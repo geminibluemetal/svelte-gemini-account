@@ -15,7 +15,10 @@
     moveToEnd = false,
     customEvents = [],
     rowHighlight = () => {},
-    customCellHighlight = () => {}
+    customCellHighlight = () => {},
+    sidebar = () => {},
+    right = () => {},
+    left = () => {}
   } = $props();
 
   let overRow = $state(-1);
@@ -95,7 +98,7 @@
   });
 </script>
 
-<div class="p-2 h-screen flex flex-col w-fit">
+<div class="p-2 h-screen flex flex-row w-fit gap-2">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <div class="overflow-auto border-2 border-black" bind:this={container}>
@@ -105,9 +108,9 @@
       <div
         class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
       >
-        <div class="flex-1 text-left"></div>
+        <div class="flex-1 text-left">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
-        <div class="flex-1 text-right"></div>
+        <div class="flex-1 text-right">{@render right()}</div>
       </div>
 
       <!-- HEADER -->
@@ -203,4 +206,9 @@
       {/if}
     </div>
   </div>
+
+  <!-- Table Side Content -->
+  {#if sidebar}
+    {@render sidebar()}
+  {/if}
 </div>
