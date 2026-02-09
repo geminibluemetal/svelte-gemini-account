@@ -26,6 +26,7 @@
     onEnter = dummyFunction,
     onValueChange = dummyFunction,
     onValueSelected = dummyFunction,
+    silentOnValue = null,
     disabled = false,
     readonly = false,
     textAlign = 'left',
@@ -140,6 +141,7 @@
   }
 
   function handleOnBlur() {
+    if (silentOnValue == value) return;
     if (options.length) {
       showOptions = false;
       const isValueExist = Array.isArray(filtered) ? filtered.includes(value) : false;
@@ -149,7 +151,6 @@
       let val = eval(value.slice(1));
       value = val;
     }
-    // onValueSelected(value);
   }
 
   async function handleCreateOption(e) {

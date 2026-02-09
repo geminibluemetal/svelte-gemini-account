@@ -111,7 +111,7 @@
     <div>
       <div class="p-3 dark flex flex-col gap-2">
         <Button onclick={viewAllToken} color="primary" class="flex justify-between gap-2">
-          <span>Total</span> <span>{viewList.all.length}</span>
+          <span>All</span> <span>{viewList.all.length}</span>
         </Button>
         <Button onclick={viewOpenedToken} color="primary" class="flex justify-between gap-2">
           <span>Opened</span> <span>{viewList.opened.length}</span>

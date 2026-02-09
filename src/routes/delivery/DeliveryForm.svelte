@@ -34,7 +34,7 @@
 
   function handleOrderNumberSelection(value) {
     const selectedOrder = options.orders.find((o) => o.order_number == value);
-    data.party_name = item.party_name;
+    data.party_name = '';
     data.address = '';
     data.delivery_item = '';
     if (selectedOrder?.party_name) data.party_name = selectedOrder.party_name;
@@ -79,6 +79,7 @@
       autoComplete="off"
       options={orderList}
       silent={true}
+      silentOnValue={item.order_number}
       onValueSelected={handleOrderNumberSelection}
     />
     <InputField
