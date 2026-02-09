@@ -109,21 +109,16 @@
   {/snippet}
   {#snippet sidebar()}
     <div>
-      <div class="p-3 flex flex-col gap-2">
-        <Button color="primary" onclick={viewAllToken}>All Tokens</Button>
-        <Button color="primary" onclick={viewOpenedToken}>Opened Tokens</Button>
-        <Button color="primary" onclick={viewClosedToken}>Closed Tokens</Button>
-      </div>
       <div class="p-3 dark flex flex-col gap-2">
-        <Badge class="flex justify-between gap-2">
+        <Button onclick={viewAllToken} color="primary" class="flex justify-between gap-2">
           <span>Total</span> <span>{viewList.all.length}</span>
-        </Badge>
-        <Badge class="flex justify-between gap-2">
+        </Button>
+        <Button onclick={viewOpenedToken} color="primary" class="flex justify-between gap-2">
           <span>Opened</span> <span>{viewList.opened.length}</span>
-        </Badge>
-        <Badge class="flex justify-between gap-2">
+        </Button>
+        <Button onclick={viewClosedToken} color="primary" class="flex justify-between gap-2">
           <span>Closed</span> <span>{viewList.closed.length}</span>
-        </Badge>
+        </Button>
       </div>
     </div>
   {/snippet}

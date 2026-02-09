@@ -237,91 +237,73 @@
   {/snippet}
   {#snippet sidebar()}
     <div>
-      <div class="p-1 flex flex-col gap-2">
+      <div class="p-1 dark flex flex-col gap-2">
         {#if true}
           <Button color="danger"><span class="w-full">Clear</span></Button>
         {/if}
         {#if viewList.all.length}
-          <Button color="primary" onclick={() => (view = 'all')}>
-            <span class="w-full">All</span>
+          <Button color="primary" onclick={() => (view = 'all')} class="flex justify-between gap-2">
+            <span>All</span> <span>{viewList.all.length}</span>
           </Button>
         {/if}
         {#if viewList.new.length}
-          <Button color="primary" onclick={() => (view = 'new')}>
-            <span class="w-full">New</span>
+          <Button color="primary" onclick={() => (view = 'new')} class="flex justify-between gap-2">
+            <span>New</span> <span>{viewList.new.length}</span>
           </Button>
         {/if}
         {#if viewList.loading.length}
-          <Button color="primary" onclick={() => (view = 'loading')}>
-            <span class="w-full">Loading</span>
+          <Button
+            color="primary"
+            onclick={() => (view = 'loading')}
+            class="flex justify-between gap-2"
+          >
+            <span>Loading</span> <span>{viewList.loading.length}</span>
           </Button>
         {/if}
         {#if viewList.partial.length}
-          <Button color="primary" onclick={() => (view = 'partial')}>
-            <span class="w-full">Parital</span>
+          <Button
+            color="primary"
+            onclick={() => (view = 'partial')}
+            class="flex justify-between gap-2"
+          >
+            <span>Parital</span> <span>{viewList.partial.length}</span>
           </Button>
         {/if}
         {#if viewList.pending.length}
-          <Button color="primary" onclick={() => (view = 'pending')}>
-            <span class="w-full">Pending</span>
-          </Button>
-        {/if}
-        {#if viewList.delivered.length}
-          <Button color="primary" onclick={() => (view = 'delivered')}>
-            <span class="w-full">Delivered</span>
-          </Button>
-        {/if}
-        {#if viewList.cancelled.length}
-          <Button color="primary" onclick={() => (view = 'cancelled')}>
-            <span class="w-full">Cancelled</span>
-          </Button>
-        {/if}
-        {#if viewList.finished.length}
-          <Button color="primary" onclick={() => (view = 'finished')}>
-            <span class="w-full">Finished</span>
-          </Button>
-        {/if}
-      </div>
-      <div class="p-1 dark flex flex-col gap-2">
-        {#if viewList.all.length}
-          <Badge class="flex justify-between gap-2">
-            <span>All</span> <span>{viewList.all.length}</span>
-          </Badge>
-        {/if}
-        {#if viewList.new.length}
-          <Badge class="flex justify-between gap-2">
-            <span>New</span> <span>{viewList.new.length}</span>
-          </Badge>
-        {/if}
-        {#if viewList.loading.length}
-          <Badge class="flex justify-between gap-2">
-            <span>Loading</span> <span>{viewList.loading.length}</span>
-          </Badge>
-        {/if}
-        {#if viewList.loading.length}
-          <Badge class="flex justify-between gap-2">
-            <span>Parital</span> <span>{viewList.loading.length}</span>
-          </Badge>
-        {/if}
-        {#if viewList.pending.length}
-          <Badge class="flex justify-between gap-2">
+          <Button
+            color="primary"
+            onclick={() => (view = 'pending')}
+            class="flex justify-between gap-2"
+          >
             <span>Pending</span> <span>{viewList.pending.length}</span>
-          </Badge>
+          </Button>
         {/if}
         {#if viewList.delivered.length}
-          <Badge class="flex justify-between gap-2">
+          <Button
+            color="primary"
+            onclick={() => (view = 'delivered')}
+            class="flex justify-between gap-2"
+          >
             <span>Delivered</span> <span>{viewList.delivered.length}</span>
-          </Badge>
+          </Button>
         {/if}
         {#if viewList.cancelled.length}
-          <Badge class="flex justify-between gap-2">
+          <Button
+            color="primary"
+            onclick={() => (view = 'cancelled')}
+            class="flex justify-between gap-2"
+          >
             <span>Cancelled</span> <span>{viewList.cancelled.length}</span>
-          </Badge>
+          </Button>
         {/if}
         {#if viewList.finished.length}
-          <Badge class="flex justify-between gap-2">
+          <Button
+            color="primary"
+            onclick={() => (view = 'finished')}
+            class="flex justify-between gap-2"
+          >
             <span>Finished</span> <span>{viewList.finished.length}</span>
-          </Badge>
+          </Button>
         {/if}
       </div>
     </div>
