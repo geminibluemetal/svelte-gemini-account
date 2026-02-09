@@ -81,12 +81,12 @@
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
     keyboardEventBus.on('H', toggleHelper);
-    syncOn('TOKEN.LIST');
+    syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('0', toggleOpenForm);
     keyboardEventBus.off('H', toggleHelper);
-    syncOff('TOKEN.LIST');
+    syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
 

@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS delivery (
     amount_type_2 TEXT,
     amount_1 REAL,
     amount_2 REAL,
-    sign TEXT,
+    sign BOOLEAN DEFAULT FALSE,
     vehicle TEXT NOT NULL,
     is_cancelled BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

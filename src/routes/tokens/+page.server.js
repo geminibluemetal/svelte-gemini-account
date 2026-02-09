@@ -13,7 +13,7 @@ import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
-  depends('TOKEN.LIST');
+  depends('DELIVERY.TOKEN.LIST');
   const token = await getAllToken();
   const party = await getAllParty();
   const vehicle = await getAllVehicle();
@@ -38,7 +38,7 @@ export const actions = {
       return fail(400, { message: result.message });
     }
 
-    sseEmit({ type: 'TOKEN.LIST' });
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     return result;
   },
 
@@ -52,7 +52,7 @@ export const actions = {
       return fail(400, { message: result.message });
     }
 
-    sseEmit({ type: 'TOKEN.LIST' });
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     return result;
   },
 

@@ -149,7 +149,7 @@
       let val = eval(value.slice(1));
       value = val;
     }
-    onValueSelected(value);
+    // onValueSelected(value);
   }
 
   async function handleCreateOption(e) {

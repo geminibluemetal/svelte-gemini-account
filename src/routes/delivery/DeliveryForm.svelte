@@ -10,16 +10,17 @@
     order_number: '',
     party_name: '',
     address: '',
-    delivered_item: '',
-    delivered_quantity: 0,
-    amount_type_1: '',
-    amount_1: null,
-    amount_type_2: '',
-    amount_2: null,
-    is_cancelled: 0
+    delivery_item: '',
+    delivery_quantity: 0,
+    is_cancelled: 0,
+    amount_type_1: ''
+    // amount_1: null,
+    // amount_type_2: '',
+    // amount_2: null,
   };
 
   let data = $state(initialData);
+  let isAc = $state(false);
 
   const orderList = $derived(options.orders.map((o) => o.order_number.toString()));
   const partyList = $derived(options.party.map((p) => p.name));
@@ -33,12 +34,12 @@
 
   function handleOrderNumberSelection(value) {
     const selectedOrder = options.orders.find((o) => o.order_number == value);
-    data.party_name = '';
+    data.party_name = item.party_name;
     data.address = '';
-    data.delivered_item = '';
+    data.delivery_item = '';
     if (selectedOrder?.party_name) data.party_name = selectedOrder.party_name;
     if (selectedOrder?.address) data.address = selectedOrder.address;
-    if (selectedOrder?.item) data.delivered_item = selectedOrder.item;
+    if (selectedOrder?.item) data.delivery_item = selectedOrder.item;
   }
 
   function handleFormSubmit() {
@@ -54,6 +55,7 @@
 
   $effect(() => {
     data = { ...item };
+    isAc = item?.amount_type_1 == 'AC';
   });
 </script>
 
@@ -96,8 +98,8 @@
       silent={true}
     />
     <InputField
-      name="delivered_item"
-      value={data.delivered_item}
+      name="delivery_item"
+      value={data.delivery_item}
       placeholder="Item"
       autoComplete="off"
       caseMode="smartTitleChars"
@@ -106,12 +108,20 @@
       silent={true}
     />
     <InputField
-      name="delivered_quantity"
-      value={data.delivered_quantity}
+      name="delivery_quantity"
+      value={data.delivery_quantity}
       placeholder="Quantity"
       autoComplete="off"
       caseMode="none"
     />
+
+    <CheckBoxField bind:value={isAc} placeholder="Is AC" />
+    {#if isAc}
+      <input type="hidden" name="amount_type_1" value="AC" />
+    {:else}
+      <input type="hidden" name="amount_type_1" value="" />
+    {/if}
+
     <CheckBoxField name="is_cancelled" value={data.is_cancelled} placeholder="Is Cancelled" />
   </Form>
 </Model>

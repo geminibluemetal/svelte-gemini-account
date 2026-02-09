@@ -1,13 +1,13 @@
 <script>
-  import Table from '$lib/components/Table.svelte';
-  import { onDestroy, onMount } from 'svelte';
-  import DeliveryForm from './DeliveryForm.svelte';
-  import { keyboardEventBus } from '$lib/core/client/eventBus';
-  import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
-  import DeliveryAmountForm from './DeliveryAmountForm.svelte';
+  import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import { onDestroy, onMount } from 'svelte';
   import { HighlightCell, HighlightRow } from '$lib/utils/highlight';
+  import Table from '$lib/components/Table.svelte';
+  import Model from '$lib/components/Model.svelte';
+  import DeliveryForm from './DeliveryForm.svelte';
+  import DeliveryAmountForm from './DeliveryAmountForm.svelte';
 
   const { data } = $props();
   const headers = [
@@ -18,18 +18,57 @@
     { name: 'ON', key: 'order_number', align: 'center' },
     { name: 'Party', key: 'party_name' },
     { name: 'Address', key: 'address' },
-    { name: 'Item', key: 'delivered_item' },
-    { name: 'Qty', key: 'delivered_quantity', align: 'center' },
-    { name: 'AT1', key: 'amount_type_1', align: 'center' },
-    { name: 'Amount1', key: 'amount_1', align: 'center' },
-    { name: 'AT2', key: 'amount_type_2', align: 'center' },
-    { name: 'Amount2', key: 'amount_2', align: 'center' },
-    { name: 'Sign', key: 'owner_sign', align: 'center' }
+    { name: 'Item', key: 'delivery_item' },
+    { name: 'Qty', key: 'delivery_quantity', align: 'center', display: 'decimal' },
+    { name: 'AT1', key: 'amount_type_1', align: 'center', color: AmountTypeColor },
+    { name: 'Amount1', key: 'amount_1', align: 'center', color: Amount1Color },
+    { name: 'AT2', key: 'amount_type_2', align: 'center', color: AmountTypeColor },
+    { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
+    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];
 
   function VehicleColor(value) {
-    // if (value.endsWith('G')) return { foreground: HighlightCell.blue.foreground };
-    if (value.endsWith('G')) return HighlightCell.blue;
+    if (value.endsWith('G')) return { foreground: 'text-blue-700 font-bold' };
+  }
+
+  function SignColor(value) {
+    return value == 1 ? HighlightCell.green : null;
+  }
+
+  function AmountTypeColor(value) {
+    switch (value) {
+      case 'Bunk':
+        return HighlightCell.purple;
+      case 'AC':
+        return HighlightCell.yellow;
+      case 'CP':
+        return HighlightCell.green;
+      case 'Paytm':
+        return HighlightCell.red;
+      case 'Gpay':
+        return HighlightCell.blue;
+    }
+  }
+
+  function AmountXColor(value) {
+    switch (value) {
+      case 'Bunk':
+        return { foreground: 'text-purple-700 font-bold' };
+      case 'CP':
+        return { foreground: 'text-green-700 font-bold' };
+      case 'Paytm':
+        return { foreground: 'text-red-700 font-bold' };
+      case 'Gpay':
+        return { foreground: 'text-blue-700 font-bold' };
+    }
+  }
+
+  function Amount1Color(value, item) {
+    return AmountXColor(item.amount_type_1);
+  }
+
+  function Amount2Color(value, item) {
+    return AmountXColor(item.amount_type_2);
   }
 
   const availableOptions = [
@@ -54,6 +93,9 @@
     amountFormOpened = true;
     editableDelivery = item;
   }
+
+  const handleDeliverySign = (item) =>
+    transportAction('?/sign', { id: item.id, current: item.sign });
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -83,6 +125,7 @@
 
   const customEvents = [
     { key: '0', handler: handleDeliveryAmountUpdate },
+    { key: 'ArrowRight', handler: handleDeliverySign },
     { key: 'E', handler: handleDeliveryEdit },
     { key: 'Enter', handler: handleDeliveryEdit }
   ];
@@ -90,18 +133,18 @@
   const toggleOpenForm = () => (formOpened = !formOpened);
 
   function customCellHighlight(item) {
-    if (item.delivered_item && item.delivered_delivered_quantity)
+    if (item.delivery_item && item.delivery_quantity)
       return { ...HighlightRow.green, cells: [0, 1, 2] };
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
   onMount(() => {
     keyboardEventBus.on('H', toggleHelper);
-    syncOn('TOKEN.LIST');
+    syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('H', toggleHelper);
-    syncOff('TOKEN.LIST');
+    syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
 

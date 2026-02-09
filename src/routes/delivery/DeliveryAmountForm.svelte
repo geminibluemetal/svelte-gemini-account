@@ -6,13 +6,14 @@
 
   const { open, onClose, item } = $props();
   let initialData = {
-    amount_type_1: null,
+    amount_type_1: null, // AC, CP, Paytm, Gpay, Bunk
     amount_1: null,
-    amount_type_2: null,
+    amount_type_2: null, // AC, CP, Paytm, Gpay, Bunk
     amount_2: null
   };
 
   let data = $state(initialData);
+  const amountType = ['AC', 'CP', 'Paytm', 'Gpay', 'Bunk'];
 
   function handleClose() {
     onClose();
@@ -51,16 +52,18 @@
       name="amount_type_1"
       value={data.amount_type_1}
       placeholder="Amount Type 1"
+      options={item.party_name ? amountType : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
     <InputField name="amount_1" value={data.amount_1} placeholder="Amount 1" autoComplete="off" />
 
-    <div class="border mb-5 mt-2 border-gray-500 w-1/2 mx-auto"></div>
+    <div class="mb-5 mt-2 mx-auto"></div>
 
     <InputField
       name="amount_type_2"
       value={data.amount_type_2}
       placeholder="Amount Type 2"
+      options={item.party_name ? amountType : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
     <InputField name="amount_2" value={data.amount_2} placeholder="Amount 2" autoComplete="off" />
