@@ -80,12 +80,16 @@
     { key: 'H', description: 'List available Shortcut' },
     { key: '0', description: 'New Order' },
     { key: 'E', description: 'Edit Order' },
-    { key: 'D', description: 'Delete Order' },
+    // { key: 'D', description: 'Delete Order' },
     { key: 'P', description: 'Print Phone Number only' },
     { key: 'I', description: 'Single Load, Cash Bill Print' },
     { key: 'O', description: 'Full Load, Cash Bill Print' },
     { key: 'T', description: 'Generate Token Directly' },
     { key: '➔', description: 'Sign Order Advance Amount' },
+    { key: 'L', description: 'Set Loading status for Order' },
+    { key: 'C', description: 'Set Cancelled status for Order' },
+    { key: 'F', description: 'Set Finished status for Order' },
+    { key: 'R', description: 'Reset Current status Automatically' },
     { key: 'Enter', description: 'Single Load Cash Bill Print' }
   ];
 
@@ -133,6 +137,10 @@
     transportAction('?/fullPrint', { id: item.id, tip });
   };
   const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item.id });
+  const handleOrderLoading = (item) => transportAction('?/changeToLoading', { id: item.id });
+  const handleOrderCancel = (item) => transportAction('?/changeToCancelled', { id: item.id });
+  const handleOrderFinish = (item) => transportAction('?/changeToFinished', { id: item.id });
+  const handleOrderStatusReset = (item) => transportAction('?/resetStatus', { id: item.id });
   const handleSignOrder = (item) => transportAction('?/sign', { id: item.id, current: item.sign });
   const handleTokenCreation = async (item) => {
     tokenOpened = true;
@@ -176,11 +184,15 @@
 
   const customEvents = [
     { key: 'E', handler: handleOrderEdit },
-    { key: 'D', handler: handleOrderDelete },
+    // { key: 'D', handler: handleOrderDelete },
     { key: 'P', handler: handlePhonePrint },
     { key: 'O', handler: handleFullPrint },
     { key: 'I', handler: handleSinglePrint },
     { key: 'T', handler: handleTokenCreation },
+    { key: 'L', handler: handleOrderLoading },
+    { key: 'C', handler: handleOrderCancel },
+    { key: 'F', handler: handleOrderFinish },
+    { key: 'R', handler: handleOrderStatusReset },
     { key: 'Enter', handler: handleSinglePrint },
     { key: 'ArrowRight', handler: handleSignOrder }
   ];

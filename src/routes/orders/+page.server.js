@@ -9,6 +9,10 @@ import {
   orderFullPrint,
   orderPhonePrint,
   orderSinglePrint,
+  orderStatusReset,
+  orderStatusToCancelled,
+  orderStatusToFinished,
+  orderStatusToLoading,
   signOrderById,
   updateOrder
 } from '$lib/entity/orders/order.service.js';
@@ -88,6 +92,35 @@ export const actions = {
     const formData = await request.formData();
     const data = formDataToObject(formData);
     signOrderById(data.id, data.current);
+    sseEmit({ type: 'ORDERS.LIST' });
+  },
+
+  // change Order status To Loading
+  changeToLoading: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    orderStatusToLoading(data.id);
+    sseEmit({ type: 'ORDERS.LIST' });
+  },
+  // change Order status To Cancelled
+  changeToCancelled: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    orderStatusToCancelled(data.id);
+    sseEmit({ type: 'ORDERS.LIST' });
+  },
+  // change Order status To Finished
+  changeToFinished: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    orderStatusToFinished(data.id);
+    sseEmit({ type: 'ORDERS.LIST' });
+  },
+  // Reset order status
+  resetStatus: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    orderStatusReset(data.id);
     sseEmit({ type: 'ORDERS.LIST' });
   },
 

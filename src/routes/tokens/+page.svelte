@@ -30,7 +30,7 @@
   let formOpened = $state(false);
   let helperOpened = $state(false);
   let editableToken = $state(null);
-  let view = $state('all');
+  let view = $state('opened');
 
   const viewList = $derived({
     all: data.token,

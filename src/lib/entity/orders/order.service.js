@@ -224,6 +224,22 @@ export async function signOrderById(id, current) {
   updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1);
 }
 
+export async function orderStatusToLoading(id) {
+  updateSingleOrderColumn(id, 'status', 'Loading');
+}
+export async function orderStatusToCancelled(id) {
+  updateSingleOrderColumn(id, 'status', 'Cancelled');
+}
+export async function orderStatusToFinished(id) {
+  updateSingleOrderColumn(id, 'status', 'Finished');
+}
+export async function orderStatusReset(id) {
+  const order = fetchSingleOrderById(id);
+  if (order.delivered_qty == order.total_qty && order.balance_qty == 0) updateSingleOrderColumn(id, 'status', 'Delivered');
+  else if (order.total_qty == order.balance_qty && order.delivered_qty == 0) updateSingleOrderColumn(id, 'status', 'New');
+  else if (order.total_qty != order.balance_qty != order.delivered_qty) updateSingleOrderColumn(id, 'status', 'Partial');
+}
+
 export async function createTokenFromOrder(id, data) {
   if (!data.vehicle) return { message: 'Vehicle is required', ok: false };
   if (!data.qty) return { message: 'Quantity is required', ok: false };

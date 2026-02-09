@@ -170,9 +170,13 @@
                 ? color?.background
                 : groupColor?.background && groupColor?.cells.includes(col)
                   ? groupColor?.background
-                  : overRow == row
-                    ? 'bg-black/20'
-                    : rowColor?.background}
+                  : rowColor?.background
+                    ? overRow == row
+                      ? `${rowColor?.background.split('-').slice(0, -1).concat('800').join('-')}/50`
+                      : rowColor?.background
+                    : overRow == row
+                      ? 'bg-black/20'
+                      : ''}
                 {color?.foreground || rowColor?.foreground}"
               onmousemove={() => (overRow = row)}
               data-over-row={row}
