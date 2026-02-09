@@ -133,6 +133,7 @@ export const actions = {
       return fail(400, { message: result.message });
     }
 
+    sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     return result;
   }

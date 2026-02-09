@@ -266,6 +266,7 @@ export async function createTokenFromOrder(id, data) {
       Date: getFormattedDate(),
       Time: getFormattedTime()
     });
+    orderStatusToLoading(id)
     return { message: 'Token Created', ok: true };
   }
 }
