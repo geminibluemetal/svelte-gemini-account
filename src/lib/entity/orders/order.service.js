@@ -6,6 +6,7 @@ import {
   fetchAllOrders,
   fetchOrdersByStatus,
   fetchSingleOrderById,
+  fetchSingleOrderByOrderNumber,
   insertOrder,
   updateOrderById,
   updateSingleOrderColumn
@@ -17,6 +18,10 @@ import { fetchDeliveryById } from '../delivery/delivery.dal';
 
 export async function getAllOrders() {
   return fetchAllOrders();
+}
+
+export async function getOrderByNumber(order_number) {
+  return fetchSingleOrderByOrderNumber(order_number);
 }
 
 export async function getAllAvailableOrders() {
@@ -54,6 +59,10 @@ export async function createOrder(data) {
   const settings = fetchSettings();
   let currentOrderNumber = settings.last_order_number + 1;
   currentOrderNumber = currentOrderNumber < 1000 ? currentOrderNumber : 1;
+
+  // Check a ordernumber already exists or not
+  const order = await getOrderByNumber(currentOrderNumber);
+  if (order) return { ok: false, message: `Order Number ${currentOrderNumber} already exists` };
 
   data.date = formatDateTime('YY-MM-DD');
   data.order_number = currentOrderNumber;

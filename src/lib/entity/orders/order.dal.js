@@ -9,6 +9,12 @@ export function fetchAllOrders() {
   return stat.all();
 }
 
+export function fetchSingleOrderByOrderNumber(order_number) {
+  const query = `SELECT * FROM ${tableName} WHERE order_number = '${order_number}'`;
+  const stat = db.prepare(query);
+  return stat.get();
+}
+
 export function fetchOrdersByStatus(statusArray) {
   // Create placeholders for each status (?, ?, ?, etc.)
   const placeholders = statusArray.map(() => '?').join(',');
