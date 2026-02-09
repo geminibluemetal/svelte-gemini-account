@@ -235,9 +235,10 @@ export async function orderStatusToFinished(id) {
 }
 export async function orderStatusReset(id) {
   const order = fetchSingleOrderById(id);
-  if (order.delivered_qty == order.total_qty && order.balance_qty == 0) updateSingleOrderColumn(id, 'status', 'Delivered');
-  else if (order.total_qty == order.balance_qty && order.delivered_qty == 0) updateSingleOrderColumn(id, 'status', 'New');
-  else if (order.total_qty != order.balance_qty != order.delivered_qty) updateSingleOrderColumn(id, 'status', 'Partial');
+  if (order.delivered_qty >= order.total_qty) updateSingleOrderColumn(id, 'status', 'Delivered');
+  else if (order.total_qty == order.balance_qty && order.delivered_qty == 0)
+    updateSingleOrderColumn(id, 'status', 'New');
+  else if (order.balance_qty != 0) updateSingleOrderColumn(id, 'status', 'Partial');
   else updateSingleOrderColumn(id, 'status', 'New');
 }
 
@@ -267,7 +268,7 @@ export async function createTokenFromOrder(id, data) {
       Date: getFormattedDate(),
       Time: getFormattedTime()
     });
-    orderStatusToLoading(id)
+    orderStatusToLoading(id);
     return { message: 'Token Created', ok: true };
   }
 }
