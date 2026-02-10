@@ -31,6 +31,7 @@ export async function getAllAvailableOrders() {
 export async function createOrder(data) {
   if (!data.address) return { message: 'Address is required', ok: false };
   if (!data.phone) return { message: 'Phone number is required', ok: false };
+  if (data.phone && data.phone.length != 10) return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
   if (!data.total_qty) return { message: 'Quantity is required', ok: false };
   if (!data.party_name && data.amount_type == 'AC')
@@ -67,7 +68,7 @@ export async function createOrder(data) {
   data.date = formatDateTime('YY-MM-DD');
   data.order_number = currentOrderNumber;
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
-  data.balance_qty = Number(data.total_qty) || 0 - Number(data.delivered_qty) || 0;
+  data.balance_qty = Number(data.total_qty);
 
   let result = insertOrder(data);
 
@@ -84,6 +85,7 @@ export async function createOrder(data) {
 export async function updateOrder(data, editId) {
   if (!data.address) return { message: 'Address is required', ok: false };
   if (!data.phone) return { message: 'Phone number is required', ok: false };
+  if (data.phone && data.phone.length != 10) return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
   if (!data.total_qty) return { message: 'Quantity is required', ok: false };
   if (!data.party_name && data.amount_type == 'AC')
@@ -99,9 +101,9 @@ export async function updateOrder(data, editId) {
     return { message: 'Discount should be Number', ok: false };
 
   // Check advance amount changes when signed in
+  const order = fetchSingleOrderById(editId);
   if (data.advance) {
-    const party = fetchSingleOrderById(editId);
-    if (party.advance != data.advance && party.sign == 1) {
+    if (order.advance != data.advance && order.sign == 1) {
       return { message: "Advance amount can't changed after Signed", ok: false };
     }
   }
@@ -117,7 +119,8 @@ export async function updateOrder(data, editId) {
   }
 
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
-  data.balance_qty = Number(data.total_qty) || 0 - Number(data.delivered_qty) || 0;
+  data.balance_qty = (Number(data.total_qty) || 0) - (Number(order.delivered_qty) || 0);
+  data.status = examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty)
 
   let result = updateOrderById(editId, data);
 
@@ -244,11 +247,21 @@ export async function orderStatusToFinished(id) {
 }
 export async function orderStatusReset(id) {
   const order = fetchSingleOrderById(id);
-  if (order.delivered_qty >= order.total_qty) updateSingleOrderColumn(id, 'status', 'Delivered');
-  else if (order.total_qty == order.balance_qty && order.delivered_qty == 0)
-    updateSingleOrderColumn(id, 'status', 'New');
-  else if (order.balance_qty != 0) updateSingleOrderColumn(id, 'status', 'Partial');
-  else updateSingleOrderColumn(id, 'status', 'New');
+  const status = examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty)
+  updateSingleOrderColumn(id, 'status', status)
+}
+
+export function examineStatusByQuantity(total_qty, delivered_qty, balance_qty) {
+  total_qty = Number(total_qty) || 0
+  delivered_qty = Number(delivered_qty) || 0
+  balance_qty = Number(balance_qty) || 0
+  return delivered_qty >= total_qty
+    ? 'Delivered'
+    : (total_qty === balance_qty && delivered_qty === 0)
+      ? 'New'
+      : balance_qty !== 0
+        ? 'Partial'
+        : 'New';
 }
 
 export async function createTokenFromOrder(id, data) {

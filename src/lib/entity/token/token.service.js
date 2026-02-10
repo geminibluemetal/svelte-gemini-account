@@ -31,7 +31,7 @@ export async function createToken(data, takePrint = true) {
     if (takePrint) {
       printToken({
         Token: serial,
-        Party: data.party_name ? data.party_name : ' - ',
+        Party: data.party_name,
         Vcle: data.vehicle,
         Item: data.token_item,
         Qty: formatFixed(data.token_quantity),
@@ -80,7 +80,7 @@ export async function updateToken(data, editId, takePrint = true) {
       const token = fetchDeliveryById(editId);
       printToken({
         Token: token.serial,
-        Party: token.party_name ? token.party_name : ' - ',
+        Party: token.party_name,
         Vcle: token.vehicle,
         Item: token.token_item,
         Qty: formatFixed(token.token_quantity),
@@ -115,7 +115,7 @@ export async function printTokenById(id) {
   if (token) {
     printToken({
       Token: token.serial,
-      Party: token.party_name ? token.party_name : ' - ',
+      Party: token.party_name,
       Vcle: token.vehicle,
       Item: token.token_item,
       Qty: formatFixed(token.token_quantity),

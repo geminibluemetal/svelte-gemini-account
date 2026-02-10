@@ -106,6 +106,7 @@ export function updateOrderById(id, data) {
       balance_qty = ?,
       is_owner_order = ?,
       tracktor_only = ?,
+      status = ?,
       notes = ?
     WHERE id = ?
   `;
@@ -126,6 +127,7 @@ export function updateOrderById(id, data) {
     data.balance_qty || 0,
     data.is_owner_order ? 1 : 0,
     data.tracktor_only ? 1 : 0,
+    data.status || 'New',
     data.notes || '',
     id
   );

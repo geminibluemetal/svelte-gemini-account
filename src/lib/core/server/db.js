@@ -1,9 +1,7 @@
 // src\lib\core\server\db.js
 import Database from 'better-sqlite3';
 
-const db = new Database('database/app.db', {
-  verbose: console.log
-});
+const db = new Database('database/app.db');
 
 /**
  * FULL SYNCHRONIZATION SETUP
