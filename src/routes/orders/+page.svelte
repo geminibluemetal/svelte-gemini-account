@@ -77,7 +77,7 @@
   function notesDisplay(value, item) {
     let prefix = '';
     prefix += item.tracktor_only ? '(🚜)' : '';
-    prefix += item.status == 'Loading' ? '(🪏)' : '';
+    prefix += item.status == 'Loading' ? '(⬆️)' : '';
     return `${prefix} ${value}`;
   }
 

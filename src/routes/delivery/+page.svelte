@@ -8,6 +8,8 @@
   import Model from '$lib/components/Model.svelte';
   import DeliveryForm from './DeliveryForm.svelte';
   import DeliveryAmountForm from './DeliveryAmountForm.svelte';
+  import Button from '$lib/components/Button.svelte';
+  import { formatFixed } from '$lib/utils/number';
 
   const { data } = $props();
   const headers = [
@@ -26,6 +28,77 @@
     { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];
+
+  const sales = $derived(
+    data.token.reduce((acc, item) => {
+      const itemName = item.delivery_item;
+      const qty = item.delivery_quantity || 0;
+
+      // Skip if no delivery_item or quantity
+      if (!itemName || qty === null || qty === undefined || qty === 0) {
+        return acc;
+      }
+
+      // Check if the item contains " + " separator
+      if (itemName.includes(' + ')) {
+        // Split by " + " and trim whitespace
+        const items = itemName.split(' + ').map((i) => i.trim());
+        const splitQty = qty / items.length;
+
+        // Add equal quantity to each split item
+        items.forEach((splitItem) => {
+          acc[splitItem] = (acc[splitItem] || 0) + splitQty;
+        });
+      } else {
+        // Single item, add full quantity
+        acc[itemName] = (acc[itemName] || 0) + qty;
+      }
+
+      return acc;
+    }, {})
+  );
+
+  const loads = $derived(
+    data.token.reduce((acc, item) => {
+      const vehicle = item.vehicle;
+
+      // Check if vehicle ends with 'G'
+      if (vehicle && vehicle.endsWith('G')) {
+        acc[vehicle] = (acc[vehicle] || 0) + 1;
+      }
+
+      return acc;
+    }, {})
+  );
+
+  const partyCounts = $derived(
+    data.token.reduce((acc, item) => {
+      const partyName = item.party_name;
+
+      if (partyName) {
+        acc[partyName] = (acc[partyName] || 0) + 1;
+      }
+
+      return acc;
+    }, {})
+  );
+
+  // Array of only Paytm amounts (numbers)
+  const paytmAmountsArray = $derived(
+    data.token.reduce((acc, item) => {
+      // Add amount_1 if it's Paytm
+      if (item.amount_type_1 === 'Paytm' && item.amount_1 !== null && item.amount_1 !== undefined) {
+        acc.push(Number(item.amount_1));
+      }
+
+      // Add amount_2 if it's Paytm
+      if (item.amount_type_2 === 'Paytm' && item.amount_2 !== null && item.amount_2 !== undefined) {
+        acc.push(Number(item.amount_2));
+      }
+
+      return acc;
+    }, [])
+  );
 
   function VehicleColor(value) {
     if (value.endsWith('G')) return { foreground: 'text-blue-700 font-bold' };
@@ -155,7 +228,106 @@
   {customEvents}
   hideSerial={true}
   {customCellHighlight}
-/>
+>
+  {#snippet sidebar()}
+    <div class="flex flex-col gap-2 w-50">
+      <div class="dark flex gap-2 *:flex-1">
+        <Button color="fuchsia">AC</Button>
+        <Button color="fuchsia">CP</Button>
+        <Button color="fuchsia">Blank</Button>
+      </div>
+      <div class="dark flex gap-2 *:flex-1">
+        <Button color="fuchsia">Remove</Button>
+        <Button color="primary">CR</Button>
+        <Button color="primary">OB</Button>
+      </div>
+      <div class="dark flex gap-2 *:flex-1">
+        <Button color="accent">Old Balance</Button>
+      </div>
+      <div class="dark flex gap-2 *:flex-1">
+        <Button color="accent">Vehicle Summary</Button>
+      </div>
+      <div class="flex flex-col gap-2 w-full overflow-auto">
+        <table class="w-full border-2">
+          <thead>
+            <tr>
+              <th class="border border-black bg-black text-white" colspan="2">Sales</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.entries(sales) as [itemName, quantity], index}
+              <tr>
+                <td class="border px-1">{itemName}</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class="border px-1 text-right">{formatFixed(quantity)}</td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+        <table class="w-full border-2">
+          <thead>
+            <tr>
+              <th class="border border-black bg-black text-white" colspan="2">Loads</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.entries(loads) as [vehicle, count], index}
+              <tr>
+                <td class="border px-1">{vehicle}</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class="border px-1 text-right">{count}</td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+        <table class="w-full border-2">
+          <thead>
+            <tr>
+              <th class="border border-black bg-black text-white" colspan="2">Party</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each Object.entries(partyCounts) as [party, count], index}
+              <tr>
+                <td class="border px-1">{party}</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class="border px-1 text-right">{count}</td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+        <table class="w-full border-2">
+          <thead>
+            <tr>
+              <th class="border border-black bg-black text-white" colspan="2">Paytm</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each paytmAmountsArray as amount, index}
+              <tr>
+                <td class="border px-1">{index + 1}</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class="border px-1 text-right">{amount}</td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            {/each}
+            <tr>
+              <td class=" border border-black bg-black text-white px-1">Total</td>
+              <!-- Item name (MS, PS, etc.) -->
+              <td class=" border border-black bg-black text-white px-1 text-right">
+                {paytmAmountsArray.reduce((total, num) => total + num, 0)}
+              </td>
+              <!-- Quantity with 2 decimals -->
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {/snippet}
+</Table>
 <DeliveryForm open={formOpened} onClose={handleFormClose} item={editableDelivery} options={data} />
 <DeliveryAmountForm
   open={amountFormOpened}
