@@ -11,18 +11,18 @@
 
   const { data } = $props();
   const headers = [
-    { name: 'SN', key: 'serial', align: 'center' },
-    { name: 'T Time', key: 'token_time', align: 'center' },
-    { name: 'Vehicle', key: 'vehicle', color: VehicleColor },
-    { name: 'D Time', key: 'delivery_time', align: 'center' },
-    { name: 'ON', key: 'order_number', align: 'center' },
-    { name: 'Party', key: 'party_name' },
-    { name: 'Address', key: 'address' },
-    { name: 'Item', key: 'delivery_item' },
-    { name: 'Qty', key: 'delivery_quantity', align: 'center', display: 'decimal' },
-    { name: 'AT1', key: 'amount_type_1', align: 'center', color: AmountTypeColor },
+    { name: 'SN', key: 'serial', align: 'center', width: '38' },
+    { name: 'T Time', key: 'token_time', align: 'center', width: '80' },
+    { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
+    { name: 'D Time', key: 'delivery_time', align: 'center', width: '80' },
+    { name: 'ON', key: 'order_number', align: 'center', width: '38' },
+    { name: 'Party', key: 'party_name', width: '250' },
+    { name: 'Address', key: 'address', width: '250' },
+    { name: 'Item', key: 'delivery_item' }, // width: '125'
+    { name: 'Qty', key: 'delivery_quantity', align: 'center', display: 'decimal', width: '55' },
+    { name: 'AT1', key: 'amount_type_1', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount1', key: 'amount_1', align: 'center', color: Amount1Color },
-    { name: 'AT2', key: 'amount_type_2', align: 'center', color: AmountTypeColor },
+    { name: 'AT2', key: 'amount_type_2', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];

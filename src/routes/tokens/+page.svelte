@@ -12,11 +12,11 @@
   const { data } = $props();
   const headers = [
     { name: 'Serial', align: 'center', key: 'serial' },
-    { name: 'Time', align: 'center', key: 'token_time' },
-    { name: 'Party', align: 'left', key: 'party_name' },
-    { name: 'Item', align: 'left', key: 'token_item' },
+    { name: 'Time', align: 'center', key: 'token_time', width: '85' },
+    { name: 'Party', align: 'left', key: 'party_name', width: '300' },
+    { name: 'Item', align: 'left', key: 'token_item', width: '125' },
     { name: 'Quantity', align: 'center', key: 'token_quantity', display: 'decimal' },
-    { name: 'Vehicle', align: 'left', key: 'vehicle' }
+    { name: 'Vehicle', align: 'left', key: 'vehicle', width: '70' }
   ];
 
   const availableOptions = [

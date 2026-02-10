@@ -38,21 +38,21 @@
   });
 
   const headers = [
-    { name: 'Date', align: 'center', key: 'date', display: 'date' },
-    { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor },
-    { name: 'Party', align: 'left', key: 'party_name' },
-    { name: 'Address', align: 'left', key: 'address' },
-    { name: 'Phone', align: 'left', key: 'phone' },
+    { name: 'Date', align: 'center', key: 'date', display: 'date', width: '96' },
+    { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor, width: '38' },
+    { name: 'Party', align: 'left', key: 'party_name', width: '210' },
+    { name: 'Address', align: 'left', key: 'address', width: '210' },
+    { name: 'Phone', align: 'left', key: 'phone', width: '100' },
     { name: 'Item', align: 'left', key: 'item' },
-    { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal' },
-    { name: 'AT', align: 'center', key: 'amount_type', color: AmountTypeColor },
+    { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal', width: '53' },
+    { name: 'AT', align: 'center', key: 'amount_type', color: AmountTypeColor, width: '60' },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Advance', align: 'right', key: 'advance', display: 'currency' },
-    { name: 'Disount', align: 'right', key: 'discount', display: 'currency' },
-    { name: 'Balance', align: 'right', key: 'balance', display: 'currency' },
+    { name: 'Advan', align: 'right', key: 'advance', display: 'currency' },
+    { name: 'Dis', align: 'right', key: 'discount', display: 'currency' },
+    { name: 'Bal', align: 'right', key: 'balance', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', display: 'boolean', color: SignColor },
-    { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal' },
-    { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal' },
+    { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal', width: '53' },
+    { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal', width: '53' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
     { name: 'DSV', align: 'center', key: 'delivery_sheet_verified' }
   ];
