@@ -138,3 +138,10 @@ export function deleteOrderById(id) {
   const stmt = db.prepare(query);
   return stmt.run(id);
 }
+
+export function deleteOrdersByStatus(statusArray) {
+  const placeholders = statusArray.map(() => '?').join(', ');
+  const query = `DELETE FROM ${tableName} WHERE status IN (${placeholders});`;
+  const stat = db.prepare(query);
+  return stat.run(...statusArray);
+}

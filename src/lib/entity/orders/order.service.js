@@ -3,6 +3,7 @@ import { fetchSinglePartyByName, updatePhoneByPartyName } from '../party/party.d
 import { fetchSettings, setSettings } from '../settings/settings.dal';
 import {
   deleteOrderById,
+  deleteOrdersByStatus,
   fetchAllOrders,
   fetchOrdersByStatus,
   fetchSingleOrderById,
@@ -292,5 +293,12 @@ export async function createTokenFromOrder(id, data) {
     });
     orderStatusToLoading(id);
     return { message: 'Token Created', ok: true };
+  }
+}
+
+export async function clearCompletedOrder() {
+  const result = deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished'])
+  if (result.changes) {
+    return { message: 'Order Cleared', ok: true };
   }
 }

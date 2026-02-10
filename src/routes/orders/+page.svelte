@@ -191,6 +191,19 @@
     editableOrder = null;
   }
 
+  async function handleOrderClear() {
+    const confirmed = confirm('Are you sure to clear?');
+    if (confirmed) {
+      const result = await transportAction('?/clearOrder');
+      if (result.type === 'failure') {
+        const parsedData = JSON.parse(result.data);
+        let message = parsedData[parsedData[0].message];
+        message = message || 'Not Deleted';
+        showToast(message, 'danger');
+      } else showToast('Order Cleared');
+    }
+  }
+
   function toggleHelper() {
     helperOpened = !helperOpened;
   }
@@ -243,7 +256,9 @@
     <div>
       <div class="p-1 dark flex flex-col gap-2">
         {#if true}
-          <Button color="danger"><span class="w-full">Clear</span></Button>
+          <Button color="danger" onclick={handleOrderClear}>
+            <span class="w-full">Clear</span>
+          </Button>
         {/if}
         {#if viewList.all.length}
           <Button color="primary" onclick={() => (view = 'all')} class="flex justify-between gap-2">

@@ -2,6 +2,7 @@ import { sseEmit } from '$lib/core/server/sseBus.js';
 import { getAllAddress } from '$lib/entity/address/address.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
 import {
+  clearCompletedOrder,
   createOrder,
   createTokenFromOrder,
   deleteOrder,
@@ -129,6 +130,18 @@ export const actions = {
     const formData = await request.formData();
     const data = formDataToObject(formData);
     const result = await createTokenFromOrder(data.id, data);
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+
+    sseEmit({ type: 'ORDERS.LIST' });
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    return result;
+  },
+
+  // Clear Orders
+  clearOrder: async () => {
+    const result = await clearCompletedOrder();
     if (!result?.ok) {
       return fail(400, { message: result.message });
     }
