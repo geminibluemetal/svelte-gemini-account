@@ -5,7 +5,7 @@
 
 <main class="min-h-screen flex flex-col items-center justify-center bg-slate-50 px-4 text-center">
   <!-- Heading -->
-  <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">Gemini Blue Metal Apps</h1>
+  <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">Gemini Blue Metal Works</h1>
 
   <!-- Description -->
   <p class="max-w-xl text-lg text-slate-600 mb-12">
@@ -13,7 +13,7 @@
   </p>
 
   <!-- App Tiles -->
-  <div class="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-3xl w-full">
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-6 max-w-4xl w-full">
     {#each apps as app}
       <a
         href={app.url}
@@ -25,7 +25,7 @@
         <div class="font-semibold text-slate-800">
           {app.name}
         </div>
-        <div class="text-xs bg-gray-200 px-1 py-0.5 rounded mt-2">
+        <div class="text-xs bg-gray-200 px-2 py-1 rounded mt-2">
           Alt + {app.key}
         </div>
       </a>
