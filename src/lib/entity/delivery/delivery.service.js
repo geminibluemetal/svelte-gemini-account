@@ -2,7 +2,7 @@ import { getFormattedTime } from '$lib/utils/dateTime';
 import {
   updateDeliveryAmountById,
   updateDeliveryById,
-  updateSingleDeliveryColumn
+  signDelivery
 } from './delivery.dal';
 
 export async function updateDelivery(data, id) {
@@ -29,5 +29,6 @@ export async function updateDeliveryAmount(data, id) {
 }
 
 export async function signDeliveryById(id, current) {
-  updateSingleDeliveryColumn(id, 'sign', current == 1 ? 0 : 1);
+  const newValue = current == 1 ? 0 : 1
+  signDelivery(id, newValue);
 }

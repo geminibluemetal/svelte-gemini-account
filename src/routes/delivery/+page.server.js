@@ -60,5 +60,6 @@ export const actions = {
     const data = formDataToObject(formData);
     signDeliveryById(data.id, data.current);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'ORDERS.LIST' });
   }
 };

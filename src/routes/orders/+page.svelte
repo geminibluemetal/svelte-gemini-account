@@ -54,7 +54,7 @@
     { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal', width: '53' },
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal', width: '53' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
-    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified' }
+    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified', color: DSVColor }
   ];
 
   const availableOptions = [
@@ -100,6 +100,10 @@
       case 'Finished':
         return HighlightRow.blue;
     }
+  }
+
+  function DSVColor(value) {
+    return value ? HighlightCell.blue : null;
   }
 
   function AmountTypeColor(value) {

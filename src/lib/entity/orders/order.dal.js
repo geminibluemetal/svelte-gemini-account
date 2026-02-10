@@ -103,6 +103,7 @@ export function updateOrderById(id, data) {
       advance = ?,
       discount = ?,
       balance = ?,
+      balance_qty = ?,
       is_owner_order = ?,
       tracktor_only = ?,
       notes = ?
@@ -122,6 +123,7 @@ export function updateOrderById(id, data) {
     data.advance || 0,
     data.discount || 0,
     data.balance || 0,
+    data.balance_qty || 0,
     data.is_owner_order ? 1 : 0,
     data.tracktor_only ? 1 : 0,
     data.notes || '',

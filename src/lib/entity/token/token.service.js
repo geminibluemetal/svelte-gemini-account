@@ -2,6 +2,7 @@ import { printOut } from '$lib/core/server/print';
 import { formatDateTime, getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import {
+  deleteTokenById,
   fetchAllDeliveryByDate,
   fetchDeliveryById,
   fetchLastSerialByDate,
@@ -93,15 +94,20 @@ export async function updateToken(data, editId, takePrint = true) {
 
 export async function deleteToken(id) {
   const token = fetchDeliveryById(id);
-  if (token.delivery_time) return { message: "Can't Delete Delivered Token", ok: false };
+  let lastSerial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
+  if (token.serial != lastSerial) return { message: 'Can only delete last token', ok: false };
+  if (token.delivery_item && token.delivery_quantity) return { message: "Can't Delete Delivered Token", ok: false };
   if (token.sign) return { message: "Can't Delete Signed Token", ok: false };
 
   const createdDate = new Date(token.created_at);
   if (getFormattedDate() != getFormattedDate(createdDate))
     return { message: "Can't delete old token", ok: false };
 
-  let lastSerial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
-  if (token.serial != lastSerial) return { message: 'Can only delete last token', ok: false };
+  const result = deleteTokenById(id)
+  if (result.changes) {
+    return { message: "Last Token Deleted", ok: true };
+  }
+
 }
 
 export async function printTokenById(id) {
