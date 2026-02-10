@@ -79,97 +79,87 @@ export function updateTokenById(data, id) {
   return stmt.run(params);
 }
 
+// --- 1. Prepared Statements (Outside for performance) ---
+const getOldDeliveryStmt = db.prepare(`SELECT order_number, delivery_quantity, sign FROM delivery WHERE id = ?`);
+const getOrderDataStmt = db.prepare(`SELECT id, total_qty, delivered_qty, delivery_sheet_verified FROM orders WHERE order_number = ?`);
+const updateOrderStatsStmt = db.prepare(`
+  UPDATE orders
+  SET delivered_qty = ?, balance_qty = ?, delivery_sheet_verified = ?, status = ?
+  WHERE id = ?
+`);
+
+/**
+ * Helper: Syncs an order's totals and verification counts.
+ * @param {string} orderNumber
+ * @param {number} qtyAdjustment - Change in quantity (e.g., -5 or +5)
+ * @param {number} signAdjustment - Change in verification (e.g., -1 or +1)
+ */
+const syncOrderStats = (orderNumber, qtyAdjustment, signAdjustment) => {
+  if (!orderNumber) return;
+  const order = getOrderDataStmt.get(orderNumber);
+  if (!order) return;
+
+  const totalQty = Number(order.total_qty) || 0;
+
+  // Recalculate Qty
+  const newDelivered = Math.max(0, (Number(order.delivered_qty) || 0) + qtyAdjustment);
+  const newBalance = Math.max(0, totalQty - newDelivered);
+
+  // Recalculate Verified Count (Signatures)
+  const newVerified = Math.max(0, (Number(order.delivery_sheet_verified) || 0) + signAdjustment);
+
+  // Determine Status
+  let newStatus = 'New';
+  if (newDelivered >= totalQty && newBalance === 0) newStatus = 'Delivered';
+  else if (newDelivered > 0) newStatus = 'Partial';
+
+  updateOrderStatsStmt.run(newDelivered, newBalance, newVerified, newStatus, order.id);
+};
+
+// --- 2. Main Function ---
 export function updateDeliveryById(data, id) {
-  // --- Prepared Statements ---
-  const getOldDeliveryStmt = db.prepare(
-    `SELECT order_number, delivery_quantity FROM delivery WHERE id = ?`
-  );
-
-  const updateDeliveryStmt = db.prepare(`
-    UPDATE delivery SET
-      order_number = ?, party_name = COALESCE(?, party_name), address = COALESCE(?, address),
-      delivery_time = CASE WHEN delivery_time IS NULL OR delivery_time = '' THEN ? ELSE delivery_time END,
-      delivery_item = COALESCE(?, delivery_item), delivery_quantity = ?,
-      amount_type_1 = COALESCE(?, amount_type_1), is_cancelled = COALESCE(?, is_cancelled)
-    WHERE id = ?
-  `);
-
-  const getOrderDataStmt = db.prepare(
-    `SELECT id, total_qty, delivered_qty FROM orders WHERE order_number = ?`
-  );
-
-  const updateOrderStatsStmt = db.prepare(`
-    UPDATE orders SET delivered_qty = ?, balance_qty = ?, status = ? WHERE id = ?
-  `);
-
-  // --- Logic to Recalculate and Update Order ---
-  const syncOrder = (orderNumber, quantityAdjustment) => {
-    if (!orderNumber) return;
-    const order = getOrderDataStmt.get(orderNumber);
-    if (!order) return;
-
-    // FIX: Convert everything to Number to avoid "1" + "1" = "11"
-    const currentDelivered = Number(order.delivered_qty) || 0;
-    const totalQty = Number(order.total_qty) || 0;
-    const adjustment = Number(quantityAdjustment) || 0;
-
-    const newDelivered = Math.max(0, currentDelivered + adjustment);
-    const newBalance = Math.max(0, totalQty - newDelivered);
-
-    let newStatus = 'New';
-    if (newDelivered >= totalQty && newBalance === 0) {
-      newStatus = 'Delivered';
-    } else if (newDelivered > 0) {
-      newStatus = 'Partial';
-    }
-
-    updateOrderStatsStmt.run(newDelivered, newBalance, newStatus, order.id);
-  };
-
-  // --- The Transaction ---
   const executeTransaction = db.transaction((txData, txId) => {
-    // 1. Get Old Data
-    const oldDelivery = getOldDeliveryStmt.get(txId);
-    if (!oldDelivery) throw new Error(`Delivery ID ${txId} not found.`);
+    const old = getOldDeliveryStmt.get(txId);
+    if (!old) throw new Error(`Delivery ID ${txId} not found.`);
 
-    // 2. Determine New Data (Converting inputs to Numbers immediately)
-    const newOrderNumber = txData.hasOwnProperty('order_number')
-      ? txData.order_number
-      : oldDelivery.order_number;
+    // Determine New Values
+    const newOrderNum = txData.hasOwnProperty('order_number') ? txData.order_number : old.order_number;
+    const newQty = txData.hasOwnProperty('delivery_quantity') ? Number(txData.delivery_quantity) : Number(old.delivery_quantity);
+    const newSign = txData.hasOwnProperty('sign') ? txData.sign : old.sign;
 
-    // FIX: Force conversion to Number
-    const newQty =
-      Number(
-        txData.hasOwnProperty('delivery_quantity')
-          ? txData.delivery_quantity
-          : oldDelivery.delivery_quantity
-      ) || 0;
-    const oldQty = Number(oldDelivery.delivery_quantity) || 0;
+    // Logic: Is this specific delivery "Verified"? (Has a signature/truthy value)
+    const wasVerified = !!old.sign ? 1 : 0;
+    const isVerified = !!newSign ? 1 : 0;
 
-    // 3. IF ORDER CHANGED OR REMOVED: Revert the old order
-    if (oldDelivery.order_number && oldDelivery.order_number !== newOrderNumber) {
-      syncOrder(oldDelivery.order_number, -oldQty);
+    // SCENARIO 1: Order Number Changed
+    if (old.order_number && old.order_number !== newOrderNum) {
+      // Remove stats from Old Order
+      syncOrderStats(old.order_number, -old.delivery_quantity, -wasVerified);
+      // Add stats to New Order
+      syncOrderStats(newOrderNum, newQty, isVerified);
     }
-    // IF SAME ORDER BUT QTY CHANGED: Adjust the difference
-    else if (oldDelivery.order_number && oldDelivery.order_number === newOrderNumber) {
-      const qtyDifference = newQty - oldQty;
-      if (qtyDifference !== 0) syncOrder(oldDelivery.order_number, qtyDifference);
-    }
+    // SCENARIO 2: Same Order, but Qty or Sign changed
+    else if (old.order_number === newOrderNum) {
+      const qtyDiff = newQty - old.delivery_quantity;
+      const signDiff = isVerified - wasVerified;
 
-    // 4. IF NEW ORDER ADDED (and it's different): Apply the new quantity
-    if (newOrderNumber && oldDelivery.order_number !== newOrderNumber) {
-      syncOrder(newOrderNumber, newQty);
+      if (qtyDiff !== 0 || signDiff !== 0) {
+        syncOrderStats(newOrderNum, qtyDiff, signDiff);
+      }
     }
 
-    // 5. Update the Delivery table
+    // 3. Update the Delivery table
+    const updateDeliveryStmt = db.prepare(`
+      UPDATE delivery SET
+        order_number = ?, party_name = COALESCE(?, party_name),
+        address = COALESCE(?, address), delivery_item = COALESCE(?, delivery_item),
+        delivery_quantity = ?, sign = ?, is_cancelled = COALESCE(?, is_cancelled)
+      WHERE id = ?
+    `);
+
     updateDeliveryStmt.run(
-      newOrderNumber,
-      txData.party_name ?? null,
-      txData.address ?? null,
-      txData.delivery_time ?? null,
-      txData.delivery_item ?? null,
-      newQty,
-      txData.amount_type_1 ?? null,
+      newOrderNum, txData.party_name ?? null, txData.address ?? null,
+      txData.delivery_item ?? null, newQty, newSign,
       txData.is_cancelled !== undefined ? (txData.is_cancelled ? 1 : 0) : null,
       txId
     );
@@ -177,12 +167,7 @@ export function updateDeliveryById(data, id) {
     return { success: true };
   });
 
-  try {
-    return executeTransaction(data, id);
-  } catch (err) {
-    console.error('Transaction Aborted:', err.message);
-    throw err;
-  }
+  return executeTransaction(data, id);
 }
 
 export function updateDeliveryAmountById(data, id) {
@@ -207,9 +192,38 @@ export function updateDeliveryAmountById(data, id) {
   return stmt.run(params);
 }
 
-export function updateSingleDeliveryColumn(id, columnName, newValue) {
-  // Use parameterized query to prevent SQL injection
-  const query = `UPDATE ${tableName} SET ${columnName} = ? WHERE id = ?`;
-  const stat = db.prepare(query);
-  return stat.run(newValue, id);
+export function signDelivery(id, newValue) {
+  // Define the transaction logic
+  const performUpdate = db.transaction((targetId, value) => {
+    // 1. Get the order number from the delivery table
+    const row = db.prepare('SELECT order_number FROM delivery WHERE id = ?').get(targetId);
+
+    if (!row) {
+      throw new Error(`Delivery record with ID ${targetId} not found.`);
+    }
+
+    // 2. Update the counter in the orders table
+    // adjustment is 1 if newValue is truthy, -1 if falsy
+    const adjustment = value ? 1 : -1;
+    db.prepare(`
+      UPDATE orders
+      SET delivery_sheet_verified = delivery_sheet_verified + ?
+      WHERE order_number = ?
+    `).run(adjustment, row.order_number);
+
+    // 3. Update the sign column in the delivery table
+    // (Assuming tableName is 'delivery' based on your context)
+    return db.prepare(`UPDATE delivery SET sign = ? WHERE id = ?`)
+      .run(value, targetId);
+  });
+
+  // Execute the transaction
+  return performUpdate(id, newValue);
+}
+
+
+export function deleteTokenById(id) {
+  const query = `DELETE FROM delivery WHERE id = ?`;
+  const stmt = db.prepare(query);
+  return stmt.run(id);
 }
