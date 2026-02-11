@@ -61,7 +61,7 @@ export function updateTokenById(data, id) {
   const query = `
     UPDATE delivery SET
       party_name = COALESCE(?, party_name),
-      token_item = COALESCE(?, token_quantity),
+      token_item = COALESCE(?, token_item),
       token_quantity = COALESCE(?, token_quantity),
       vehicle = COALESCE(?, vehicle),
       is_cancelled = COALESCE(?, is_cancelled)
@@ -82,7 +82,7 @@ export function updateTokenById(data, id) {
 }
 
 const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
-  const num = (val) => Number(val) || 0
+  const num = (val) => Number(val) || 0;
   const query = `
     UPDATE orders
     SET
@@ -93,16 +93,22 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
     WHERE order_number = ?
   `;
   const orderUpdates = db.prepare(query);
-  const updates = {}
+  const updates = {};
 
   // Updates Old Order
-  const oldOrder = fetchSingleOrderByOrderNumber(oldDelivery.order_number)
+  const oldOrder = fetchSingleOrderByOrderNumber(oldDelivery.order_number);
   if (oldOrder) {
-    updates.delivered_qty = num(oldOrder.delivered_qty) - num(oldDelivery.delivery_quantity)
-    updates.balance_qty = num(oldOrder.total_qty) - num(updates.delivered_qty)
-    updates.status = examineStatusByQuantity(num(oldOrder.total_qty), num(updates.delivered_qty), num(updates.balance_qty))
-    updates.delivery_sheet_verified = oldDelivery.sign ? num(oldOrder.delivery_sheet_verified) - 1 : oldOrder.delivery_sheet_verified
-    updates.order_number = oldOrder.order_number
+    updates.delivered_qty = num(oldOrder.delivered_qty) - num(oldDelivery.delivery_quantity);
+    updates.balance_qty = num(oldOrder.total_qty) - num(updates.delivered_qty);
+    updates.status = examineStatusByQuantity(
+      num(oldOrder.total_qty),
+      num(updates.delivered_qty),
+      num(updates.balance_qty)
+    );
+    updates.delivery_sheet_verified = oldDelivery.sign
+      ? num(oldOrder.delivery_sheet_verified) - 1
+      : oldOrder.delivery_sheet_verified;
+    updates.order_number = oldOrder.order_number;
 
     orderUpdates.run(
       updates.delivered_qty || 0,
@@ -114,13 +120,19 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
   }
 
   // Updates New Order
-  const newOrder = fetchSingleOrderByOrderNumber(newDelivery.order_number)
+  const newOrder = fetchSingleOrderByOrderNumber(newDelivery.order_number);
   if (newOrder) {
-    updates.delivered_qty = num(newOrder.delivered_qty) + num(newDelivery.delivery_quantity)
-    updates.balance_qty = num(newOrder.total_qty) - num(updates.delivered_qty)
-    updates.status = examineStatusByQuantity(num(newOrder.total_qty), num(updates.delivered_qty), num(updates.balance_qty))
-    updates.delivery_sheet_verified = newDelivery.sign ? num(newOrder.delivery_sheet_verified) + 1 : newOrder.delivery_sheet_verified
-    updates.order_number = newOrder.order_number
+    updates.delivered_qty = num(newOrder.delivered_qty) + num(newDelivery.delivery_quantity);
+    updates.balance_qty = num(newOrder.total_qty) - num(updates.delivered_qty);
+    updates.status = examineStatusByQuantity(
+      num(newOrder.total_qty),
+      num(updates.delivered_qty),
+      num(updates.balance_qty)
+    );
+    updates.delivery_sheet_verified = newDelivery.sign
+      ? num(newOrder.delivery_sheet_verified) + 1
+      : newOrder.delivery_sheet_verified;
+    updates.order_number = newOrder.order_number;
 
     orderUpdates.run(
       updates.delivered_qty || 0,
@@ -130,10 +142,10 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
       updates.order_number
     );
   }
-}
+};
 
 export function updateDeliveryById(data, id) {
-  const oldDelivery = fetchDeliveryById(id)
+  const oldDelivery = fetchDeliveryById(id);
 
   const query = `
     UPDATE delivery SET
@@ -159,7 +171,7 @@ export function updateDeliveryById(data, id) {
     data.delivery_time !== undefined ? data.delivery_time : null,
     data.delivery_item !== undefined ? data.delivery_item : null,
     data.delivery_quantity !== undefined ? data.delivery_quantity : null,
-    data.amount_type_1 !== undefined ? data.amount_type_1 : null,
+    data.amount_type_1 ? data.amount_type_1 : null, // TODO
     data.is_cancelled !== undefined ? (data.is_cancelled ? 1 : 0) : null,
     id
   ];
@@ -167,15 +179,14 @@ export function updateDeliveryById(data, id) {
   const result = stmt.run(params);
 
   if (!result.changes) {
-    return { message: 'Delivery Not Updated', ok: false }
+    return { message: 'Delivery Not Updated', ok: false };
   }
 
-
-  const newDelivery = fetchDeliveryById(id)
+  const newDelivery = fetchDeliveryById(id);
 
   // Additional Things
   // 1) Updaste Orders
-  syncOrderFromDelivery(oldDelivery, newDelivery)
+  syncOrderFromDelivery(oldDelivery, newDelivery);
   return { success: true };
 }
 
@@ -214,22 +225,22 @@ export function signDelivery(id, newValue) {
     // 2. Update the counter in the orders table
     // adjustment is 1 if newValue is truthy, -1 if falsy
     const adjustment = value ? 1 : -1;
-    db.prepare(`
+    db.prepare(
+      `
       UPDATE orders
       SET delivery_sheet_verified = delivery_sheet_verified + ?
       WHERE order_number = ?
-    `).run(adjustment, row.order_number);
+    `
+    ).run(adjustment, row.order_number);
 
     // 3. Update the sign column in the delivery table
     // (Assuming tableName is 'delivery' based on your context)
-    return db.prepare(`UPDATE delivery SET sign = ? WHERE id = ?`)
-      .run(value, targetId);
+    return db.prepare(`UPDATE delivery SET sign = ? WHERE id = ?`).run(value, targetId);
   });
 
   // Execute the transaction
   return performUpdate(id, newValue);
 }
-
 
 export function deleteTokenById(id) {
   const query = `DELETE FROM delivery WHERE id = ?`;

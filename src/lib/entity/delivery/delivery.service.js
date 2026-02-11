@@ -1,9 +1,5 @@
 import { getFormattedTime } from '$lib/utils/dateTime';
-import {
-  updateDeliveryAmountById,
-  updateDeliveryById,
-  signDelivery
-} from './delivery.dal';
+import { updateDeliveryAmountById, updateDeliveryById, signDelivery } from './delivery.dal';
 
 export async function updateDelivery(data, id) {
   if (data.delivery_quantity && isNaN(Number(data.delivery_quantity)))
@@ -29,6 +25,6 @@ export async function updateDeliveryAmount(data, id) {
 }
 
 export async function signDeliveryById(id, current) {
-  const newValue = current == 1 ? 0 : 1
+  const newValue = current == 1 ? 0 : 1;
   signDelivery(id, newValue);
 }

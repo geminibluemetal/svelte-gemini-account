@@ -248,82 +248,90 @@
         <Button color="accent">Vehicle Summary</Button>
       </div>
       <div class="flex flex-col gap-2 w-full overflow-auto">
-        <table class="w-full border-2">
-          <thead>
-            <tr>
-              <th class="border border-black bg-black text-white" colspan="2">Sales</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.entries(sales) as [itemName, quantity], index}
+        {#if Object.entries(sales).length}
+          <table class="w-full border-2">
+            <thead>
               <tr>
-                <td class="border px-1">{itemName}</td>
+                <th class="border border-black bg-black text-white" colspan="2">Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each Object.entries(sales) as [itemName, quantity], index}
+                <tr>
+                  <td class="border px-1">{itemName}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{formatFixed(quantity)}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
+        {#if Object.entries(loads).length}
+          <table class="w-full border-2">
+            <thead>
+              <tr>
+                <th class="border border-black bg-black text-white" colspan="2">Loads</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each Object.entries(loads) as [vehicle, count], index}
+                <tr>
+                  <td class="border px-1">{vehicle}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{count}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
+        {#if Object.entries(partyCounts).length}
+          <table class="w-full border-2">
+            <thead>
+              <tr>
+                <th class="border border-black bg-black text-white" colspan="2">Party</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each Object.entries(partyCounts) as [party, count], index}
+                <tr>
+                  <td class="border px-1">{party}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{count}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        {/if}
+        {#if Object.entries(paytmAmountsArray).length}
+          <table class="w-full border-2">
+            <thead>
+              <tr>
+                <th class="border border-black bg-black text-white" colspan="2">Paytm</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each paytmAmountsArray as amount, index}
+                <tr>
+                  <td class="border px-1">{index + 1}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{amount}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+              <tr>
+                <td class=" border border-black bg-black text-white px-1">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
-                <td class="border px-1 text-right">{formatFixed(quantity)}</td>
+                <td class=" border border-black bg-black text-white px-1 text-right">
+                  {paytmAmountsArray.reduce((total, num) => total + num, 0)}
+                </td>
                 <!-- Quantity with 2 decimals -->
               </tr>
-            {/each}
-          </tbody>
-        </table>
-        <table class="w-full border-2">
-          <thead>
-            <tr>
-              <th class="border border-black bg-black text-white" colspan="2">Loads</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.entries(loads) as [vehicle, count], index}
-              <tr>
-                <td class="border px-1">{vehicle}</td>
-                <!-- Item name (MS, PS, etc.) -->
-                <td class="border px-1 text-right">{count}</td>
-                <!-- Quantity with 2 decimals -->
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-        <table class="w-full border-2">
-          <thead>
-            <tr>
-              <th class="border border-black bg-black text-white" colspan="2">Party</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each Object.entries(partyCounts) as [party, count], index}
-              <tr>
-                <td class="border px-1">{party}</td>
-                <!-- Item name (MS, PS, etc.) -->
-                <td class="border px-1 text-right">{count}</td>
-                <!-- Quantity with 2 decimals -->
-              </tr>
-            {/each}
-          </tbody>
-        </table>
-        <table class="w-full border-2">
-          <thead>
-            <tr>
-              <th class="border border-black bg-black text-white" colspan="2">Paytm</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each paytmAmountsArray as amount, index}
-              <tr>
-                <td class="border px-1">{index + 1}</td>
-                <!-- Item name (MS, PS, etc.) -->
-                <td class="border px-1 text-right">{amount}</td>
-                <!-- Quantity with 2 decimals -->
-              </tr>
-            {/each}
-            <tr>
-              <td class=" border border-black bg-black text-white px-1">Total</td>
-              <!-- Item name (MS, PS, etc.) -->
-              <td class=" border border-black bg-black text-white px-1 text-right">
-                {paytmAmountsArray.reduce((total, num) => total + num, 0)}
-              </td>
-              <!-- Quantity with 2 decimals -->
-            </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        {/if}
       </div>
     </div>
   {/snippet}

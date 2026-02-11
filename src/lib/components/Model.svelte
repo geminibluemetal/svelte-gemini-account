@@ -18,7 +18,7 @@
   } = $props();
 
   /* state */
-  let modalEl;
+  let modalEl = $state();
   let lastFocused;
 
   const focusableSelector = `
