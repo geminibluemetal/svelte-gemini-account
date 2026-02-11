@@ -160,10 +160,12 @@ export function updateDeliveryById(data, id) {
       delivery_item = COALESCE(?, delivery_item),
       delivery_quantity = COALESCE(?, delivery_quantity),
       amount_type_1 = COALESCE(?, amount_type_1),
+      amount_1 = COALESCE(?, amount_1),
       is_cancelled = COALESCE(?, is_cancelled)
     WHERE id = ?
   `;
 
+  console.log(data.amount_type_1, oldDelivery.amount_type_1)
   const params = [
     data.order_number !== undefined ? data.order_number : null,
     data.party_name !== undefined ? data.party_name : null,
@@ -171,7 +173,8 @@ export function updateDeliveryById(data, id) {
     data.delivery_time !== undefined ? data.delivery_time : null,
     data.delivery_item !== undefined ? data.delivery_item : null,
     data.delivery_quantity !== undefined ? data.delivery_quantity : null,
-    data.amount_type_1 ? data.amount_type_1 : null, // TODO
+    data.amount_type_1 ? data.amount_type_1 : oldDelivery.amount_type_1 == 'AC' ? '' : null, // TODO
+    data.amount_type_1 == 'AC' ? 0 : null, // TODO
     data.is_cancelled !== undefined ? (data.is_cancelled ? 1 : 0) : null,
     id
   ];

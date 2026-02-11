@@ -158,13 +158,17 @@
   let editableDelivery = $state(null);
 
   function handleDeliveryEdit(item) {
-    formOpened = true;
-    editableDelivery = item;
+    if (!formOpened && !amountFormOpened && !helperOpened) {
+      formOpened = true;
+      editableDelivery = item;
+    }
   }
 
   function handleDeliveryAmountUpdate(item) {
-    amountFormOpened = true;
-    editableDelivery = item;
+    if (!formOpened && !amountFormOpened && !helperOpened) {
+      amountFormOpened = true;
+      editableDelivery = item;
+    }
   }
 
   const handleDeliverySign = (item) =>
@@ -192,8 +196,10 @@
     editableDelivery = null;
   }
 
-  function toggleHelper() {
-    helperOpened = !helperOpened;
+  function handleHelper() {
+    if (!formOpened && !amountFormOpened && !helperOpened) {
+      helperOpened = true;
+    }
   }
 
   const customEvents = [
@@ -212,11 +218,11 @@
   }
 
   onMount(() => {
-    keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('H', handleHelper);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
-    keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('H', handleHelper);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
@@ -343,7 +349,7 @@
   item={editableDelivery}
 />
 
-<Model open={helperOpened} onClose={toggleHelper}>
+<Model open={helperOpened} onClose={() => (helperOpened = false)}>
   <div class="bg-white p-5 min-w-md">
     {#each availableOptions as o}
       <div class="m-1 mb-2 flex gap-2 items-center">
