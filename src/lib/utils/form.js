@@ -58,10 +58,11 @@ function isArray(value) {
 }
 
 function normalizeValue(value) {
-  if (value === 'on') return true;
-  if (value === 'off') return false;
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-
+  if (value === true) return 1;
+  if (value === false) return 0;
+  if (value === 'on') return 1;
+  if (value === 'off') return 0;
+  if (value === 'true') return 1;
+  if (value === 'false') return 0;
   return value;
 }
