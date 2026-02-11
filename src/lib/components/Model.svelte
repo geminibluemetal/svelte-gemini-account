@@ -118,10 +118,13 @@
 
 {#if open}
   <Teleport to="body">
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
     <div
       class="fixed inset-0 flex items-center justify-center"
       style="z-index: {1000 + modalStack.indexOf(instanceId)}"
     >
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="absolute inset-0 bg-black/50" onclick={() => closeOnBackdrop && close()}></div>
 
       <div

@@ -183,6 +183,7 @@
 
   <input
     class="outline-none py-1 px-2 w-full text-{textAlign}"
+    autocomplete="off"
     bind:value
     {placeholder}
     title={placeholder}

@@ -14,7 +14,8 @@
   import { commonDate } from '$lib/stores/common';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { Trash } from 'lucide-svelte';
+  import { CheckCheck, Trash } from 'lucide-svelte';
+  import OldBalanceForm from './OldBalanceForm.svelte';
 
   const { data } = $props();
   let view = $state('All');
@@ -36,7 +37,7 @@
   ];
 
   const oldBalanceHeaders = [
-    { name: 'SN', key: 'serial', align: 'center', width: '38' },
+    // { name: 'SN', key: 'serial', align: 'center', width: '38' },
     { name: 'Party', key: 'party_name', width: '220' },
     { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount', key: 'amount', align: 'center', color: Amount1Color },
@@ -176,16 +177,31 @@
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
     { key: '0', description: 'Amount Update' },
+    { key: '1', description: 'AC Filter' },
+    { key: '2', description: 'CP Filter' },
+    { key: '3', description: 'Blank Filter' },
+    { key: '4', description: 'Remove Filter' },
+    { key: '5', description: 'Open Cash Report' },
+    { key: '6', description: 'Open Order Book' },
+    { key: '7', description: 'Open Old Balance' },
+    { key: '8', description: 'Open Vehicle Summary' },
     { key: '➔', description: 'Sign delivery entry' },
     { key: 'E', description: 'Delivery Entry' },
+    { key: 'D', description: 'Delete Delivery Sheet' },
+    { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
     { key: 'Enter', description: 'Delivery Entry' }
   ];
 
   let formOpened = $state(false);
   let amountFormOpened = $state(false);
   let helperOpened = $state(false);
+
   let oldBalanceOpened = $state(false);
+  let oldBalanceFormOpened = $state(false);
+  let oldBalanceEditableItem = $state(null);
+
   let vehicleSummaryOpened = $state(false);
+  let reviewMode = $state(false);
   let editableDelivery = $state(null);
 
   function handleDeliveryEdit(item) {
@@ -212,6 +228,10 @@
       amountFormOpened = true;
       editableDelivery = item;
     }
+  }
+
+  function handleOldBalanceForm() {
+    if (oldBalanceOpened) oldBalanceFormOpened = true;
   }
 
   const handleDeliverySign = (item) =>
@@ -241,6 +261,10 @@
 
   function handleFullDelete() {
     transportAction('?/fullDelete', { date: $commonDate.toISOString() });
+  }
+
+  function handleReviewMode() {
+    reviewMode = !reviewMode;
   }
 
   function handleOldBalance() {
@@ -277,6 +301,10 @@
     ) {
       helperOpened = true;
     }
+  }
+
+  function handleOldBalanceFormClose() {
+    oldBalanceFormOpened = false;
   }
 
   function handleDateNavigationChange(value) {
@@ -318,6 +346,7 @@
 
   onMount(() => {
     keyboardEventBus.on('H', handleHelper);
+    keyboardEventBus.on('0', handleOldBalanceForm);
     keyboardEventBus.on('1', openACFilter);
     keyboardEventBus.on('2', openCPFilter);
     keyboardEventBus.on('3', openBlankFilter);
@@ -330,6 +359,7 @@
   });
   onDestroy(() => {
     keyboardEventBus.off('H', handleHelper);
+    keyboardEventBus.off('0', handleOldBalanceForm);
     keyboardEventBus.off('1', openACFilter);
     keyboardEventBus.off('2', openCPFilter);
     keyboardEventBus.off('3', openBlankFilter);
@@ -343,7 +373,8 @@
 </script>
 
 <Table
-  title="Delivery Sheet"
+  title={`Delivery Sheet${reviewMode ? ` (Reconciliation & Review Mode)` : ''}`}
+  headerColor={reviewMode ? 'blue' : 'red'}
   {headers}
   items={viewList[view]}
   {customEvents}
@@ -354,8 +385,17 @@
     <button
       class="m-0 p-0 cursor-pointer bg-white rounded-full hover:bg-white/90"
       onclick={handleFullDelete}
+      title="Delete Current Delivery Sheet"
     >
       <Trash size={23} class="text-red-500 p-1" />
+    </button>
+    <div>&nbsp;</div>
+    <button
+      class="m-0 p-0 cursor-pointer bg-white rounded-full hover:bg-white/90"
+      onclick={handleReviewMode}
+      title="Turn on Reconciliation & Review Mode"
+    >
+      <CheckCheck size={23} class="text-red-500 p-1" />
     </button>
   {/snippet}
   {#snippet right()}
@@ -505,6 +545,12 @@
     <Table title="Old Balance" headers={oldBalanceHeaders} autoHight={true}></Table>
   </div>
 </Model>
+<OldBalanceForm
+  open={oldBalanceFormOpened}
+  onClose={handleOldBalanceFormClose}
+  item={oldBalanceEditableItem}
+  options={{ party: data.party }}
+/>
 
 <!-- Vehicle Summary -->
 <Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>

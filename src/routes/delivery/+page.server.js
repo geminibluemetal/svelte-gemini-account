@@ -17,11 +17,11 @@ import { fail } from '@sveltejs/kit';
 export async function load({ depends, url }) {
   depends('DELIVERY.TOKEN.LIST');
 
-  const date = url.searchParams.get('date')
-  let formattedDate = formatDateTime('YY-MM-DD')
+  const date = url.searchParams.get('date');
+  let formattedDate = formatDateTime('YY-MM-DD');
 
   if (Date.parse(date)) {
-    formattedDate = formatDateTime('YY-MM-DD', date)
+    formattedDate = formatDateTime('YY-MM-DD', date);
   }
 
   const orders = await getAllAvailableOrders();
@@ -76,7 +76,16 @@ export const actions = {
   fullDelete: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    console.log("Full Delete Delivery SHeet By Date Pending", data)
+    console.log('Full Delete Delivery SHeet By Date Pending', data);
+    // sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    // sseEmit({ type: 'ORDERS.LIST' });
+  },
+
+  // Old Balance
+  oldBalance: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    console.log('oldBalance', data);
     // sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     // sseEmit({ type: 'ORDERS.LIST' });
   }

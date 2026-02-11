@@ -9,6 +9,7 @@
     title = '',
     headers = [],
     items = [],
+    headerColor = 'red',
     autoHight = false,
     hideSerial = false,
     hideAction = true,
@@ -107,7 +108,8 @@
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <!-- TITLE ROW -->
       <div
-        class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
+        class="col-span-full text-white text-center font-bold border-b-2 border-white sticky top-0 flex
+        {headerColor == 'blue' ? 'bg-blue-700' : 'bg-red-700'}"
       >
         <div class="flex-1 text-left flex">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
