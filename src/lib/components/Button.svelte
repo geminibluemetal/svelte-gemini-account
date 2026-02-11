@@ -10,6 +10,7 @@
     size = 'md',
     type = 'button',
     radius = '',
+    corner = '',
     prefix = null,
     suffix = null,
     disabled = false,
@@ -84,9 +85,20 @@
   <a
     {href}
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]}
-    {radiusStyles[radius || size]} {userClass}"
+    {radiusStyles[radius || size]} relative {userClass}"
     {...props}
   >
+    {#if corner}
+      <div
+        class="absolute -top-1 -left-1 size-4 p-1
+             bg-white text-black text-[12px] font-semibold
+             rounded-full flex items-center justify-center
+             border-2 shadow-sm z-10"
+      >
+        {corner}
+      </div>
+    {/if}
+
     {#if prefix}
       {@const Prefix = prefix}
       <Prefix class="inline-block {prefixClassSize}" size={iconSize} />
@@ -103,12 +115,23 @@
   <!-- Normal Button -->
   <button
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]} {disabledClass}
-    {radiusStyles[radius || size]} {userClass}"
+    {radiusStyles[radius || size]} relative {userClass}"
     {onclick}
     {disabled}
     {type}
     {...props}
   >
+    {#if corner}
+      <div
+        class="absolute -top-1 -left-1 size-4 p-1
+             bg-white text-black text-[12px] font-semibold
+             rounded-full flex items-center justify-center
+             border-2 shadow-sm z-10"
+      >
+        {corner}
+      </div>
+    {/if}
+
     {#if prefix}
       {@const Prefix = prefix}
       <Prefix class="inline-block {prefixClassSize}" size={iconSize} />

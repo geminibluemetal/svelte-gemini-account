@@ -70,5 +70,14 @@ export const actions = {
     signDeliveryById(data.id, data.current);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
+  },
+
+  // Full Delete
+  fullDelete: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    console.log("Full Delete Delivery SHeet By Date Pending", data)
+    // sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    // sseEmit({ type: 'ORDERS.LIST' });
   }
 };

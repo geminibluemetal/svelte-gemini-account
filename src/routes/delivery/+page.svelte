@@ -14,8 +14,10 @@
   import { commonDate } from '$lib/stores/common';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { Trash } from 'lucide-svelte';
 
   const { data } = $props();
+  let view = $state('All');
   const headers = [
     { name: 'SN', key: 'serial', align: 'center', width: '38' },
     { name: 'T Time', key: 'token_time', align: 'center', width: '80' },
@@ -32,6 +34,21 @@
     { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];
+
+  const viewList = $derived({
+    All: data.token,
+    AC: data.token.filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC'),
+    CP: data.token.filter(
+      (d) =>
+        d.amount_type_1 == 'CP' ||
+        d.amount_type_1 == 'Paytm' ||
+        d.amount_type_2 == 'CP' ||
+        d.amount_type_2 == 'Paytm'
+    ),
+    Blank: data.token.filter(
+      (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2
+    )
+  });
 
   const sales = $derived(
     data.token.reduce((acc, item) => {
@@ -159,17 +176,31 @@
   let formOpened = $state(false);
   let amountFormOpened = $state(false);
   let helperOpened = $state(false);
+  let oldBalanceOpened = $state(false);
+  let vehicleSummaryOpened = $state(false);
   let editableDelivery = $state(null);
 
   function handleDeliveryEdit(item) {
-    if (!formOpened && !amountFormOpened && !helperOpened) {
+    if (
+      !formOpened &&
+      !amountFormOpened &&
+      !helperOpened &&
+      !oldBalanceOpened &&
+      !vehicleSummaryOpened
+    ) {
       formOpened = true;
       editableDelivery = item;
     }
   }
 
   function handleDeliveryAmountUpdate(item) {
-    if (!formOpened && !amountFormOpened && !helperOpened) {
+    if (
+      !formOpened &&
+      !amountFormOpened &&
+      !helperOpened &&
+      !oldBalanceOpened &&
+      !vehicleSummaryOpened
+    ) {
       amountFormOpened = true;
       editableDelivery = item;
     }
@@ -200,8 +231,42 @@
     editableDelivery = null;
   }
 
+  function handleFullDelete() {
+    transportAction('?/fullDelete', { date: $commonDate.toISOString() });
+  }
+
+  function handleOldBalance() {
+    if (
+      !formOpened &&
+      !amountFormOpened &&
+      !helperOpened &&
+      !oldBalanceOpened &&
+      !vehicleSummaryOpened
+    ) {
+      oldBalanceOpened = true;
+    }
+  }
+
+  function handleVehicleSummary(item) {
+    if (
+      !formOpened &&
+      !amountFormOpened &&
+      !helperOpened &&
+      !oldBalanceOpened &&
+      !vehicleSummaryOpened
+    ) {
+      vehicleSummaryOpened = true;
+    }
+  }
+
   function handleHelper() {
-    if (!formOpened && !amountFormOpened && !helperOpened) {
+    if (
+      !formOpened &&
+      !amountFormOpened &&
+      !helperOpened &&
+      !oldBalanceOpened &&
+      !vehicleSummaryOpened
+    ) {
       helperOpened = true;
     }
   }
@@ -236,12 +301,35 @@
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
+  const openCashReport = () => goto('/cash');
+  const openOrderBook = () => goto('/orders');
+  const openACFilter = () => (view = 'AC');
+  const openCPFilter = () => (view = 'CP');
+  const openBlankFilter = () => (view = 'Blank');
+  const openRemoveFilter = () => (view = 'All');
+
   onMount(() => {
     keyboardEventBus.on('H', handleHelper);
+    keyboardEventBus.on('1', openACFilter);
+    keyboardEventBus.on('2', openCPFilter);
+    keyboardEventBus.on('3', openBlankFilter);
+    keyboardEventBus.on('4', openRemoveFilter);
+    keyboardEventBus.on('5', openCashReport);
+    keyboardEventBus.on('6', openOrderBook);
+    keyboardEventBus.on('7', handleOldBalance);
+    keyboardEventBus.on('8', handleVehicleSummary);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('H', handleHelper);
+    keyboardEventBus.off('1', openACFilter);
+    keyboardEventBus.off('2', openCPFilter);
+    keyboardEventBus.off('3', openBlankFilter);
+    keyboardEventBus.off('4', openRemoveFilter);
+    keyboardEventBus.off('5', openCashReport);
+    keyboardEventBus.off('6', openOrderBook);
+    keyboardEventBus.off('7', handleOldBalance);
+    keyboardEventBus.off('8', handleVehicleSummary);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
@@ -249,11 +337,22 @@
 <Table
   title="Delivery Sheet"
   {headers}
-  items={data.token}
+  items={viewList[view]}
   {customEvents}
   hideSerial={true}
   {customCellHighlight}
 >
+  {#snippet left()}
+    <button
+      class="m-0 p-0 cursor-pointer bg-white rounded-full hover:bg-white/90"
+      onclick={handleFullDelete}
+    >
+      <Trash size={23} class="text-red-500 p-1" />
+    </button>
+  {/snippet}
+  {#snippet right()}
+    <span class="mr-2">{view}</span>
+  {/snippet}
   {#snippet sidebar()}
     <div class="flex flex-col gap-2 w-50">
       <div class="flex gap-2 *:flex-1">
@@ -264,20 +363,20 @@
         />
       </div>
       <div class="dark flex gap-2 *:flex-1">
-        <Button color="fuchsia">AC</Button>
-        <Button color="fuchsia">CP</Button>
-        <Button color="fuchsia">Blank</Button>
+        <Button corner="1" color="fuchsia" onclick={openACFilter}>AC</Button>
+        <Button corner="2" color="fuchsia" onclick={openCPFilter}>CP</Button>
+        <Button corner="3" color="fuchsia" onclick={openBlankFilter}>Blank</Button>
       </div>
       <div class="dark flex gap-2 *:flex-1">
-        <Button color="fuchsia">Remove</Button>
-        <Button color="primary">CR</Button>
-        <Button color="primary">OB</Button>
+        <Button corner="4" color="fuchsia" onclick={openRemoveFilter}>Remove</Button>
+        <Button corner="5" color="primary" onclick={openCashReport}>CR</Button>
+        <Button corner="6" color="primary" onclick={openOrderBook}>OB</Button>
       </div>
       <div class="dark flex gap-2 *:flex-1">
-        <Button color="accent">Old Balance</Button>
+        <Button corner="7" color="accent" onclick={handleOldBalance}>Old Balance</Button>
       </div>
       <div class="dark flex gap-2 *:flex-1">
-        <Button color="accent">Vehicle Summary</Button>
+        <Button corner="8" color="accent" onclick={handleVehicleSummary}>Vehicle Summary</Button>
       </div>
       <div class="flex flex-col gap-2 w-full overflow-auto">
         {#if Object.entries(sales).length}
@@ -368,13 +467,18 @@
     </div>
   {/snippet}
 </Table>
+
+<!-- Delivery Entry Form -->
 <DeliveryForm open={formOpened} onClose={handleFormClose} item={editableDelivery} options={data} />
+
+<!-- Delivery Amount Update -->
 <DeliveryAmountForm
   open={amountFormOpened}
   onClose={handleAmountFormClose}
   item={editableDelivery}
 />
 
+<!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
   <div class="bg-white p-5 min-w-md">
     {#each availableOptions as o}
@@ -384,5 +488,19 @@
         <span class="flex-11">{o.description}</span>
       </div>
     {/each}
+  </div>
+</Model>
+
+<!-- Old Balance -->
+<Model open={oldBalanceOpened} onClose={() => (oldBalanceOpened = false)}>
+  <div class="bg-white p-5 min-w-2xl">
+    <Table></Table>
+  </div>
+</Model>
+
+<!-- Vehicle Summary -->
+<Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>
+  <div class="bg-white p-5 min-w-2xl">
+    <Table></Table>
   </div>
 </Model>

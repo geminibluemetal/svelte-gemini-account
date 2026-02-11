@@ -108,7 +108,7 @@
       <div
         class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
       >
-        <div class="flex-1 text-left">{@render left()}</div>
+        <div class="flex-1 text-left flex">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
         <div class="flex-1 text-right">{@render right()}</div>
       </div>
