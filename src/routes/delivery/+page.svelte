@@ -10,6 +10,10 @@
   import DeliveryAmountForm from './DeliveryAmountForm.svelte';
   import Button from '$lib/components/Button.svelte';
   import { formatFixed } from '$lib/utils/number';
+  import DateNavigator from '$lib/components/DateNavigator.svelte';
+  import { commonDate } from '$lib/stores/common';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   const { data } = $props();
   const headers = [
@@ -20,7 +24,7 @@
     { name: 'ON', key: 'order_number', align: 'center', width: '38' },
     { name: 'Party', key: 'party_name', width: '220' },
     { name: 'Address', key: 'address', width: '220' },
-    { name: 'Item', key: 'delivery_item' }, // width: '125'
+    { name: 'Item', key: 'delivery_item', width: '125' },
     { name: 'Qty', key: 'delivery_quantity', align: 'center', display: 'decimal', width: '55' },
     { name: 'AT1', key: 'amount_type_1', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount1', key: 'amount_1', align: 'center', color: Amount1Color },
@@ -202,6 +206,21 @@
     }
   }
 
+  function handleDateNavigationChange(value) {
+    // 1. Calculate the ISO strings for a stable comparison
+    const newDateStr = value.toISOString();
+    const urlDateStr = $page.url.searchParams.get('date');
+
+    // 2. Only proceed if the date has actually changed
+    if (newDateStr !== urlDateStr) {
+      $commonDate = value; // Update store
+
+      // 3. Use { keepFocus: true, replaceState: true } to prevent
+      // unnecessary scroll jumps or history bloating
+      goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
+    }
+  }
+
   const customEvents = [
     { key: '0', handler: handleDeliveryAmountUpdate },
     { key: 'ArrowRight', handler: handleDeliverySign },
@@ -237,6 +256,13 @@
 >
   {#snippet sidebar()}
     <div class="flex flex-col gap-2 w-50">
+      <div class="flex gap-2 *:flex-1">
+        <DateNavigator
+          class="focus:bg-amber-50"
+          value={$commonDate}
+          onDateChange={handleDateNavigationChange}
+        />
+      </div>
       <div class="dark flex gap-2 *:flex-1">
         <Button color="fuchsia">AC</Button>
         <Button color="fuchsia">CP</Button>

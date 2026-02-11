@@ -1,7 +1,10 @@
 <script>
   import { ArrowBigLeft, ArrowBigRight } from 'lucide-svelte';
   import DateField from './DateField.svelte';
-  let { value = $bindable(), full, ...props } = $props();
+  let { value = $bindable(), full, onDateChange = () => {}, ...props } = $props();
+  $effect(() => {
+    onDateChange(value);
+  });
 </script>
 
 <div class="flex gap-2 w-{full ? 'full' : '52'}">

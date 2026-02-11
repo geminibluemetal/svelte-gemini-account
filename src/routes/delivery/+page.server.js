@@ -10,14 +10,23 @@ import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllToken } from '$lib/entity/token/token.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
+import { formatDateTime } from '$lib/utils/dateTime.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
 
-export async function load({ depends }) {
+export async function load({ depends, url }) {
   depends('DELIVERY.TOKEN.LIST');
+
+  const date = url.searchParams.get('date')
+  let formattedDate = formatDateTime('YY-MM-DD')
+
+  if (Date.parse(date)) {
+    formattedDate = formatDateTime('YY-MM-DD', date)
+  }
+
   const orders = await getAllAvailableOrders();
   const address = await getAllAddress();
-  const token = await getAllToken();
+  const token = await getAllToken(formattedDate);
   const party = await getAllParty();
   const vehicle = await getAllVehicle();
   const item = await getAllItems();
