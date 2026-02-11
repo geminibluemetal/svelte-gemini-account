@@ -35,6 +35,14 @@
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];
 
+  const oldBalanceHeaders = [
+    { name: 'SN', key: 'serial', align: 'center', width: '38' },
+    { name: 'Party', key: 'party_name', width: '220' },
+    { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '60' },
+    { name: 'Amount', key: 'amount', align: 'center', color: Amount1Color },
+    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
+  ];
+
   const viewList = $derived({
     All: data.token,
     AC: data.token.filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC'),
@@ -493,8 +501,8 @@
 
 <!-- Old Balance -->
 <Model open={oldBalanceOpened} onClose={() => (oldBalanceOpened = false)}>
-  <div class="bg-white p-5 min-w-2xl">
-    <Table></Table>
+  <div class="bg-white p-5">
+    <Table title="Old Balance" headers={oldBalanceHeaders} autoHight={true}></Table>
   </div>
 </Model>
 

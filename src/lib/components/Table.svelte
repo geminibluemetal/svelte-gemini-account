@@ -9,6 +9,7 @@
     title = '',
     headers = [],
     items = [],
+    autoHight = false,
     hideSerial = false,
     hideAction = true,
     bottomSpace = false,
@@ -98,7 +99,7 @@
   });
 </script>
 
-<div class="p-2 h-screen flex flex-row w-fit gap-2">
+<div class="p-2 {autoHight ? 'h-full' : 'h-screen'} flex flex-row w-fit gap-2">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <div class="overflow-auto border-2 border-black" bind:this={container}>
