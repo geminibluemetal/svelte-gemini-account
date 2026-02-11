@@ -8,6 +8,10 @@
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import Badge from '$lib/components/Badge.svelte';
   import Button from '$lib/components/Button.svelte';
+  import DateNavigator from '$lib/components/DateNavigator.svelte';
+  import { commonDate } from '$lib/stores/common';
+  import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
 
   const { data } = $props();
   const headers = [
@@ -83,6 +87,21 @@
     helperOpened = !helperOpened;
   }
 
+  function handleDateNavigationChange(value) {
+    // 1. Calculate the ISO strings for a stable comparison
+    const newDateStr = value.toISOString();
+    const urlDateStr = $page.url.searchParams.get('date');
+
+    // 2. Only proceed if the date has actually changed
+    if (newDateStr !== urlDateStr) {
+      $commonDate = value; // Update store
+
+      // 3. Use { keepFocus: true, replaceState: true } to prevent
+      // unnecessary scroll jumps or history bloating
+      goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
+    }
+  }
+
   const customEvents = [
     { key: 'E', handler: handleTokenEdit },
     { key: 'D', handler: handleTokenDelete },
@@ -109,14 +128,19 @@
   {/snippet}
   {#snippet sidebar()}
     <div>
-      <div class="p-3 dark flex flex-col gap-2">
-        <Button onclick={viewAllToken} color="primary" class="flex justify-between gap-2">
+      <div class="p-3 flex flex-col gap-2">
+        <DateNavigator
+          class="focus:bg-amber-50"
+          value={$commonDate}
+          onDateChange={handleDateNavigationChange}
+        />
+        <Button onclick={viewAllToken} color="primary" class="flex dark justify-between gap-2">
           <span>All</span> <span>{viewList.all.length}</span>
         </Button>
-        <Button onclick={viewOpenedToken} color="primary" class="flex justify-between gap-2">
+        <Button onclick={viewOpenedToken} color="primary" class="flex dark justify-between gap-2">
           <span>Opened</span> <span>{viewList.opened.length}</span>
         </Button>
-        <Button onclick={viewClosedToken} color="primary" class="flex justify-between gap-2">
+        <Button onclick={viewClosedToken} color="primary" class="flex dark justify-between gap-2">
           <span>Closed</span> <span>{viewList.closed.length}</span>
         </Button>
       </div>
