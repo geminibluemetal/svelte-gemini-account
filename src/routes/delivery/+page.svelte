@@ -102,15 +102,19 @@
   );
 
   const partyCounts = $derived(
-    data.token.reduce((acc, item) => {
-      const partyName = item.party_name;
+    Object.fromEntries(
+      Object.entries(
+        data.token.reduce((acc, item) => {
+          const partyName = item.party_name;
 
-      if (partyName) {
-        acc[partyName] = (acc[partyName] || 0) + 1;
-      }
+          if (partyName) {
+            acc[partyName] = (acc[partyName] || 0) + 1;
+          }
 
-      return acc;
-    }, {})
+          return acc;
+        }, {})
+      ).filter(([_, count]) => count > 1)
+    )
   );
 
   // Array of only Paytm amounts (numbers)
@@ -176,9 +180,9 @@
       case 'Bunk Cash':
         return { foreground: 'text-green-800 font-bold' };
       case 'Bunk Ac':
-        return { foreground: 'text-amber-600 font-bold' };
+        return { foreground: 'text-yellow-600 font-bold' };
       case 'Gemini Ac':
-        return { foreground: 'text-amber-600 font-bold' };
+        return { foreground: 'text-yellow-600 font-bold' };
       case 'Cash':
         return { foreground: 'text-green-800 font-bold' };
       case 'Cheque':
@@ -364,7 +368,6 @@
   ];
 
   const oldBalanceCustomEvents = [
-    { key: '0', handler: handleOldBalanceForm },
     { key: 'ArrowRight', handler: handleOldBalanceSign },
     { key: 'E', handler: handleOldBalanceEdit },
     { key: 'Enter', handler: handleOldBalanceEdit }
@@ -387,6 +390,7 @@
 
   onMount(() => {
     keyboardEventBus.on('H', handleHelper);
+    keyboardEventBus.on('0', handleOldBalanceForm);
     keyboardEventBus.on('1', openACFilter);
     keyboardEventBus.on('2', openCPFilter);
     keyboardEventBus.on('3', openBlankFilter);
@@ -399,6 +403,7 @@
   });
   onDestroy(() => {
     keyboardEventBus.off('H', handleHelper);
+    keyboardEventBus.off('0', handleOldBalanceForm);
     keyboardEventBus.off('1', openACFilter);
     keyboardEventBus.off('2', openCPFilter);
     keyboardEventBus.off('3', openBlankFilter);

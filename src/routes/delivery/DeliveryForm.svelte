@@ -42,7 +42,8 @@
     if (selectedOrder?.item) data.delivery_item = selectedOrder.item;
   }
 
-  function handleFormSubmit() {
+  function handleFormSubmit({ formData }) {
+    formData.set('vehicle', item.vehicle);
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');
