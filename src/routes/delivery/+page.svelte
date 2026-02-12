@@ -176,9 +176,9 @@
       case 'Bunk Cash':
         return { foreground: 'text-green-800 font-bold' };
       case 'Bunk Ac':
-        return { foreground: 'text-amber-800 font-bold' };
+        return { foreground: 'text-amber-600 font-bold' };
       case 'Gemini Ac':
-        return { foreground: 'text-amber-800 font-bold' };
+        return { foreground: 'text-amber-600 font-bold' };
       case 'Cash':
         return { foreground: 'text-green-800 font-bold' };
       case 'Cheque':
@@ -321,7 +321,7 @@
   }
 
   function handleOldBalanceSign(item) {
-    alert('Old Balance');
+    transportAction('?/oldBalanceSign', { id: item.id, current: item.sign });
   }
 
   function handleHelper() {

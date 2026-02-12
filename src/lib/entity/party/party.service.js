@@ -9,6 +9,7 @@ import {
 import {
   fetchAllOldBalanceByDate,
   insertPartyOldBalance,
+  signOldBalance,
   updatePartyOldBalance
 } from './party.statements.dal';
 
@@ -112,4 +113,9 @@ export async function updateOldBalance(data, id) {
 
 export async function getAllOldBalance(date) {
   return fetchAllOldBalanceByDate(date);
+}
+
+export async function signOldBalanceById(id, current) {
+  const newValue = current == 1 ? 0 : 1;
+  return signOldBalance(id, newValue);
 }

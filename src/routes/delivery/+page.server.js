@@ -11,6 +11,7 @@ import {
   createOldBalance,
   getAllOldBalance,
   getAllParty,
+  signOldBalanceById,
   updateOldBalance
 } from '$lib/entity/party/party.service.js';
 import { getAllToken } from '$lib/entity/token/token.service.js';
@@ -69,7 +70,7 @@ export const actions = {
     return result;
   },
 
-  // Sing Delivery Sheet
+  // Sign Delivery Sheet
   sign: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
@@ -102,5 +103,14 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
     return result;
-  }
+  },
+
+  // Sign Old Balance
+  oldBalanceSign: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    signOldBalanceById(data.id, data.current);
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
+  },
 };
