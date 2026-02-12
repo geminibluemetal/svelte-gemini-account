@@ -22,7 +22,7 @@
   let data = $state(initialData);
   let isAc = $state(false);
 
-  const orderList = $derived(options.orders.map((o) => o.order_number.toString()));
+  const orderList = $derived(['NO', ...options.orders.map((o) => o.order_number.toString())]);
   const partyList = $derived(options.party.map((p) => p.name));
   const addressList = $derived(options.address.map((a) => a.name));
   const vehicleList = $derived(options.vehicle.map((v) => v.short_number));

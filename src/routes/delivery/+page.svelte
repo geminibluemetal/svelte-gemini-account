@@ -24,7 +24,7 @@
     { name: 'T Time', key: 'token_time', align: 'center', width: '80' },
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
     { name: 'D Time', key: 'delivery_time', align: 'center', width: '80' },
-    { name: 'ON', key: 'order_number', align: 'center', width: '38' },
+    { name: 'ON', key: 'order_number', align: 'center', width: '38', color: orderColor },
     { name: 'Party', key: 'party_name', width: '220' },
     { name: 'Address', key: 'address', width: '220' },
     { name: 'Item', key: 'delivery_item', width: '125' },
@@ -46,14 +46,19 @@
 
   const viewList = $derived({
     All: data.token,
-    AC: data.token.filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC'),
-    CP: data.token.filter(
-      (d) =>
-        d.amount_type_1 == 'CP' ||
-        d.amount_type_1 == 'Paytm' ||
-        d.amount_type_2 == 'CP' ||
-        d.amount_type_2 == 'Paytm'
-    ),
+    AC: data.token
+      .filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC')
+      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
+    CP: data.token
+      .filter(
+        (d) =>
+          d.amount_type_1 == 'CP' ||
+          d.amount_type_1 == 'Paytm' ||
+          d.amount_type_2 == 'CP' ||
+          d.amount_type_2 == 'Paytm'
+      )
+      .sort((a, b) => a.order_number.localeCompare(b.order_number))
+      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
     Blank: data.token.filter(
       (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2
     )
@@ -134,12 +139,20 @@
     }, [])
   );
 
+  function orderColor(v) {
+    return v == 'NO' ? HighlightCell.red : null;
+  }
+
   function VehicleColor(value) {
     if (value.endsWith('G')) return { foreground: 'text-blue-700 font-bold' };
   }
 
   function SignColor(value) {
     return value == 1 ? HighlightCell.green : null;
+  }
+
+  function rowHighlight(item) {
+    if (item.is_cancelled) return HighlightRow.red;
   }
 
   function AmountTypeColor(value) {
@@ -429,6 +442,7 @@
     !oldBalanceOpened &&
     !vehicleSummaryOpened}
   {customCellHighlight}
+  {rowHighlight}
 >
   {#snippet left()}
     <button

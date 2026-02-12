@@ -12,6 +12,7 @@
   import { commonDate } from '$lib/stores/common';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
+  import { HighlightRow } from '$lib/utils/highlight';
 
   const { data } = $props();
   const headers = [
@@ -110,6 +111,10 @@
 
   const toggleOpenForm = () => (formOpened = !formOpened);
 
+  function rowHighlight(item) {
+    return item.is_cancelled ? HighlightRow.red : null;
+  }
+
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
     keyboardEventBus.on('H', toggleHelper);
@@ -122,7 +127,14 @@
   });
 </script>
 
-<Table title="Token" {headers} items={viewList[view]} {customEvents} hideSerial={true}>
+<Table
+  title="Token"
+  {headers}
+  items={viewList[view]}
+  {customEvents}
+  hideSerial={true}
+  {rowHighlight}
+>
   {#snippet right()}
     <span class="capitalize px-2">{view}</span>
   {/snippet}

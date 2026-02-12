@@ -2,14 +2,16 @@ import { getFormattedTime } from '$lib/utils/dateTime';
 import { updateDeliveryAmountById, updateDeliveryById, signDelivery } from './delivery.dal';
 
 export async function updateDelivery(data, id) {
-  if (data.vehicle.endsWith('G') && !data.address)
-    return { message: 'Address is Missing', ok: false };
-  else if (data.vehicle.endsWith('G') && !data.order_number)
-    return { message: 'Order Number is Missing', ok: false };
-  else if (data.delivery_quantity && isNaN(Number(data.delivery_quantity)))
-    return { message: 'Quantity Must be a Number', ok: false };
-  else if (data.amount_type_1 == 'AC' && !data.party_name)
-    return { message: 'AC type Must have Party Name', ok: false };
+  if (!data.is_cancelled && data.delivery_quantity && data.delivery_item) {
+    if (data.vehicle.endsWith('G') && !data.address)
+      return { message: 'Address is Missing', ok: false };
+    else if (data.vehicle.endsWith('G') && !data.order_number)
+      return { message: 'Order Number is Missing', ok: false };
+    else if (data.delivery_quantity && isNaN(Number(data.delivery_quantity)))
+      return { message: 'Quantity Must be a Number', ok: false };
+    else if (data.amount_type_1 == 'AC' && !data.party_name)
+      return { message: 'AC type Must have Party Name', ok: false };
+  }
   data.delivery_time = getFormattedTime();
   const result = updateDeliveryById(data, id);
 

@@ -170,6 +170,11 @@
       else {
         showToast(result?.data?.message);
         tokenOpened = false;
+        quickToken = {
+          id: null,
+          vehicle: null,
+          qty: null
+        };
       }
     };
   };
@@ -208,8 +213,13 @@
     helperOpened = !helperOpened;
   }
 
-  function toggleToken() {
-    tokenOpened = !tokenOpened;
+  function handleQuickTokenClose() {
+    tokenOpened = false;
+    quickToken = {
+      id: null,
+      vehicle: null,
+      qty: null
+    };
   }
 
   const customEvents = [
@@ -342,11 +352,11 @@
 </Model>
 
 <!-- Ask Vehicle and qty to genereate token for orders -->
-<Model open={tokenOpened} onClose={toggleToken} autoFocusTabIndex={2}>
+<Model open={tokenOpened} onClose={handleQuickTokenClose} autoFocusTabIndex={2}>
   <Form
     action="?/orderToToken"
     method="POST"
-    cancel={toggleToken}
+    cancel={handleQuickTokenClose}
     class="max-w-lg"
     title="Quick Token"
     enhance={handleQuickTokenSubmit}

@@ -24,7 +24,9 @@
     onClose();
   }
 
-  function handleFormSubmit() {
+  function handleFormSubmit({ formData }) {
+    formData.set('delivery_item', item.delivery_item ? item.delivery_item : '');
+    formData.set('delivery_quantity', item.delivery_quantity ? item.delivery_quantity : '');
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');
@@ -86,6 +88,8 @@
       autoComplete="off"
       caseMode="none"
     />
-    <CheckBoxField name="is_cancelled" value={data.is_cancelled} placeholder="Is Cancelled" />
+    {#if !!item}
+      <CheckBoxField name="is_cancelled" value={data.is_cancelled} placeholder="Is Cancelled" />
+    {/if}
   </Form>
 </Model>

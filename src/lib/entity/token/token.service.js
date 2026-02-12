@@ -68,6 +68,7 @@ export async function printToken(data) {
 }
 
 export async function updateToken(data, editId, takePrint = true) {
+  if (data.delivery_item && data.delivery_quantity) return { message: 'Can not modify delivered token', ok: false };
   if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
   if (!data.token_item) return { message: 'Item is Required', ok: false };
   if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
@@ -78,17 +79,18 @@ export async function updateToken(data, editId, takePrint = true) {
   if (result?.changes) {
     if (takePrint) {
       const token = fetchDeliveryById(editId);
-      printToken({
-        Token: token.serial,
-        Party: token.party_name,
-        Vcle: token.vehicle,
-        Item: token.token_item,
-        Qty: formatFixed(token.token_quantity),
-        Date: getFormattedDate(),
-        Time: getFormattedTime()
-      });
+      if (!token.is_cancelled)
+        printToken({
+          Token: token.serial,
+          Party: token.party_name,
+          Vcle: token.vehicle,
+          Item: token.token_item,
+          Qty: formatFixed(token.token_quantity),
+          Date: getFormattedDate(),
+          Time: getFormattedTime()
+        });
     }
-    return { message: `Token created`, ok: true };
+    return { message: `Token updated`, ok: true };
   }
 }
 

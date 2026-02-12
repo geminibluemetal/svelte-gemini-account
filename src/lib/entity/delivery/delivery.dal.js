@@ -165,7 +165,6 @@ export function updateDeliveryById(data, id) {
     WHERE id = ?
   `;
 
-  console.log(data.amount_type_1, oldDelivery.amount_type_1)
   const params = [
     data.order_number !== undefined ? data.order_number : null,
     data.party_name !== undefined ? data.party_name : null,
@@ -175,7 +174,7 @@ export function updateDeliveryById(data, id) {
     data.delivery_quantity !== undefined ? data.delivery_quantity : null,
     data.amount_type_1 ? data.amount_type_1 : oldDelivery.amount_type_1 == 'AC' ? '' : null, // TODO
     data.amount_type_1 == 'AC' ? 0 : null, // TODO
-    data.is_cancelled !== undefined ? (data.is_cancelled ? 1 : 0) : null,
+    data.is_cancelled ? 1 : 0,
     id
   ];
   const stmt = db.prepare(query);
