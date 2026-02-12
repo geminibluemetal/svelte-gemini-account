@@ -6,6 +6,11 @@ import {
   insertParty,
   updatePartyById
 } from './party.dal';
+import {
+  fetchAllOldBalanceByDate,
+  insertPartyOldBalance,
+  updatePartyOldBalance
+} from './party.statements.dal';
 
 export async function getAllParty() {
   return fetchAllParty();
@@ -71,4 +76,40 @@ export async function deleteParty(id) {
   } else {
     return { message: `Party Not Deleted`, ok: false };
   }
+}
+
+export async function createOldBalance(data) {
+  if (!data.party_id) return { message: 'Party is required', ok: false };
+  if (!data.amount_type) return { message: 'Amount Type is required', ok: false };
+  if (!data.amount) return { message: 'Amount is required', ok: false };
+  if (!data.entry_type) return { message: 'Entry Type Missing', ok: false };
+  if (data.amount && isNaN(Number(data.amount)))
+    return { message: 'Amount should be number', ok: false };
+
+  const result = insertPartyOldBalance(data);
+  if (result?.changes) {
+    return { message: `Old Balance Added`, ok: true };
+  } else {
+    return { message: `Old Balance Not Added`, ok: false };
+  }
+}
+
+export async function updateOldBalance(data, id) {
+  if (!data.party_id) return { message: 'Party is required', ok: false };
+  if (!data.amount_type) return { message: 'Amount Type is required', ok: false };
+  if (!data.amount) return { message: 'Amount is required', ok: false };
+  if (!data.entry_type) return { message: 'Entry Type Missing', ok: false };
+  if (data.amount && isNaN(Number(data.amount)))
+    return { message: 'Amount should be number', ok: false };
+
+  const result = updatePartyOldBalance(data, id);
+  if (result?.changes) {
+    return { message: `Old Balance Added`, ok: true };
+  } else {
+    return { message: `Old Balance Not Added`, ok: false };
+  }
+}
+
+export async function getAllOldBalance(date) {
+  return fetchAllOldBalanceByDate(date);
 }

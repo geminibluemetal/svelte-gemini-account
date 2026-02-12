@@ -39,8 +39,8 @@
   const oldBalanceHeaders = [
     // { name: 'SN', key: 'serial', align: 'center', width: '38' },
     { name: 'Party', key: 'party_name', width: '220' },
-    { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '60' },
-    { name: 'Amount', key: 'amount', align: 'center', color: Amount1Color },
+    { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '100' },
+    { name: 'Amount', key: 'amount', align: 'right', color: AmountOBColor, display: 'currency' },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
   ];
 
@@ -150,19 +150,39 @@
         return HighlightCell.red;
       case 'Gpay':
         return HighlightCell.blue;
+      case 'Bunk Cash':
+        return HighlightCell.green;
+      case 'Bunk Ac':
+        return HighlightCell.yellow;
+      case 'Gemini Ac':
+        return HighlightCell.yellow;
+      case 'Cash':
+        return HighlightCell.green;
+      case 'Cheque':
+        return HighlightCell.purple;
     }
   }
 
   function AmountXColor(value) {
     switch (value) {
       case 'Bunk':
-        return { foreground: 'text-purple-700 font-bold' };
+        return { foreground: 'text-purple-800 font-bold' };
       case 'CP':
-        return { foreground: 'text-green-700 font-bold' };
+        return { foreground: 'text-green-800 font-bold' };
       case 'Paytm':
-        return { foreground: 'text-red-700 font-bold' };
+        return { foreground: 'text-red-800 font-bold' };
       case 'Gpay':
-        return { foreground: 'text-blue-700 font-bold' };
+        return { foreground: 'text-blue-800 font-bold' };
+      case 'Bunk Cash':
+        return { foreground: 'text-green-800 font-bold' };
+      case 'Bunk Ac':
+        return { foreground: 'text-amber-800 font-bold' };
+      case 'Gemini Ac':
+        return { foreground: 'text-amber-800 font-bold' };
+      case 'Cash':
+        return { foreground: 'text-green-800 font-bold' };
+      case 'Cheque':
+        return { foreground: 'text-purple-800 font-bold' };
     }
   }
 
@@ -174,9 +194,13 @@
     return AmountXColor(item.amount_type_2);
   }
 
+  function AmountOBColor(value, item) {
+    return AmountXColor(item.amount_type);
+  }
+
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
-    { key: '0', description: 'Amount Update' },
+    { key: '0', description: 'Amount Update or Old Balance Entry' },
     { key: '1', description: 'AC Filter' },
     { key: '2', description: 'CP Filter' },
     { key: '3', description: 'Blank Filter' },
@@ -185,11 +209,11 @@
     { key: '6', description: 'Open Order Book' },
     { key: '7', description: 'Open Old Balance' },
     { key: '8', description: 'Open Vehicle Summary' },
-    { key: '➔', description: 'Sign delivery entry' },
-    { key: 'E', description: 'Delivery Entry' },
-    { key: 'D', description: 'Delete Delivery Sheet' },
+    { key: '➔', description: 'Sign delivery entry or old balance' },
+    { key: 'E', description: 'Delivery Entry or Edit old balance' },
+    { key: 'C', description: 'Clear Delivery Sheet' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
-    { key: 'Enter', description: 'Delivery Entry' }
+    { key: 'Enter', description: 'Delivery Entry or Edit old balance' }
   ];
 
   let formOpened = $state(false);
@@ -291,6 +315,15 @@
     }
   }
 
+  function handleOldBalanceEdit(item) {
+    oldBalanceFormOpened = true;
+    oldBalanceEditableItem = item;
+  }
+
+  function handleOldBalanceSign(item) {
+    alert('Old Balance');
+  }
+
   function handleHelper() {
     if (
       !formOpened &&
@@ -305,6 +338,7 @@
 
   function handleOldBalanceFormClose() {
     oldBalanceFormOpened = false;
+    oldBalanceEditableItem = null;
   }
 
   function handleDateNavigationChange(value) {
@@ -329,6 +363,13 @@
     { key: 'Enter', handler: handleDeliveryEdit }
   ];
 
+  const oldBalanceCustomEvents = [
+    { key: '0', handler: handleOldBalanceForm },
+    { key: 'ArrowRight', handler: handleOldBalanceSign },
+    { key: 'E', handler: handleOldBalanceEdit },
+    { key: 'Enter', handler: handleOldBalanceEdit }
+  ];
+
   const toggleOpenForm = () => (formOpened = !formOpened);
 
   function customCellHighlight(item) {
@@ -346,7 +387,6 @@
 
   onMount(() => {
     keyboardEventBus.on('H', handleHelper);
-    keyboardEventBus.on('0', handleOldBalanceForm);
     keyboardEventBus.on('1', openACFilter);
     keyboardEventBus.on('2', openCPFilter);
     keyboardEventBus.on('3', openBlankFilter);
@@ -359,7 +399,6 @@
   });
   onDestroy(() => {
     keyboardEventBus.off('H', handleHelper);
-    keyboardEventBus.off('0', handleOldBalanceForm);
     keyboardEventBus.off('1', openACFilter);
     keyboardEventBus.off('2', openCPFilter);
     keyboardEventBus.off('3', openBlankFilter);
@@ -379,6 +418,11 @@
   items={viewList[view]}
   {customEvents}
   hideSerial={true}
+  doAction={!formOpened &&
+    !amountFormOpened &&
+    !helperOpened &&
+    !oldBalanceOpened &&
+    !vehicleSummaryOpened}
   {customCellHighlight}
 >
   {#snippet left()}
@@ -542,7 +586,14 @@
 <!-- Old Balance -->
 <Model open={oldBalanceOpened} onClose={() => (oldBalanceOpened = false)}>
   <div class="bg-white p-5">
-    <Table title="Old Balance" headers={oldBalanceHeaders} autoHight={true}></Table>
+    <Table
+      title="Old Balance"
+      headers={oldBalanceHeaders}
+      autoHight={true}
+      items={data.oldBalance}
+      doAction={oldBalanceOpened}
+      customEvents={oldBalanceCustomEvents}
+    ></Table>
   </div>
 </Model>
 <OldBalanceForm

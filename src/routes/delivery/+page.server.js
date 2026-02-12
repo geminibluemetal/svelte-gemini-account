@@ -7,7 +7,12 @@ import {
 } from '$lib/entity/delivery/delivery.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
 import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
-import { getAllParty } from '$lib/entity/party/party.service.js';
+import {
+  createOldBalance,
+  getAllOldBalance,
+  getAllParty,
+  updateOldBalance
+} from '$lib/entity/party/party.service.js';
 import { getAllToken } from '$lib/entity/token/token.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
 import { formatDateTime } from '$lib/utils/dateTime.js';
@@ -30,7 +35,8 @@ export async function load({ depends, url }) {
   const party = await getAllParty();
   const vehicle = await getAllVehicle();
   const item = await getAllItems();
-  return { token, party, vehicle, item, address, orders };
+  const oldBalance = await getAllOldBalance(formattedDate);
+  return { token, party, vehicle, item, address, orders, oldBalance };
 }
 
 export const actions = {
@@ -84,9 +90,17 @@ export const actions = {
   // Old Balance
   oldBalance: async ({ request }) => {
     const formData = await request.formData();
-    const data = formDataToObject(formData);
-    console.log('oldBalance', data);
-    // sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
-    // sseEmit({ type: 'ORDERS.LIST' });
+    const { editId, ...data } = formDataToObject(formData);
+    let result = null;
+    if (editId) result = await updateOldBalance(data, editId);
+    else result = await createOldBalance(data);
+
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
+    return result;
   }
 };

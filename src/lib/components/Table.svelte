@@ -16,6 +16,7 @@
     bottomSpace = false,
     moveToEnd = false,
     customEvents = [],
+    doAction = true,
     rowHighlight = () => {},
     customCellHighlight = () => {},
     sidebar = () => {},
@@ -40,12 +41,15 @@
   );
 
   // Navigation functions
-  const rowUp = () => (overRow = overRow - 1 >= 0 ? overRow - 1 : overRow);
-  const rowDown = () => (overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow);
-  const gotoTop = () => (overRow = 0);
-  const gotoBottom = () => (overRow = items.length - 1);
-  const jump20Top = () => (overRow = overRow - 20 >= 0 ? overRow - 20 : overRow);
-  const jump20Bottom = () => (overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow);
+  const rowUp = () => (doAction ? (overRow = overRow - 1 >= 0 ? overRow - 1 : overRow) : null);
+  const rowDown = () =>
+    doAction ? (overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow) : null;
+  const gotoTop = () => (doAction ? (overRow = 0) : null);
+  const gotoBottom = () => (doAction ? (overRow = items.length - 1) : null);
+  const jump20Top = () =>
+    doAction ? (overRow = overRow - 20 >= 0 ? overRow - 20 : overRow) : null;
+  const jump20Bottom = () =>
+    doAction ? (overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow) : null;
 
   $effect(() => {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
@@ -71,7 +75,7 @@
     const handlersMap = new Map();
     customEvents.forEach(({ key, handler }) => {
       const wrappedHandler = () => {
-        if (overRow >= 0 && overRow < items.length) {
+        if (overRow >= 0 && overRow < items.length && doAction) {
           handler(items[overRow]);
         }
       };

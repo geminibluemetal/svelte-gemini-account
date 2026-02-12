@@ -22,9 +22,22 @@
     const party = options.party.find((p) => p.name == partyName);
     if (!party?.id) {
       cancel();
-      showToast('Selected Party ID not exist', 'danger');
+      showToast('Party is required', 'danger');
+    } else {
+      formData.set('party_id', party.id);
+      return async ({ result }) => {
+        if (result.type == 'failure') {
+          showToast(result?.data?.message || 'Enter Correct Details', 'danger');
+        } else {
+          showToast(result?.data?.message || 'Success');
+          handleClose();
+        }
+      };
     }
-    formData.set('party_id', party.id);
+
+    return async ({ result }) => {
+      console.log();
+    };
   }
 
   function handleClose() {
@@ -36,7 +49,7 @@
   });
 </script>
 
-<Model {open} onClose={handleClose} autoFocusTabIndex={1}>
+<Model {open} onClose={handleClose} autoFocusTabIndex={!!item ? 2 : 1}>
   <Form
     action="?/oldBalance"
     method="POST"
@@ -47,9 +60,13 @@
     submitButtonText={['Save', 'Update']}
     enhance={handleFormSubmit}
   >
+    {#if !!item}
+      <input type="hidden" name="editId" value={data.id} />
+    {/if}
     <InputField
       placeholder="Party Name"
       options={partyList}
+      silent={true}
       name="party_name"
       value={data.party_name}
     />
