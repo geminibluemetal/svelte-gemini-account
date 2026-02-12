@@ -19,7 +19,8 @@
     onClose();
   }
 
-  function handleFormSubmit() {
+  function handleFormSubmit({ formData }) {
+    if (item) formData.set('sign', item.sign);
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');

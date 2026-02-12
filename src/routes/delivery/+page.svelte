@@ -16,6 +16,7 @@
   import { page } from '$app/stores';
   import { CheckCheck, Trash } from 'lucide-svelte';
   import OldBalanceForm from './OldBalanceForm.svelte';
+  import InputField from '$lib/components/InputField.svelte';
 
   const { data } = $props();
   let view = $state('All');
@@ -61,7 +62,21 @@
       .sort((a, b) => a.party_name.localeCompare(b.party_name)),
     Blank: data.token.filter(
       (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2
-    )
+    ),
+    AC_Unsigned: data.token
+      .filter((d) => (d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC') && !d.sign)
+      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
+    CP_Unsigned: data.token
+      .filter(
+        (d) =>
+          (d.amount_type_1 == 'CP' ||
+            d.amount_type_1 == 'Paytm' ||
+            d.amount_type_2 == 'CP' ||
+            d.amount_type_2 == 'Paytm') &&
+          !d.sign
+      )
+      .sort((a, b) => a.order_number.localeCompare(b.order_number))
+      .sort((a, b) => a.party_name.localeCompare(b.party_name))
   });
 
   const sales = $derived(
@@ -100,6 +115,24 @@
       // Check if vehicle ends with 'G'
       if (vehicle && vehicle.endsWith('G')) {
         acc[vehicle] = (acc[vehicle] || 0) + 1;
+      }
+
+      return acc;
+    }, {})
+  );
+
+  const vehicleSummary = $derived(
+    data.token.reduce((acc, item) => {
+      const vehicle = item.vehicle;
+
+      // Check if vehicle ends with 'G'
+      if (vehicle && vehicle.endsWith('G')) {
+        if (Array.isArray(acc[vehicle])) {
+          acc[vehicle].push({ time: item.delivery_time, address: item.address });
+        } else {
+          acc[vehicle] = [];
+          acc[vehicle].push({ time: item.delivery_time, address: item.address });
+        }
       }
 
       return acc;
@@ -396,8 +429,8 @@
 
   const openCashReport = () => goto('/cash');
   const openOrderBook = () => goto('/orders');
-  const openACFilter = () => (view = 'AC');
-  const openCPFilter = () => (view = 'CP');
+  const openACFilter = () => (view = view == 'AC' ? 'AC_Unsigned' : 'AC');
+  const openCPFilter = () => (view = view == 'CP' ? 'CP_Unsigned' : 'CP');
   const openBlankFilter = () => (view = 'Blank');
   const openRemoveFilter = () => (view = 'All');
 
@@ -462,10 +495,10 @@
     </button>
   {/snippet}
   {#snippet right()}
-    <span class="mr-2">{view}</span>
+    <span class="mr-2">{view.replaceAll('_', ' ')}</span>
   {/snippet}
   {#snippet sidebar()}
-    <div class="flex flex-col gap-2 w-50">
+    <div class="flex flex-col gap-2 w-48">
       <div class="flex gap-2 *:flex-1">
         <DateNavigator
           class="focus:bg-amber-50"
@@ -624,7 +657,34 @@
 
 <!-- Vehicle Summary -->
 <Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>
-  <div class="bg-white p-5 min-w-2xl">
-    <Table></Table>
+  <!-- <div class="text-center mt-5 mx-5 flex items-center">
+    <InputField />
+  </div> -->
+  <div
+    class="bg-white p-5 max-w-7xl flex gap-2 justify-start whitespace-nowrap items-start overflow-x-auto"
+  >
+    {#each Object.entries(vehicleSummary) as [vehicle, data]}
+      <table class="border-2">
+        <thead>
+          <tr>
+            <th class="border px-1 bg-black text-white" colspan="3">{vehicle}</th>
+          </tr>
+          <tr>
+            <th class="border px-1 bg-black text-white">S.no</th>
+            <th class="border px-1 bg-black text-white">Time</th>
+            <th class="border px-1 bg-black text-white">Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          {#each data as entry, index (index)}
+            <tr>
+              <td class="border border-gray-500 px-1 text-center">{index + 1}</td>
+              <td class="border border-gray-500 px-1">{entry.time}</td>
+              <td class="border border-gray-500 px-1">{entry.address}</td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/each}
   </div>
 </Model>

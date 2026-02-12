@@ -18,13 +18,14 @@
 
   function handleFormSubmit({ formData, cancel }) {
     formData.set('entry_type', 'CREDIT');
+    if (item) formData.set('sign', item.sign);
     const partyName = formData.get('party_name');
     const party = options.party.find((p) => p.name == partyName);
     if (!party?.id) {
       cancel();
       showToast('Party is required', 'danger');
     } else {
-      formData.set('party_id', party.id);
+      if (item) formData.set('party_id', party.id);
       return async ({ result }) => {
         if (result.type == 'failure') {
           showToast(result?.data?.message || 'Enter Correct Details', 'danger');

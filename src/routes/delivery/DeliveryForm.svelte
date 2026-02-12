@@ -43,7 +43,10 @@
   }
 
   function handleFormSubmit({ formData }) {
-    formData.set('vehicle', item.vehicle);
+    if (item) {
+      formData.set('vehicle', item.vehicle);
+      formData.set('sign', item.sign);
+    }
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');

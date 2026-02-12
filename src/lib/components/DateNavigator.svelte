@@ -10,19 +10,19 @@
 <div class="flex gap-2 {full ? 'w-full' : 'w-50'}">
   <button
     type="button"
-    class="border-2 rounded flex items-center justify-center w-10 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
+    class="border-2 rounded flex items-center justify-center w-9 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
     onclick={() => (value = new Date(value.setDate(value.getDate() - 1)))}
   >
-    <ArrowBigLeft />
+    <ArrowBigLeft size={20} />
   </button>
   <div class="flex-1">
     <DateField placeholder="Date" bind:value {...props} textAlign="center" />
   </div>
   <button
     type="button"
-    class="border-2 rounded flex items-center justify-center w-10 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
+    class="border-2 rounded flex items-center justify-center w-9 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
     onclick={() => (value = new Date(value.setDate(value.getDate() + 1)))}
   >
-    <ArrowBigRight />
+    <ArrowBigRight size={20} />
   </button>
 </div>

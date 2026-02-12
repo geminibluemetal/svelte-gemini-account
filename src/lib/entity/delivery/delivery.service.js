@@ -2,6 +2,7 @@ import { getFormattedTime } from '$lib/utils/dateTime';
 import { updateDeliveryAmountById, updateDeliveryById, signDelivery } from './delivery.dal';
 
 export async function updateDelivery(data, id) {
+  if (Number(data.sign)) return { message: 'Can not edit Signed Delivery Record', ok: false };
   if (!data.is_cancelled && data.delivery_quantity && data.delivery_item) {
     if (data.vehicle.endsWith('G') && !data.address)
       return { message: 'Address is Missing', ok: false };
@@ -21,6 +22,7 @@ export async function updateDelivery(data, id) {
 }
 
 export async function updateDeliveryAmount(data, id) {
+  if (Number(data.sign)) return { message: 'Can not edit Signed Delivery Record', ok: false };
   if (data.amount_2 && isNaN(Number(data.amount_2)))
     return { message: 'Amount 2 Must be a Number', ok: false };
   const result = updateDeliveryAmountById(data, id);
