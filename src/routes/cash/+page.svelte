@@ -25,8 +25,8 @@
     { name: 'Sign', align: 'center', key: '0' }
   ];
 
-  const income = Array.from({ length: 200 }).map((_) => a);
-  const expense = Array.from({ length: 10 }).map((_) => a);
+  const income = Array.from({ length: 10 }).map((_) => a);
+  const expense = Array.from({ length: 20 }).map((_) => a);
 </script>
 
 <CashTable

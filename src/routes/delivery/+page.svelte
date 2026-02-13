@@ -189,7 +189,6 @@
   }
 
   function rowHighlight(item) {
-    console.log(item.has_mark);
     let highlight = {};
     if (item.is_cancelled) highlight = { ...highlight, ...HighlightRow.red };
     if (item.has_mark)
