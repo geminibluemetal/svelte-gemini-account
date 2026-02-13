@@ -1,6 +1,7 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import { getAllAddress } from '$lib/entity/address/address.service.js';
 import {
+  markDelivery,
   signDeliveryById,
   updateDelivery,
   updateDeliveryAmount
@@ -79,6 +80,14 @@ export const actions = {
     sseEmit({ type: 'ORDERS.LIST' });
   },
 
+  // Mark Delivery Entry
+  mark: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    markDelivery(data.id, data.current);
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+  },
+
   // Full Delete
   fullDelete: async ({ request }) => {
     const formData = await request.formData();
@@ -112,5 +121,5 @@ export const actions = {
     signOldBalanceById(data.id, data.current);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
-  },
+  }
 };

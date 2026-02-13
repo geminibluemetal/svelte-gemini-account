@@ -14,14 +14,14 @@
   import { commonDate } from '$lib/stores/common';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { CheckCheck, Trash } from 'lucide-svelte';
+  import { CheckCheck, SearchXIcon, Trash } from 'lucide-svelte';
   import OldBalanceForm from './OldBalanceForm.svelte';
   import InputField from '$lib/components/InputField.svelte';
 
   const { data } = $props();
   let view = $state('All');
   const headers = [
-    { name: 'SN', key: 'serial', align: 'center', width: '38' },
+    { name: 'SN', key: 'serial', align: 'center', width: '38', color: serialColor },
     { name: 'T Time', key: 'token_time', align: 'center', width: '80' },
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
     { name: 'D Time', key: 'delivery_time', align: 'center', width: '80' },
@@ -176,6 +176,10 @@
     return v == 'NO' ? HighlightCell.red : null;
   }
 
+  function serialColor(_, item) {
+    return item.has_mark ? HighlightCell.red : null;
+  }
+
   function VehicleColor(value) {
     if (value.endsWith('G')) return { foreground: 'text-blue-700 font-bold' };
   }
@@ -185,7 +189,12 @@
   }
 
   function rowHighlight(item) {
-    if (item.is_cancelled) return HighlightRow.red;
+    console.log(item.has_mark);
+    let highlight = {};
+    if (item.is_cancelled) highlight = { ...highlight, ...HighlightRow.red };
+    if (item.has_mark)
+      highlight = { ...highlight, border: 'border-b-3 border-b-red-500 border-gray-500' };
+    return highlight;
   }
 
   function AmountTypeColor(value) {
@@ -260,6 +269,7 @@
     { key: '7', description: 'Open Old Balance' },
     { key: '8', description: 'Open Vehicle Summary' },
     { key: '➔', description: 'Sign delivery entry or old balance' },
+    { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
     { key: 'C', description: 'Clear Delivery Sheet' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
@@ -289,6 +299,10 @@
       formOpened = true;
       editableDelivery = item;
     }
+  }
+
+  function handleDeliveryMark(item) {
+    transportAction('?/mark', { id: item.id, current: item.has_mark });
   }
 
   function handleDeliveryAmountUpdate(item) {
@@ -410,6 +424,7 @@
     { key: '0', handler: handleDeliveryAmountUpdate },
     { key: 'ArrowRight', handler: handleDeliverySign },
     { key: 'E', handler: handleDeliveryEdit },
+    { key: 'M', handler: handleDeliveryMark },
     { key: 'Enter', handler: handleDeliveryEdit }
   ];
 
@@ -657,34 +672,42 @@
 
 <!-- Vehicle Summary -->
 <Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>
+  <div class="text-center mt-5 mx-5 flex justify-center">Vehicle Summary</div>
   <!-- <div class="text-center mt-5 mx-5 flex items-center">
     <InputField />
   </div> -->
   <div
     class="bg-white p-5 max-w-7xl flex gap-2 justify-start whitespace-nowrap items-start overflow-x-auto"
   >
-    {#each Object.entries(vehicleSummary) as [vehicle, data]}
-      <table class="border-2">
-        <thead>
-          <tr>
-            <th class="border px-1 bg-black text-white" colspan="3">{vehicle}</th>
-          </tr>
-          <tr>
-            <th class="border px-1 bg-black text-white">S.no</th>
-            <th class="border px-1 bg-black text-white">Time</th>
-            <th class="border px-1 bg-black text-white">Address</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each data as entry, index (index)}
+    {#if Object.entries(vehicleSummary).length}
+      {#each Object.entries(vehicleSummary) as [vehicle, data]}
+        <table class="border-2">
+          <thead>
             <tr>
-              <td class="border border-gray-500 px-1 text-center">{index + 1}</td>
-              <td class="border border-gray-500 px-1">{entry.time}</td>
-              <td class="border border-gray-500 px-1">{entry.address}</td>
+              <th class="border px-1 bg-black text-white" colspan="3">{vehicle}</th>
             </tr>
-          {/each}
-        </tbody>
-      </table>
-    {/each}
+            <tr>
+              <th class="border px-1 bg-black text-white">S.no</th>
+              <th class="border px-1 bg-black text-white">Time</th>
+              <th class="border px-1 bg-black text-white">Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            {#each data as entry, index (index)}
+              <tr>
+                <td class="border border-gray-500 px-1 text-center">{index + 1}</td>
+                <td class="border border-gray-500 px-1">{entry.time}</td>
+                <td class="border border-gray-500 px-1">{entry.address}</td>
+              </tr>
+            {/each}
+          </tbody>
+        </table>
+      {/each}
+    {:else}
+      <div class="text-gray-500 flex gap-2">
+        <SearchXIcon />
+        <div>No Data to Show</div>
+      </div>
+    {/if}
   </div>
 </Model>

@@ -170,7 +170,8 @@
             <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             {@const color = header?.color ? header.color(item[header.key], item) : null}
             <div
-              class="border-b px-1 border-gray-500
+              class="px-1
+                {rowColor?.border ? rowColor.border : 'border-b border-gray-500'}
                 {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
                 {header?.align ? `text-${header.align}` : 'text-left'}
                 {color?.background

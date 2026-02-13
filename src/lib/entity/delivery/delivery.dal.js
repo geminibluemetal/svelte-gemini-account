@@ -244,6 +244,10 @@ export function signDelivery(id, newValue) {
   return performUpdate(id, newValue);
 }
 
+export function markDeliveryById(id, value) {
+  db.prepare(`UPDATE delivery SET has_mark = ? WHERE id = ?`).run(value, id);
+}
+
 export function deleteTokenById(id) {
   const query = `DELETE FROM delivery WHERE id = ?`;
   const stmt = db.prepare(query);

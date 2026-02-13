@@ -1,5 +1,10 @@
 import { getFormattedTime } from '$lib/utils/dateTime';
-import { updateDeliveryAmountById, updateDeliveryById, signDelivery } from './delivery.dal';
+import {
+  updateDeliveryAmountById,
+  updateDeliveryById,
+  signDelivery,
+  markDeliveryById
+} from './delivery.dal';
 
 export async function updateDelivery(data, id) {
   if (Number(data.sign)) return { message: 'Can not edit Signed Delivery Record', ok: false };
@@ -35,4 +40,9 @@ export async function updateDeliveryAmount(data, id) {
 export async function signDeliveryById(id, current) {
   const newValue = current == 1 ? 0 : 1;
   signDelivery(id, newValue);
+}
+
+export async function markDelivery(id, current) {
+  const newValue = current == 1 ? 0 : 1;
+  markDeliveryById(id, newValue);
 }

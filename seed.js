@@ -1,4 +1,3 @@
-// seed.js
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -8,94 +7,92 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function runSeeds() {
-  console.log('🚀 Starting database seeding...');
+  console.log('🚀 Starting database migrations and seeding...');
 
   const db = new Database('database/app.db');
   db.pragma('journal_mode = WAL');
   db.pragma('foreign_keys = ON');
 
   try {
-    // Get all seed files from seed directory
+    // 1. Create a migrations table if it doesn't exist
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS _migrations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE,
+        executed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     const seedDir = path.join(__dirname, 'seed');
     const files = await fs.readdir(seedDir);
-
-    // Filter for .js files
     const seedFiles = files.filter((file) => file.endsWith('.js') && file !== 'index.js').sort();
 
-    console.log(`📁 Found ${seedFiles.length} seed files`);
+    console.log(`📁 Found ${seedFiles.length} potential seed/migration files`);
 
-    // Run each seed file
     for (const file of seedFiles) {
-      const filePath = path.join(seedDir, file);
+      // 2. Check if this specific file has already been run
+      const alreadyRun = db.prepare('SELECT name FROM _migrations WHERE name = ?').get(file);
+
+      if (alreadyRun) {
+        console.log(`  ⏭️  Skipping: ${file} (Already executed)`);
+        continue;
+      }
+
       console.log(`\n📄 Processing: ${file}`);
+      const filePath = path.join(seedDir, file);
+      const fileUrl = pathToFileURL(filePath).href;
 
       try {
-        // Convert Windows path to file:// URL for dynamic import
-        const fileUrl = pathToFileURL(filePath).href;
-
-        // Dynamically import the seed module
         const module = await import(fileUrl);
 
-        if (!module.tableName || !module.tableSchema) {
-          console.log(`   ⚠️  Skipping: Missing tableName or tableSchema export`);
+        // Validation
+        if (!module.tableSchema) {
+          console.log(`  ⚠️  Skipping: ${file} is missing 'tableSchema' export`);
           continue;
         }
 
-        // Check if table already exists
-        const tableCheck = db
-          .prepare(
-            `
-          SELECT name FROM sqlite_master
-          WHERE type='table' AND name=?;
-        `
-          )
-          .get(module.tableName);
-
-        if (tableCheck) {
-          console.log(`   ⏭️  Table '${module.tableName}' already exists, skipping`);
-          continue;
-        }
-
-        // Create table using schema from module
-        console.log(`   📊 Creating table '${module.tableName}'...`);
+        // 3. Execute the SQL (Works for CREATE, ALTER, etc.)
         db.exec(module.tableSchema);
 
-        // Run seed data if provided
-        if (module.seedData && Array.isArray(module.seedData)) {
-          console.log(`   🌱 Seeding ${module.seedData.length} records...`);
+        // 4. Handle Seed Data if present
+        if (
+          module.tableName &&
+          module.seedData &&
+          Array.isArray(module.seedData) &&
+          module.seedData.length > 0
+        ) {
+          console.log(
+            `  🌱 Seeding ${module.seedData.length} records into '${module.tableName}'...`
+          );
 
-          if (module.seedData.length > 0) {
-            // Get column names from first object
-            const columns = Object.keys(module.seedData[0]);
-            const placeholders = columns.map(() => '?').join(', ');
+          const columns = Object.keys(module.seedData[0]);
+          const placeholders = columns.map(() => '?').join(', ');
+          const insertQuery = `INSERT OR IGNORE INTO ${module.tableName} (${columns.join(', ')}) VALUES (${placeholders})`;
 
-            const insertQuery = `
-              INSERT OR IGNORE INTO ${module.tableName}
-              (${columns.join(', ')})
-              VALUES (${placeholders})
-            `;
-
-            const stmt = db.prepare(insertQuery);
-
-            // Insert all seed data
-            for (const data of module.seedData) {
-              const values = columns.map((col) => data[col]);
+          const stmt = db.prepare(insertQuery);
+          const insertMany = db.transaction((data) => {
+            for (const row of data) {
+              const values = columns.map((col) => row[col]);
               stmt.run(...values);
             }
-          }
+          });
+
+          insertMany(module.seedData);
         }
 
-        console.log(`   ✅ '${module.tableName}' seeded successfully`);
+        // 5. Record that this file has been successfully executed
+        db.prepare('INSERT INTO _migrations (name) VALUES (?)').run(file);
+        console.log(`  ✅ ${file} completed successfully`);
       } catch (error) {
-        console.error(`   ❌ Error in ${file}:`, error.message);
-        // Continue with other seeds instead of throwing
-        // throw error; // Remove this to continue on error
+        console.error(`  ❌ Error in ${file}:`, error.message);
+        // We stop here to prevent dependent migrations from running out of order
+        throw error;
       }
     }
 
-    console.log('\n🎉 All seeds completed!');
+    console.log('\n🎉 All tasks completed!');
   } catch (error) {
-    console.error('💥 Seed process failed:', error);
+    console.error('💥 Process failed:', error);
     process.exit(1);
   } finally {
     db.close();
