@@ -1,9 +1,14 @@
-import { getFormattedDate } from '$lib/utils/dateTime';
+import { getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
+import { parseTime } from '$lib/utils/dateTimeParser';
 import { formatFixed, formatNumber } from '$lib/utils/number';
 
 const formatters = {
   date: function (value) {
     return getFormattedDate(value);
+  },
+  time: function (value) {
+    value = parseTime(value)
+    return getFormattedTime(value);
   },
   currency: function (value) {
     return formatNumber(value);

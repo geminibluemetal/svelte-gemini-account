@@ -44,6 +44,30 @@ export function fetchAllOldBalanceByDate(date) {
   return stat.all();
 }
 
+export function getAllOldBalanceCash(date) {
+  const query = `
+    SELECT
+      ob.id,
+      ob.party_id,
+      TIME(ob.time, 'localtime') AS time,
+      p.name || ' O/B' AS description,
+      ob.amount_type,
+      ob.amount,
+      ob.sign,
+      ob.entry_type
+    FROM ${tableName} ob
+    INNER JOIN party p ON ob.party_id = p.id
+    WHERE ob.created_at >= ?
+      AND ob.created_at < date(?, '+1 day')
+      AND ob.entry_type = 'CREDIT'
+      AND ob.amount_type = 'Cash'
+  `;
+
+  const stat = db.prepare(query);
+  return stat.all(date, date);
+}
+
+
 export function signOldBalance(id, newValue) {
   const stat = db.prepare(`UPDATE ${tableName} SET sign = ? WHERE id = ?`);
   return stat.run(newValue, id);

@@ -253,3 +253,32 @@ export function deleteTokenById(id) {
   const stmt = db.prepare(query);
   return stmt.run(id);
 }
+
+export function getAllDeliveryCash(date) {
+  const query = `
+  SELECT
+      id,
+      serial,
+      delivery_time AS time,
+      TRIM(
+          COALESCE(NULLIF(party_name, ''), '') ||
+          CASE WHEN NULLIF(party_name, '') IS NOT NULL AND NULLIF(address, '') IS NOT NULL THEN ', ' ELSE '' END ||
+          COALESCE(NULLIF(address, ''), '')
+      ) AS description,
+      (
+        CASE WHEN amount_type_1 = 'CP' THEN amount_1 ELSE 0 END +
+        CASE WHEN amount_type_2 = 'CP' THEN amount_2 ELSE 0 END
+      ) AS amount,
+      sign
+  FROM delivery
+  WHERE
+      DATE(created_at) = ?
+      AND (
+          (amount_type_1 = 'CP' AND amount_1 != 0)
+          OR
+          (amount_type_2 = 'CP' AND amount_2 != 0)
+      );
+  `;
+  const stmt = db.prepare(query)
+  return stmt.all(date)
+}

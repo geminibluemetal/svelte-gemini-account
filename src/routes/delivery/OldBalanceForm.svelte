@@ -25,7 +25,7 @@
       cancel();
       showToast('Party is required', 'danger');
     } else {
-      if (item) formData.set('party_id', party.id);
+      if (party) formData.set('party_id', party.id);
       return async ({ result }) => {
         if (result.type == 'failure') {
           showToast(result?.data?.message || 'Enter Correct Details', 'danger');

@@ -78,6 +78,7 @@ export const actions = {
     signDeliveryById(data.id, data.current);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
   },
 
   // Mark Delivery Entry
@@ -111,6 +112,7 @@ export const actions = {
 
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
     return result;
   },
 
@@ -121,5 +123,6 @@ export const actions = {
     signOldBalanceById(data.id, data.current);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
   }
 };
