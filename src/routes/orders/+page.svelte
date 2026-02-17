@@ -66,7 +66,7 @@
     { key: 'I', description: 'Single Load, Cash Bill Print' },
     { key: 'O', description: 'Full Load, Cash Bill Print' },
     { key: 'T', description: 'Generate Token Directly' },
-    { key: '➔', description: 'Sign Order Advance Amount' },
+    { key: '🠊', description: 'Sign Order Advance Amount' },
     { key: 'L', description: 'Set Loading status for Order' },
     { key: 'C', description: 'Set Cancelled status for Order' },
     { key: 'F', description: 'Set Finished status for Order' },

@@ -4,7 +4,9 @@
   import Button from '$lib/components/Button.svelte';
   import CashTable from '$lib/components/CashTable.svelte';
   import DateNavigator from '$lib/components/DateNavigator.svelte';
+  import Model from '$lib/components/Model.svelte';
   import NavigateButton from '$lib/components/NavigateButton.svelte';
+  import { keyboardEventBus } from '$lib/core/client/eventBus.js';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver.js';
   import { commonDate } from '$lib/stores/common';
   import { HighlightCell } from '$lib/utils/highlight.js';
@@ -37,6 +39,29 @@
     { name: 'Sign', align: 'center', key: '0' }
   ];
 
+  const availableOptions = [
+    { key: 'H', description: 'List available Shortcut' },
+    { key: '0', description: 'Cash Entry both (income and expense)' },
+    { key: '1', description: 'Previous Cash Report' },
+    { key: '2', description: 'Next Cash Report' },
+    { key: '3', description: 'Create New Cash Report' },
+    { key: '4', description: 'Go to Delivery Sheet' },
+    { key: '5', description: 'Open Current Cash Report' },
+    { key: '6', description: 'Go to Order Book' },
+    // { key: '7', description: 'Open Old Balance' },
+    // { key: '8', description: 'Open Vehicle Summary' },
+    { key: '🠈', description: 'Switch focus on Income and Expense' }, // 🠈	🠉	🠊	🠋
+    { key: '🠊', description: 'Sign Cash Entry' },
+    // { key: 'M', description: 'Mark Delivery Entry' },
+    { key: 'E', description: 'Edit Cash Entry' },
+    // { key: 'C', description: 'Clear Delivery Sheet' },
+    // { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
+    { key: 'Enter', description: 'Edit Cash Entry' }
+  ];
+
+  let formOpened = $state(false);
+  let helperOpened = $state(false);
+
   // const income = Array.from({ length: 10 }).map((_) => a);
   const expense = Array.from({ length: 10 }).map((_) => a);
 
@@ -65,14 +90,24 @@
     }
   }
 
+  function handleHelper() {
+    if (!formOpened && !helperOpened) {
+      helperOpened = true;
+    }
+  }
+
+  function handleFocusSwitch() {
+    changeOverType(); // Calling client componet function
+  }
+
   onMount(() => {
     // keyboardEventBus.on('0', toggleOpenForm);
-    // keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('H', handleHelper);
     syncOn('CASH.LIST');
   });
   onDestroy(() => {
     // keyboardEventBus.off('0', toggleOpenForm);
-    // keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('H', handleHelper);
     syncOff('CASH.LIST');
   });
 </script>
@@ -149,3 +184,16 @@
     </div>
   {/snippet}
 </CashTable>
+
+<!-- Helper Dialog -->
+<Model open={helperOpened} onClose={() => (helperOpened = false)}>
+  <div class="bg-white p-5 min-w-md">
+    {#each availableOptions as o}
+      <div class="m-1 mb-2 flex gap-2 items-center">
+        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+        <span>=</span>
+        <span class="flex-11">{o.description}</span>
+      </div>
+    {/each}
+  </div>
+</Model>

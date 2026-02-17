@@ -267,7 +267,7 @@
     { key: '6', description: 'Open Order Book' },
     { key: '7', description: 'Open Old Balance' },
     { key: '8', description: 'Open Vehicle Summary' },
-    { key: '➔', description: 'Sign delivery entry or old balance' },
+    { key: '🠊', description: 'Sign delivery entry or old balance' },
     { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
     { key: 'C', description: 'Clear Delivery Sheet' },

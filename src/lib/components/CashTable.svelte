@@ -63,6 +63,10 @@
       ? (overRow = overRow + 20 <= finance[overType].length - 1 ? overRow + 20 : overRow)
       : null;
 
+  function changeOverType() {
+    overType = overType == 'income' ? 'expense' : 'income';
+  }
+
   onMount(() => {
     if (moveToEnd) {
       container.scrollTop = container.scrollHeight;
@@ -75,6 +79,7 @@
     keyboardEventBus.on('End', gotoBottom);
     keyboardEventBus.on('PageUp', jump20Top);
     keyboardEventBus.on('PageDown', jump20Bottom);
+    keyboardEventBus.on('ArrowLeft', changeOverType);
 
     // Register custom events
     const handlersMap = new Map();
@@ -100,6 +105,7 @@
     keyboardEventBus.off('End', gotoBottom);
     keyboardEventBus.off('PageUp', jump20Top);
     keyboardEventBus.off('PageDown', jump20Bottom);
+    keyboardEventBus.off('ArrowLeft', changeOverType);
 
     // Unregister custom events
     customHandlersMap.forEach((handler, key) => {
