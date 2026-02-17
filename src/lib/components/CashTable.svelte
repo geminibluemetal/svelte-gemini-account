@@ -163,7 +163,9 @@
             : null}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
+            title={income[row]?.[header.key]}
             class="border-b px-1 text-{header.align || 'left'}
+            {header?.nowrap ? 'overflow-hidden whitespace-nowrap text-ellipsis' : ''}
               {color?.background
               ? color?.background
               : overRow == row && overType == 'income'
@@ -171,7 +173,8 @@
                 : ''}
               {expenseHeader.length - 1 == i
               ? 'border-gray-600 border-r-3'
-              : 'border-gray-500 border-r'}"
+              : 'border-gray-500 border-r'}
+              {color?.foreground || ''}"
             onmousemove={() => handleCellMouseMove(row, 'income')}
           >
             <!-- {income[row]?.[header.key]} -->
@@ -192,7 +195,9 @@
             : null}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
+            title={expense[row]?.[header.key]}
             class="border-b px-1 border-gray-500 text-{header.align || 'left'}
+              {header?.nowrap ? 'overflow-hidden whitespace-nowrap text-ellipsis' : ''}
               {overRow == row && overType == 'expense' ? 'bg-black/20' : ''}
               {expenseHeader.length - 1 == i ? 'border-r-0' : 'border-r'}"
             onmousemove={() => handleCellMouseMove(row, 'expense')}

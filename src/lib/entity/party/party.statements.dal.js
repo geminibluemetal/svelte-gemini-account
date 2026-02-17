@@ -49,12 +49,14 @@ export function getAllOldBalanceCash(date) {
     SELECT
       ob.id,
       ob.party_id,
+      'OB' AS serial,
       TIME(ob.time, 'localtime') AS time,
       p.name || ' O/B' AS description,
       ob.amount_type,
       ob.amount,
       ob.sign,
-      ob.entry_type
+      ob.entry_type,
+      'OB' AS source
     FROM ${tableName} ob
     INNER JOIN party p ON ob.party_id = p.id
     WHERE ob.created_at >= ?

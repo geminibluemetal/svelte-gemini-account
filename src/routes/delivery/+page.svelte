@@ -49,7 +49,7 @@
     All: data.token,
     AC: data.token
       .filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC')
-      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
+      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
     CP: data.token
       .filter(
         (d) =>
@@ -58,14 +58,14 @@
           d.amount_type_2 == 'CP' ||
           d.amount_type_2 == 'Paytm'
       )
-      .sort((a, b) => a.order_number.localeCompare(b.order_number))
-      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
+      .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
+      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
     Blank: data.token.filter(
       (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2
     ),
     AC_Unsigned: data.token
       .filter((d) => (d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC') && !d.sign)
-      .sort((a, b) => a.party_name.localeCompare(b.party_name)),
+      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
     CP_Unsigned: data.token
       .filter(
         (d) =>
@@ -75,8 +75,8 @@
             d.amount_type_2 == 'Paytm') &&
           !d.sign
       )
-      .sort((a, b) => a.order_number.localeCompare(b.order_number))
-      .sort((a, b) => a.party_name.localeCompare(b.party_name))
+      .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
+      .sort((a, b) => a?.party_name?.localeCompare(b.party_name))
   });
 
   const sales = $derived(

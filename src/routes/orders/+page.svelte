@@ -11,6 +11,7 @@
   import InputField from '$lib/components/InputField.svelte';
   import Button from '$lib/components/Button.svelte';
   import Badge from '$lib/components/Badge.svelte';
+  import { goto } from '$app/navigation';
 
   const { data } = $props();
   let view = $state('pending');
@@ -60,6 +61,12 @@
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
     { key: '0', description: 'New Order' },
+    { key: '1', description: 'Switch to Delivered orders' },
+    { key: '2', description: 'Switch to Cancelled orders' },
+    { key: '3', description: 'Switch to Finsihed orders' },
+    { key: '4', description: 'Go to Delivery Sheet' },
+    { key: '5', description: 'Go to Cash Report' },
+    { key: '6', description: 'Switch to All orders' },
     { key: 'E', description: 'Edit Order' },
     // { key: 'D', description: 'Delete Order' },
     { key: 'P', description: 'Print Phone Number only' },
@@ -238,14 +245,32 @@
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
+  const gotoDeliverySheet = () => goto('/delivery');
+  const gotoCashReport = () => goto('/cash');
+  const handleFilterAll = () => (view = view == 'all' ? 'pending' : 'all');
+  const handleFilterDelivered = () => (view = view == 'delivered' ? 'pending' : 'delivered');
+  const handleFilterCancelled = () => (view = view == 'cancelled' ? 'pending' : 'cancelled');
+  const handleFilterFinished = () => (view = view == 'finished' ? 'pending' : 'finished');
 
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
+    keyboardEventBus.on('1', handleFilterDelivered);
+    keyboardEventBus.on('2', handleFilterCancelled);
+    keyboardEventBus.on('3', handleFilterFinished);
+    keyboardEventBus.on('4', gotoDeliverySheet);
+    keyboardEventBus.on('5', gotoCashReport);
+    keyboardEventBus.on('6', handleFilterAll);
     keyboardEventBus.on('H', toggleHelper);
     syncOn('ORDERS.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('0', toggleOpenForm);
+    keyboardEventBus.off('1', handleFilterDelivered);
+    keyboardEventBus.off('2', handleFilterCancelled);
+    keyboardEventBus.off('3', handleFilterFinished);
+    keyboardEventBus.off('4', gotoDeliverySheet);
+    keyboardEventBus.off('5', gotoCashReport);
+    keyboardEventBus.off('6', handleFilterAll);
     keyboardEventBus.off('H', toggleHelper);
     syncOff('ORDERS.LIST');
   });

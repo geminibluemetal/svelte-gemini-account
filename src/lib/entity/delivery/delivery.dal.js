@@ -258,7 +258,7 @@ export function getAllDeliveryCash(date) {
   const query = `
   SELECT
       id,
-      serial,
+      'DS-' || serial AS serial,
       delivery_time AS time,
       TRIM(
           COALESCE(NULLIF(party_name, ''), '') ||
@@ -269,7 +269,8 @@ export function getAllDeliveryCash(date) {
         CASE WHEN amount_type_1 = 'CP' THEN amount_1 ELSE 0 END +
         CASE WHEN amount_type_2 = 'CP' THEN amount_2 ELSE 0 END
       ) AS amount,
-      sign
+      sign,
+      'DELIVERY' AS source
   FROM delivery
   WHERE
       DATE(created_at) = ?

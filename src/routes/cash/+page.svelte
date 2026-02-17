@@ -9,6 +9,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus.js';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver.js';
   import { commonDate } from '$lib/stores/common';
+  import { parseDate, parseTime } from '$lib/utils/dateTimeParser.js';
   import { HighlightCell } from '$lib/utils/highlight.js';
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
@@ -17,24 +18,24 @@
 
   const a = {
     time: '02:30 AM',
-    serial: '12',
+    serial: 'OA-888',
     description: 'Stock yesterday',
     amount: '1888',
-    sign: '0'
+    sign: '1'
   };
 
   const incomeHeader = [
     { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
-    { name: 'SN', align: 'center', key: 'serial', width: '35' },
-    { name: 'Description', align: 'left', key: 'description', width: '250' },
+    { name: 'Pointer', align: 'center', key: 'serial', width: '68' },
+    { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' }
   ];
 
   const expenseHeader = [
     { name: 'Time', align: 'center', key: 'time', width: '85' },
-    { name: 'SN', align: 'center', key: 'serial', width: '35' },
-    { name: 'Description', align: 'left', key: 'description', width: '250' },
+    { name: 'Pointer', align: 'center', key: 'serial', width: '68' },
+    { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount' },
     { name: 'Sign', align: 'center', key: '0' }
   ];
@@ -100,21 +101,41 @@
     changeOverType(); // Calling client componet function
   }
 
+  function gotoDeliverySheet() {
+    goto('/delivery');
+  }
+
+  function gotoOrderBook() {
+    goto('/orders');
+  }
+
+  const sortedIncome = $derived(
+    data.income.sort((a, b) => {
+      return parseTime(a.time) - parseTime(b.time);
+    })
+  );
+
   onMount(() => {
     // keyboardEventBus.on('0', toggleOpenForm);
     keyboardEventBus.on('H', handleHelper);
+    keyboardEventBus.on('4', gotoDeliverySheet);
+    // keyboardEventBus.on('5', handleHelper);
+    keyboardEventBus.on('6', gotoOrderBook);
     syncOn('CASH.LIST');
   });
   onDestroy(() => {
     // keyboardEventBus.off('0', toggleOpenForm);
     keyboardEventBus.off('H', handleHelper);
+    keyboardEventBus.off('4', gotoDeliverySheet);
+    // keyboardEventBus.off('5', handleHelper);
+    keyboardEventBus.off('6', gotoOrderBook);
     syncOff('CASH.LIST');
   });
 </script>
 
 <CashTable
   title="Cash Report"
-  income={data.income}
+  income={sortedIncome}
   {expense}
   {incomeHeader}
   {expenseHeader}
@@ -135,7 +156,7 @@
         />
       </div>
       <div class="flex gap-2 *:flex-1">
-        <NavigateButton class="focus:bg-amber-50">
+        <NavigateButton class="focus:bg-amber-50" cornerLeft="1" cornerRight="2">
           <span>Report 1 </span>
         </NavigateButton>
       </div>
@@ -144,8 +165,8 @@
         <Button color="fuchsia">Delete</Button>
       </div>
       <div class="flex gap-2 *:flex-1 dark">
-        <Button color="fuchsia" corner="4">Current</Button>
-        <Button color="primary" corner="5">CR</Button>
+        <Button color="primary" corner="4">DS</Button>
+        <Button color="fuchsia" corner="5">Current</Button>
         <Button color="primary" corner="6">OB</Button>
       </div>
       <div class="flex gap-2 *:flex-1 font-bold">

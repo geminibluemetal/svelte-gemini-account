@@ -68,6 +68,7 @@ export const actions = {
     }
 
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
     return result;
   },
 

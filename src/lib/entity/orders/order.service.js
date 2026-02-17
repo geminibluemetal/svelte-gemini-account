@@ -16,6 +16,9 @@ import { printOut } from '$lib/core/server/print';
 import { formatFixed } from '$lib/utils/number';
 import { createToken, printToken } from '../token/token.service';
 import { fetchDeliveryById } from '../delivery/delivery.dal';
+import { createIncome } from '../cash/cash.service';
+
+const num = (val) => Number(val) || 0
 
 export async function getAllOrders() {
   return fetchAllOrders();
@@ -63,7 +66,7 @@ export async function createOrder(data) {
   currentOrderNumber = currentOrderNumber < 1000 ? currentOrderNumber : 1;
 
   // Check a ordernumber already exists or not
-  const order = await getOrderByNumber(currentOrderNumber);
+  let order = await getOrderByNumber(currentOrderNumber);
   if (order) return { ok: false, message: `Order Number ${currentOrderNumber} already exists` };
 
   data.date = formatDateTime('YY-MM-DD');
@@ -80,6 +83,8 @@ export async function createOrder(data) {
     }
   }
 
+  order = await getOrderByNumber(currentOrderNumber);
+  syncCashReport(order)
   return { message: 'Order Created', ok: true };
 }
 
@@ -300,5 +305,18 @@ export async function clearCompletedOrder() {
   const result = deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished'])
   if (result.changes) {
     return { message: 'Order Cleared', ok: true };
+  }
+}
+
+function syncCashReport(order) {
+  const advance = num(order.advance)
+  const isCashType = order.amount_type == 'Cash'
+  if (advance && isCashType) {
+    const data = {
+      order_id: order.id,
+      amount: advance,
+      description: order.party_name ? `${order.party_name} Ad` : order.address ? `${order.address} Ad` : ''
+    }
+    createIncome(data)
   }
 }

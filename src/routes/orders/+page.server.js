@@ -50,6 +50,7 @@ export const actions = {
     }
 
     sseEmit({ type: 'ORDERS.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
     return result;
   },
 
