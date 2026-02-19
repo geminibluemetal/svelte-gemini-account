@@ -95,6 +95,7 @@ export const actions = {
     const data = formDataToObject(formData);
     signOrderById(data.id, data.current);
     sseEmit({ type: 'ORDERS.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
   },
 
   // change Order status To Loading

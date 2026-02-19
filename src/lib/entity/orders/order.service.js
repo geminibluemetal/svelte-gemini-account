@@ -16,9 +16,10 @@ import { printOut } from '$lib/core/server/print';
 import { formatFixed } from '$lib/utils/number';
 import { createToken, printToken } from '../token/token.service';
 import { fetchDeliveryById } from '../delivery/delivery.dal';
-import { createIncome } from '../cash/cash.service';
+import { createIncome, deleteIncomIfExist, updateIncome } from '../cash/cash.service';
+import { fetchCashByOrderId } from '../cash/cash.dal';
 
-const num = (val) => Number(val) || 0
+const num = (val) => Number(val) || 0;
 
 export async function getAllOrders() {
   return fetchAllOrders();
@@ -35,7 +36,8 @@ export async function getAllAvailableOrders() {
 export async function createOrder(data) {
   if (!data.address) return { message: 'Address is required', ok: false };
   if (!data.phone) return { message: 'Phone number is required', ok: false };
-  if (data.phone && data.phone.length != 10) return { message: 'Phone number must be 10 numbers', ok: false };
+  if (data.phone && data.phone.length != 10)
+    return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
   if (!data.total_qty) return { message: 'Quantity is required', ok: false };
   if (!data.party_name && data.amount_type == 'AC')
@@ -84,14 +86,15 @@ export async function createOrder(data) {
   }
 
   order = await getOrderByNumber(currentOrderNumber);
-  syncCashReport(order)
+  syncCashReport(order);
   return { message: 'Order Created', ok: true };
 }
 
 export async function updateOrder(data, editId) {
   if (!data.address) return { message: 'Address is required', ok: false };
   if (!data.phone) return { message: 'Phone number is required', ok: false };
-  if (data.phone && data.phone.length != 10) return { message: 'Phone number must be 10 numbers', ok: false };
+  if (data.phone && data.phone.length != 10)
+    return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
   if (!data.total_qty) return { message: 'Quantity is required', ok: false };
   if (!data.party_name && data.amount_type == 'AC')
@@ -107,9 +110,9 @@ export async function updateOrder(data, editId) {
     return { message: 'Discount should be Number', ok: false };
 
   // Check advance amount changes when signed in
-  const order = fetchSingleOrderById(editId);
-  if (data.advance) {
-    if (order.advance != data.advance && order.sign == 1) {
+  let order = fetchSingleOrderById(editId);
+  if (order.sign == 1) {
+    if (order.advance != data.advance) {
       return { message: "Advance amount can't changed after Signed", ok: false };
     }
   }
@@ -126,7 +129,7 @@ export async function updateOrder(data, editId) {
 
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
   data.balance_qty = (Number(data.total_qty) || 0) - (Number(order.delivered_qty) || 0);
-  data.status = examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty)
+  data.status = examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty);
 
   let result = updateOrderById(editId, data);
 
@@ -134,6 +137,8 @@ export async function updateOrder(data, editId) {
     return { message: 'Error, Order Not Updated', ok: false };
   }
 
+  order = fetchSingleOrderById(editId);
+  syncCashReport(order, true);
   return { message: 'Order Updated', ok: true };
 }
 
@@ -239,7 +244,11 @@ export async function orderPhonePrint(data) {
 }
 
 export async function signOrderById(id, current) {
-  updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1);
+  const result = updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1);
+  if (result?.changes) {
+    const order = fetchSingleOrderById(id);
+    syncCashReport(order, true);
+  }
 }
 
 export async function orderStatusToLoading(id) {
@@ -253,17 +262,17 @@ export async function orderStatusToFinished(id) {
 }
 export async function orderStatusReset(id) {
   const order = fetchSingleOrderById(id);
-  const status = examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty)
-  updateSingleOrderColumn(id, 'status', status)
+  const status = examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty);
+  updateSingleOrderColumn(id, 'status', status);
 }
 
 export function examineStatusByQuantity(total_qty, delivered_qty, balance_qty) {
-  total_qty = Number(total_qty) || 0
-  delivered_qty = Number(delivered_qty) || 0
-  balance_qty = Number(balance_qty) || 0
+  total_qty = Number(total_qty) || 0;
+  delivered_qty = Number(delivered_qty) || 0;
+  balance_qty = Number(balance_qty) || 0;
   return delivered_qty >= total_qty
     ? 'Delivered'
-    : (total_qty === balance_qty && delivered_qty === 0)
+    : total_qty === balance_qty && delivered_qty === 0
       ? 'New'
       : balance_qty !== 0
         ? 'Partial'
@@ -302,21 +311,30 @@ export async function createTokenFromOrder(id, data) {
 }
 
 export async function clearCompletedOrder() {
-  const result = deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished'])
+  const result = deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished']);
   if (result.changes) {
     return { message: 'Order Cleared', ok: true };
   }
 }
 
-function syncCashReport(order) {
-  const advance = num(order.advance)
-  const isCashType = order.amount_type == 'Cash'
+function syncCashReport(order, isUpdate) {
+  const advance = num(order.advance);
+  const isCashType = order.amount_type == 'Cash';
   if (advance && isCashType) {
     const data = {
       order_id: order.id,
       amount: advance,
-      description: order.party_name ? `${order.party_name} Ad` : order.address ? `${order.address} Ad` : ''
-    }
-    createIncome(data)
+      sign: order?.sign || 0,
+      description: order.party_name
+        ? `${order.party_name} Ad`
+        : order.address
+          ? `${order.address} Ad`
+          : ''
+    };
+    const cash = fetchCashByOrderId(data.order_id);
+    if (isUpdate && cash?.id) updateIncome(data, cash.id);
+    else createIncome(data);
+  } else {
+    deleteIncomIfExist(order.id);
   }
 }
