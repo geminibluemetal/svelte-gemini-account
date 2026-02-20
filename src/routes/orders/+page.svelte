@@ -41,8 +41,8 @@
   const headers = [
     { name: 'Date', align: 'center', key: 'date', display: 'date', width: '96' },
     { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor, width: '38' },
-    { name: 'Party', align: 'left', key: 'party_name', width: '210' },
-    { name: 'Address', align: 'left', key: 'address', width: '210' },
+    { name: 'Party', align: 'left', key: 'party_name', width: '220' },
+    { name: 'Address', align: 'left', key: 'address', width: '220' },
     { name: 'Phone', align: 'left', key: 'phone', width: '100' },
     { name: 'Item', align: 'left', key: 'item' },
     { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal', width: '53' },

@@ -13,6 +13,7 @@
   import { HighlightCell } from '$lib/utils/highlight.js';
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
+  import CashForm from './CashForm.svelte';
 
   const { data } = $props();
 
@@ -62,6 +63,7 @@
 
   let formOpened = $state(false);
   let helperOpened = $state(false);
+  let editableItem = $state();
 
   // const income = Array.from({ length: 10 }).map((_) => a);
   const expense = Array.from({ length: 10 }).map((_) => a);
@@ -97,6 +99,12 @@
     }
   }
 
+  function handleForm() {
+    if (!formOpened && !helperOpened) {
+      formOpened = true;
+    }
+  }
+
   function handleFocusSwitch() {
     changeOverType(); // Calling client componet function
   }
@@ -109,6 +117,10 @@
     goto('/orders');
   }
 
+  function handleFormClose() {
+    formOpened = false;
+  }
+
   const sortedIncome = $derived(
     data.income.sort((a, b) => {
       return parseTime(a.time) - parseTime(b.time);
@@ -116,7 +128,7 @@
   );
 
   onMount(() => {
-    // keyboardEventBus.on('0', toggleOpenForm);
+    keyboardEventBus.on('0', handleForm);
     keyboardEventBus.on('H', handleHelper);
     keyboardEventBus.on('4', gotoDeliverySheet);
     // keyboardEventBus.on('5', handleHelper);
@@ -124,7 +136,7 @@
     syncOn('CASH.LIST');
   });
   onDestroy(() => {
-    // keyboardEventBus.off('0', toggleOpenForm);
+    keyboardEventBus.off('0', handleForm);
     keyboardEventBus.off('H', handleHelper);
     keyboardEventBus.off('4', gotoDeliverySheet);
     // keyboardEventBus.off('5', handleHelper);
@@ -205,6 +217,13 @@
     </div>
   {/snippet}
 </CashTable>
+<CashForm
+  open={formOpened}
+  onClose={handleFormClose}
+  item={editableItem}
+  cashDescription={data.cashDescription}
+  party={data.party}
+/>
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>

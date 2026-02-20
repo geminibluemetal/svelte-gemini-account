@@ -1,5 +1,7 @@
 import { getAllCash } from '$lib/entity/cash/cash.service.js';
+import { fetchAllCashDescription } from '$lib/entity/cash/cash_description.dal.js';
 import { getAllDeliveryCash } from '$lib/entity/delivery/delivery.dal.js';
+import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllOldBalanceCash } from '$lib/entity/party/party.statements.dal.js';
 import { formatDateTime } from '$lib/utils/dateTime';
 
@@ -16,5 +18,8 @@ export async function load({ depends, url }) {
   const directCash = await getAllCash(formattedDate);
   const deliveryCash = await getAllDeliveryCash(formattedDate);
   const oldBalanceCash = await getAllOldBalanceCash(formattedDate);
-  return { income: [...directCash, ...deliveryCash, ...oldBalanceCash] };
+
+  const cashDescription = fetchAllCashDescription()
+  const party = await getAllParty();
+  return { income: [...directCash, ...deliveryCash, ...oldBalanceCash], cashDescription, party };
 }
