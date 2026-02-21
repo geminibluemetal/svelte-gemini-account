@@ -35,7 +35,7 @@
   }
 
   $effect(() => {
-    data = item ? { ...item } : data;
+    data = item ? { ...item } : initialData;
   });
 </script>
 
@@ -61,10 +61,12 @@
     />
     <InputField
       name="description"
+      newValue="accept"
       value={data.description}
       options={descriptionOption}
       placeholder="Description"
       autoComplete="off"
+      silent={true}
     />
     <InputField name="amount" value={data.amount} placeholder="Amount" autoComplete="off" />
   </Form>

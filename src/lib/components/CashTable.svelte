@@ -85,8 +85,10 @@
     const handlersMap = new Map();
     customEvents.forEach(({ key, handler }) => {
       const wrappedHandler = () => {
-        if (overRow >= 0 && overRow < items.length && doAction) {
-          handler(items[overRow]);
+        if (overRow >= 0 && overRow < finance[overType].length && doAction) {
+          const data = finance[overType][overRow];
+          data.entry_type = overType == 'income' ? 'INCOME' : 'EXPENSE';
+          handler(data);
         }
       };
 
@@ -175,7 +177,7 @@
               : overRow == row && overType == 'income'
                 ? 'bg-black/20'
                 : ''}
-              {expenseHeader.length - 1 == i
+              {incomeHeader.length - 1 == i
               ? 'border-gray-600 border-r-3'
               : 'border-gray-500 border-r'}
               {color?.foreground || ''}"
@@ -198,18 +200,34 @@
             <div class="sticky top-12.5 z-20 w-0"></div>
           {:else}
             {@const color = header?.color
-              ? header.color(finance.expense[header.key], finance.expense)
+              ? header.color(expense[row]?.[header.key], expense[row])
               : null}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               title={expense[row]?.[header.key]}
               class="border-b px-1 border-gray-500 text-{header.align || 'left'}
               {header?.nowrap ? 'overflow-hidden whitespace-nowrap text-ellipsis' : ''}
-              {overRow == row && overType == 'expense' ? 'bg-black/20' : ''}
-              {expenseHeader.length - 1 == i ? 'border-r-0' : 'border-r'}"
+              {color?.background
+                ? color?.background
+                : overRow == row && overType == 'expense'
+                  ? 'bg-black/20'
+                  : ''}
+              {expenseHeader.length - 1 == i
+                ? 'border-gray-600 border-r-0'
+                : 'border-gray-500 border-r'}
+              {color?.foreground || ''}"
               onmousemove={() => handleCellMouseMove(row, 'expense')}
             >
-              {expense[row]?.[header.key]}
+              <!-- {expense[row]?.[header.key]} -->
+              {#if header?.display && header.display instanceof Function}
+                {header.display(expense[row]?.[header.key], expense[row])}
+              {:else if expense[row]?.[header.key] != null && expense[row]?.[header.key] !== '' && expense[row]?.[header.key] !== 0 && expense[row]?.[header.key] !== '0'}
+                {#if header?.display}
+                  {display(header.display, expense[row]?.[header.key])}
+                {:else}
+                  {expense[row]?.[header.key]}
+                {/if}
+              {/if}
             </div>
           {/if}
         {/each}

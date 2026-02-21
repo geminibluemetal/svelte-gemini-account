@@ -14,16 +14,9 @@
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
   import CashForm from './CashForm.svelte';
+  import { showToast } from '$lib/stores/toast';
 
   const { data } = $props();
-
-  const a = {
-    time: '02:30 AM',
-    serial: 'OA-888',
-    description: 'Stock yesterday',
-    amount: '1888',
-    sign: '1'
-  };
 
   const incomeHeader = [
     { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
@@ -34,11 +27,11 @@
   ];
 
   const expenseHeader = [
-    { name: 'Time', align: 'center', key: 'time', width: '85' },
+    { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
     { hide: true },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
-    { name: 'Amount', align: 'right', key: 'amount' },
-    { name: 'Sign', align: 'center', key: '0' }
+    { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
+    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' }
   ];
 
   const availableOptions = [
@@ -54,7 +47,7 @@
     // { key: '8', description: 'Open Vehicle Summary' },
     { key: '🠈', description: 'Switch focus on Income and Expense' }, // 🠈	🠉	🠊	🠋
     { key: '🠊', description: 'Sign Cash Entry' },
-    // { key: 'M', description: 'Mark Delivery Entry' },
+    { key: 'D', description: 'Delete Cash Entry' },
     { key: 'E', description: 'Edit Cash Entry' },
     // { key: 'C', description: 'Clear Delivery Sheet' },
     // { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
@@ -65,26 +58,21 @@
   let helperOpened = $state(false);
   let editableItem = $state();
 
-  // const income = Array.from({ length: 10 }).map((_) => a);
-  const expense = Array.from({ length: 10 }).map((_) => a);
-
   // Number Safe
   const num = (value) => Number(value) || 0;
 
   const totalIncome = $derived(data?.income?.reduce((sum, item) => sum + num(item?.amount), 0));
-  const totalExpense = $derived(expense?.reduce((sum, item) => sum + num(item?.amount), 0));
+  const totalExpense = $derived(data?.expense?.reduce((sum, item) => sum + num(item?.amount), 0));
 
-  function SignColor(value) {
+  function SignColor(value, item) {
     return value ? HighlightCell.green : null;
   }
 
   function ReferanceColor(value) {
-    switch (value.startsWith) {
-      case value:
-        break;
-
-      default:
-        break;
+    if (value && typeof value === 'string') {
+      if (value.startsWith('DS')) return HighlightCell.green;
+      if (value.startsWith('OA')) return HighlightCell.red;
+      if (value.startsWith('OB')) return HighlightCell.blue;
     }
   }
 
@@ -128,6 +116,7 @@
   }
 
   function handleFormClose() {
+    editableItem = null;
     formOpened = false;
   }
 
@@ -136,6 +125,56 @@
       return parseTime(a.time) - parseTime(b.time);
     })
   );
+
+  const sortedExpense = $derived(
+    data.expense.sort((a, b) => {
+      return parseTime(a.time) - parseTime(b.time);
+    })
+  );
+
+  function handleCashEdit(item) {
+    formOpened = true;
+    editableItem = item;
+  }
+
+  function handleCashSign(item) {
+    if (item.serial) {
+      showToast('Referance record can not sign here', 'danger');
+      return;
+    }
+    transportAction('?/sign', { id: item.id, current: item.sign });
+  }
+
+  async function handleCashDelete(item) {
+    if (item.serial) {
+      showToast('Referance record can not delete here', 'danger');
+      return;
+    }
+    const result = await transportAction('?/delete', { id: item.id });
+    if (result.type == 'failure') {
+      const data = JSON.parse(result.data);
+      showToast(data[data[0].message], 'danger');
+    }
+  }
+
+  const cashCustomEvents = [
+    { key: 'ArrowRight', handler: handleCashSign },
+    { key: 'E', handler: handleCashEdit },
+    { key: 'Enter', handler: handleCashEdit },
+    { key: 'D', handler: handleCashDelete }
+  ];
+
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData
+    });
+    return await res.json();
+  }
 
   onMount(() => {
     keyboardEventBus.on('0', handleForm);
@@ -158,12 +197,13 @@
 <CashTable
   title="Cash Report"
   income={sortedIncome}
-  {expense}
+  expense={sortedExpense}
   {incomeHeader}
   {expenseHeader}
   moveToEnd={true}
   hideSerial={true}
   hideAction={true}
+  customEvents={cashCustomEvents}
 >
   {#snippet right()}
     <span class="p-1">Report 1</span>

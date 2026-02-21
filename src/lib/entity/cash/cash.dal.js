@@ -5,13 +5,16 @@ export function fetchAllCash(date) {
     SELECT
       c.*,
       'CASH' AS source,
-      'OA-' || o.order_number AS serial,
+      CASE
+        WHEN c.order_id IS NOT NULL THEN 'OA-' || o.order_number
+        ELSE ''
+      END AS serial,
       TIME(c.time, 'localtime') AS time
     FROM cash c
-    JOIN orders o ON c.order_id = o.id
+    LEFT JOIN orders o ON c.order_id = o.id
     WHERE DATE(c.created_at) = ?;
   `);
-
+  db.pragma('wal_checkpoint(TRUNCATE)');
   return stmt.all(date);
 }
 
@@ -62,10 +65,33 @@ export function fetchCashByOrderId(order_id) {
   return stat.get(order_id);
 }
 
+export function fetchSingleCashById(id) {
+  const query = `
+    SELECT * FROM cash WHERE id = ?
+  `;
+  const stat = db.prepare(query);
+  return stat.get(id);
+}
+
 export function deleteCashByOrderId(order_id) {
   const query = `
     DELETE FROM cash WHERE order_id = ?
   `;
   const stat = db.prepare(query);
   return stat.run(order_id);
+}
+
+export function deleteCashById(id) {
+  const query = `
+    DELETE FROM cash WHERE id = ?
+  `;
+  const stat = db.prepare(query);
+  return stat.run(id);
+}
+
+
+export function signCashById(id, value) {
+  const query = `UPDATE cash SET sign = ? WHERE id = ?`;
+  const stat = db.prepare(query);
+  return stat.run(value, id);
 }
