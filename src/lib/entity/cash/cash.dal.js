@@ -26,7 +26,7 @@ export function insertCash(data, entry_type) {
     data.amount || 0,
     data.description || null,
     data.sign ? 1 : 0,
-    entry_type || 'EXPENSE'
+    entry_type || 'INCOME'
   );
 }
 
@@ -49,7 +49,7 @@ export function updateCash(data, entry_type, id) {
     data.amount || 0,
     data.description || null,
     data.sign ? 1 : 0,
-    entry_type || 'EXPENSE',
+    entry_type || 'INCOME',
     id
   );
 }

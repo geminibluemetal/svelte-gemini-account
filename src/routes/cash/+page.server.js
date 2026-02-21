@@ -19,7 +19,7 @@ export async function load({ depends, url }) {
   const deliveryCash = await getAllDeliveryCash(formattedDate);
   const oldBalanceCash = await getAllOldBalanceCash(formattedDate);
 
-  const cashDescription = fetchAllCashDescription()
+  const cashDescription = fetchAllCashDescription();
   const party = await getAllParty();
   return { income: [...directCash, ...deliveryCash, ...oldBalanceCash], cashDescription, party };
 }

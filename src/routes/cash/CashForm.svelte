@@ -13,10 +13,11 @@
   };
 
   let data = $state(initialData);
-  const descriptionOption = $derived([
-    ...cashDescription.map((cd) => cd.description),
-    ...party.map((p) => p.name)
-  ]);
+  const descriptionOption = $derived(
+    Array.from(
+      new Set([...cashDescription.map((cd) => cd.description), ...party.map((p) => p.name)])
+    )
+  );
 
   function handleClose() {
     onClose();

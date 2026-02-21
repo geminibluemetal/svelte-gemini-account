@@ -115,6 +115,9 @@ export async function updateOrder(data, editId) {
     if (order.advance != data.advance) {
       return { message: "Advance amount can't changed after Signed", ok: false };
     }
+    if (order.amount_type != data.amount_type) {
+      return { message: "Amount Type can't changed after Signed", ok: false };
+    }
   }
 
   // Check party phone number if not exist save it.
@@ -322,6 +325,7 @@ function syncCashReport(order, isUpdate) {
   const isCashType = order.amount_type == 'Cash';
   if (advance && isCashType) {
     const data = {
+      entry_type: 'INCOME',
       order_id: order.id,
       amount: advance,
       sign: order?.sign || 0,

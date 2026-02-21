@@ -27,7 +27,7 @@
 
   const incomeHeader = [
     { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
-    { name: 'Pointer', align: 'center', key: 'serial', width: '68' },
+    { name: 'Referance', align: 'left', key: 'serial', width: '82', color: ReferanceColor },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' }
@@ -35,7 +35,7 @@
 
   const expenseHeader = [
     { name: 'Time', align: 'center', key: 'time', width: '85' },
-    { name: 'Pointer', align: 'center', key: 'serial', width: '68' },
+    { hide: true },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount' },
     { name: 'Sign', align: 'center', key: '0' }
@@ -76,6 +76,16 @@
 
   function SignColor(value) {
     return value ? HighlightCell.green : null;
+  }
+
+  function ReferanceColor(value) {
+    switch (value.startsWith) {
+      case value:
+        break;
+
+      default:
+        break;
+    }
   }
 
   function handleDateNavigationChange(value) {

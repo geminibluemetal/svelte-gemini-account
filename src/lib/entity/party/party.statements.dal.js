@@ -69,7 +69,6 @@ export function getAllOldBalanceCash(date) {
   return stat.all(date, date);
 }
 
-
 export function signOldBalance(id, newValue) {
   const stat = db.prepare(`UPDATE ${tableName} SET sign = ? WHERE id = ?`);
   return stat.run(newValue, id);

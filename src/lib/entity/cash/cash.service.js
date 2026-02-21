@@ -11,7 +11,7 @@ export function createIncome(data) {
 }
 
 export function updateIncome(data, cashId) {
-  const result = updateCash(data, 'EXPENSE', cashId);
+  const result = updateCash(data, 'INCOME', cashId);
   return result;
 }
 
