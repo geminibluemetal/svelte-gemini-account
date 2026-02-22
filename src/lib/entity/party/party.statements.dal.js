@@ -56,6 +56,7 @@ export function getAllOldBalanceCash(date) {
       ob.amount,
       ob.sign,
       ob.entry_type,
+      ob.created_at,
       'OB' AS source
     FROM ${tableName} ob
     INNER JOIN party p ON ob.party_id = p.id

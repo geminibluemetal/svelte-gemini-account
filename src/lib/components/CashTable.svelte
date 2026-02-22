@@ -121,7 +121,7 @@
   <div class="overflow-auto border-2 border-black w-fit" bind:this={container}>
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <div
-        class="col-span-full bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
+        class="col-span-10 bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
       >
         <div class="flex-1 text-left flex">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
@@ -129,12 +129,12 @@
       </div>
 
       <div
-        class="col-span-{incomeHeader.length} sticky top-6.5 z-20 bg-black text-white border-r-3 border-white text-center px-1"
+        class="col-span-5 sticky top-6.5 z-20 bg-black text-white border-r-3 border-white text-center px-1"
       >
         Income
       </div>
       <div
-        class="col-span-{expenseHeader.length} sticky top-6.5 z-20 bg-black text-white border-r-0 border-white text-center px-1"
+        class="col-span-5 sticky top-6.5 z-20 bg-black text-white border-r-0 border-white text-center px-1"
       >
         Expense
       </div>

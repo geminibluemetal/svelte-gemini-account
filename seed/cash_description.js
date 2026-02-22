@@ -1,4 +1,4 @@
-// seed/delivery.js
+// seed/cash_description.js
 export const tableName = 'cash_description';
 
 export const tableSchema = `

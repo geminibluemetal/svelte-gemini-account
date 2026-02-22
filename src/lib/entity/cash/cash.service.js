@@ -1,7 +1,7 @@
 import { formatDateTime } from '$lib/utils/dateTime';
 import { deleteCashById, deleteCashByOrderId, fetchAllCash, fetchSingleCashById, insertCash, signCashById, updateCash as UpdateCashInDal } from './cash.dal';
 import { checkDescriptionExist, insertCashDescription } from './cash_description.dal';
-import { fetchAllReportsByDate } from './cash_reports.dal';
+import { checkReportExistsByDate, deleteCashReportById, fetchAllReportsByDate, insertCashReport } from './cash_reports.dal';
 
 export function getAllCash(date) {
   const cash = fetchAllCash(date);
@@ -84,8 +84,27 @@ export function deleteCash(id) {
   else return { message: 'Not Deleted', ok: false }
 }
 
+export function reportsExist(date = formatDateTime('YY-MM-DD')) {
+  return checkReportExistsByDate(date)
+}
+
+
 export function getAllReports(date = formatDateTime('YY-MM-DD')) {
-  return fetchAllReportsByDate(date)
+  let reports = fetchAllReportsByDate(date)
+  reports.push({ id: 'current' })
+  return reports
+}
+
+export function createNewCashReport() {
+  const result = insertCashReport()
+  if (result?.changes) return { message: 'New Report created', ok: true }
+  else return { message: 'New Report not created', ok: false }
+}
+
+export function deleteCashReport(id) {
+  const result = deleteCashReportById(id)
+  if (result?.changes) return { message: 'New Report created', ok: true }
+  else return { message: 'New Report not created', ok: false }
 }
 
 // export function fetchAllDeliveryByDate(date) {

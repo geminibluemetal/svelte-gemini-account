@@ -8,6 +8,7 @@
     children,
     cornerLeft = '',
     cornerRight = '',
+    cornerCenter = '',
     class: userClass = '',
     ...props
   } = $props();
@@ -37,7 +38,7 @@
     <span
       class="absolute -top-5 -left-5 bg-gray-300 size-10 text-sm flex items-end justify-end pr-2 pb-0.5 rounded-full"
     >
-      2
+      {cornerCenter}
     </span>
     {@render children()}
   </div>

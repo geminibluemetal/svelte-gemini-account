@@ -1,4 +1,4 @@
-// seed/delivery.js
+// seed/party_statements.js
 export const tableName = 'party_statements';
 
 export const tableSchema = `

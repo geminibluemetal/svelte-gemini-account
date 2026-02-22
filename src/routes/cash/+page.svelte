@@ -8,13 +8,16 @@
   import NavigateButton from '$lib/components/NavigateButton.svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus.js';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver.js';
-  import { commonDate } from '$lib/stores/common';
   import { parseDate, parseTime } from '$lib/utils/dateTimeParser.js';
   import { HighlightCell } from '$lib/utils/highlight.js';
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
   import CashForm from './CashForm.svelte';
   import { showToast } from '$lib/stores/toast';
+  import {
+    commonDate,
+    commonCurrontCashReportIndex as currentReportIndex
+  } from '$lib/stores/common';
 
   const { data } = $props();
 
@@ -39,12 +42,11 @@
     { key: '0', description: 'Cash Entry both (income and expense)' },
     { key: '1', description: 'Previous Cash Report' },
     { key: '2', description: 'Next Cash Report' },
-    { key: '3', description: 'Create New Cash Report' },
     { key: '4', description: 'Go to Delivery Sheet' },
     { key: '5', description: 'Open Current Cash Report' },
     { key: '6', description: 'Go to Order Book' },
-    // { key: '7', description: 'Open Old Balance' },
-    // { key: '8', description: 'Open Vehicle Summary' },
+    { key: '7', description: 'Create New Cash Report' },
+    { key: '8', description: 'Delete Cash Report' },
     { key: '🠈', description: 'Switch focus on Income and Expense' }, // 🠈	🠉	🠊	🠋
     { key: '🠊', description: 'Sign Cash Entry' },
     { key: 'D', description: 'Delete Cash Entry' },
@@ -73,21 +75,6 @@
       if (value.startsWith('DS')) return HighlightCell.green;
       if (value.startsWith('OA')) return HighlightCell.red;
       if (value.startsWith('OB')) return HighlightCell.blue;
-    }
-  }
-
-  function handleDateNavigationChange(value) {
-    // 1. Calculate the ISO strings for a stable comparison
-    const newDateStr = value.toISOString();
-    const urlDateStr = $page.url.searchParams.get('date');
-
-    // 2. Only proceed if the date has actually changed
-    if (newDateStr !== urlDateStr) {
-      $commonDate = value; // Update store
-
-      // 3. Use { keepFocus: true, replaceState: true } to prevent
-      // unnecessary scroll jumps or history bloating
-      goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
     }
   }
 
@@ -145,6 +132,41 @@
     transportAction('?/sign', { id: item.id, current: item.sign });
   }
 
+  function handleDateNavigationChange(value) {
+    // Just update the store; the $effect will handle the URL
+    $commonDate = value;
+  }
+
+  function handleNextReport() {
+    if ($currentReportIndex < data.reports.length - 1) {
+      $currentReportIndex = Number($currentReportIndex) + 1;
+    }
+  }
+
+  function handlePreviousReport() {
+    if ($currentReportIndex > 0) {
+      $currentReportIndex = Number($currentReportIndex) - 1;
+    }
+  }
+
+  function handleNewReport() {
+    transportAction('?/newReport');
+  }
+
+  function handleDeleteReport() {
+    if (data.reports[$currentReportIndex]?.id === 'current') {
+      transportAction('?/deleteReport', {
+        id: data.reports[$currentReportIndex - 1]?.id
+      });
+    } else {
+      if (!data.income.length && !data.expense.length) {
+        transportAction('?/deleteReport', { id: data.reports[$currentReportIndex]?.id });
+      } else {
+        showToast('Only empty reports can be deleted', 'danger');
+      }
+    }
+  }
+
   async function handleCashDelete(item) {
     if (item.serial) {
       showToast('Referance record can not delete here', 'danger');
@@ -179,18 +201,52 @@
   onMount(() => {
     keyboardEventBus.on('0', handleForm);
     keyboardEventBus.on('H', handleHelper);
+    keyboardEventBus.on('1', handlePreviousReport);
+    keyboardEventBus.on('2', handleNextReport);
     keyboardEventBus.on('4', gotoDeliverySheet);
     // keyboardEventBus.on('5', handleHelper);
     keyboardEventBus.on('6', gotoOrderBook);
+    keyboardEventBus.on('7', handleNewReport);
+    keyboardEventBus.on('8', handleDeleteReport);
     syncOn('CASH.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('0', handleForm);
     keyboardEventBus.off('H', handleHelper);
+    keyboardEventBus.off('1', handlePreviousReport);
+    keyboardEventBus.off('2', handleNextReport);
     keyboardEventBus.off('4', gotoDeliverySheet);
     // keyboardEventBus.off('5', handleHelper);
     keyboardEventBus.off('6', gotoOrderBook);
+    keyboardEventBus.off('7', handleNewReport);
+    keyboardEventBus.off('8', handleDeleteReport);
     syncOff('CASH.LIST');
+  });
+
+  // 1. Define a derived state for the URL string to prevent unnecessary updates
+  const searchParamsString = $derived.by(() => {
+    const params = new URLSearchParams();
+    // Ensure date is formatted correctly (YYYY-MM-DD or ISO)
+    const dateStr = $commonDate instanceof Date ? $commonDate.toISOString() : $commonDate;
+    const reportVal = $currentReportIndex;
+
+    params.set('date', dateStr);
+    params.set('report', reportVal);
+    return params.toString();
+  });
+
+  // 2. Use one effect to sync the URL
+  $effect(() => {
+    const currentParams = $page.url.searchParams.toString();
+
+    // Only navigate if the calculated params differ from the current URL
+    if (searchParamsString !== currentParams) {
+      goto(`?${searchParamsString}`, {
+        keepFocus: true,
+        replaceState: true,
+        invalidateAll: false // Use this to prevent full page reloads if only the UI needs to sync
+      });
+    }
   });
 </script>
 
@@ -218,18 +274,27 @@
         />
       </div>
       <div class="flex gap-2 *:flex-1">
-        <NavigateButton class="focus:bg-amber-50" cornerLeft="1" cornerRight="2">
-          <span>Report 1 </span>
+        <NavigateButton
+          class="focus:bg-amber-50"
+          cornerLeft="1"
+          cornerRight="2"
+          cornerCenter={data.reports.length}
+          onNext={handleNextReport}
+          onPrevious={handlePreviousReport}
+        >
+          <span>
+            {`Cash ${$currentReportIndex + 1}`}
+          </span>
         </NavigateButton>
       </div>
       <div class="flex gap-2 *:flex-1 dark">
-        <Button color="fuchsia" corner="3">New</Button>
-        <Button color="fuchsia">Delete</Button>
+        <Button color="fuchsia" corner="7" onclick={handleNewReport}>New</Button>
+        <Button color="fuchsia" corner="8" onclick={handleDeleteReport}>Delete</Button>
       </div>
       <div class="flex gap-2 *:flex-1 dark">
-        <Button color="primary" corner="4">DS</Button>
+        <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>
         <Button color="fuchsia" corner="5">Current</Button>
-        <Button color="primary" corner="6">OB</Button>
+        <Button color="primary" corner="6" onclick={gotoOrderBook}>OB</Button>
       </div>
       <div class="flex gap-2 *:flex-1 font-bold">
         <div class="border-2">

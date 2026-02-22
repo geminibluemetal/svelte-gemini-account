@@ -270,6 +270,7 @@ export function getAllDeliveryCash(date) {
         CASE WHEN amount_type_2 = 'CP' THEN amount_2 ELSE 0 END
       ) AS amount,
       sign,
+      created_at,
       'DELIVERY' AS source
   FROM delivery
   WHERE
