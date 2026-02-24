@@ -21,8 +21,7 @@ CREATE TABLE IF NOT EXISTS party_statements (
     address TEXT,
 
     -- Timestamps
-    date DATE DEFAULT (DATE('now')),
-    time TIME DEFAULT (TIME('now')),
+    time TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 
     -- Metadata
@@ -31,5 +30,4 @@ CREATE TABLE IF NOT EXISTS party_statements (
 );
 
 CREATE INDEX IF NOT EXISTS idx_party_statements_party_id ON party_statements(party_id);
-CREATE INDEX IF NOT EXISTS idx_party_statements_date ON party_statements(date);
 `;

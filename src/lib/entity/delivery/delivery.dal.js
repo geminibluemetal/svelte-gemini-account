@@ -195,14 +195,19 @@ export function updateDeliveryById(data, id) {
 export function updateDeliveryAmountById(data, id) {
   const query = `
     UPDATE delivery SET
+      amount_time = COALESCE(?, amount_time),
       amount_type_1 = COALESCE(?, amount_type_1),
       amount_1 = COALESCE(?, amount_1),
       amount_type_2 = COALESCE(?, amount_type_2),
       amount_2 = COALESCE(?, amount_2)
     WHERE id = ?
   `;
-
+  const amount_time =
+    data.amount_1 || data.amount_type_1 || data.amount_2 || data.amount_type_2
+      ? new Date().toISOString()
+      : '';
   const params = [
+    amount_time,
     data.amount_type_1 !== undefined ? data.amount_type_1 : null,
     data.amount_1 !== undefined ? data.amount_1 : null,
     data.amount_type_2 !== undefined ? data.amount_type_2 : null,
@@ -259,7 +264,7 @@ export function getAllDeliveryCash(date) {
   SELECT
       id,
       'DS-' || serial AS serial,
-      delivery_time AS time,
+      amount_time AS time,
       TRIM(
           COALESCE(NULLIF(party_name, ''), '') ||
           CASE WHEN NULLIF(party_name, '') IS NOT NULL AND NULLIF(address, '') IS NOT NULL THEN ', ' ELSE '' END ||
@@ -274,13 +279,13 @@ export function getAllDeliveryCash(date) {
       'DELIVERY' AS source
   FROM delivery
   WHERE
-      DATE(created_at) = ?
+      DATE(amount_time) = ?
       AND (
           (amount_type_1 = 'CP' AND amount_1 != 0)
           OR
           (amount_type_2 = 'CP' AND amount_2 != 0)
       );
   `;
-  const stmt = db.prepare(query)
-  return stmt.all(date)
+  const stmt = db.prepare(query);
+  return stmt.all(date);
 }

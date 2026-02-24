@@ -271,6 +271,7 @@
     { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
     { key: 'C', description: 'Clear Delivery Sheet' },
+    { key: 'D', description: 'Delete Old Balance' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
     { key: 'Enter', description: 'Delivery Entry or Edit old balance' }
   ];
@@ -383,6 +384,11 @@
     oldBalanceEditableItem = item;
   }
 
+  function handleOldBalanceDelete(item) {
+    if (item.sign) showToast("Can't Delete Signed Payments", 'danger');
+    else transportAction('?/oldBalanceDelete', { id: item.id });
+  }
+
   function handleOldBalanceSign(item) {
     transportAction('?/oldBalanceSign', { id: item.id, current: item.sign });
   }
@@ -430,6 +436,7 @@
   const oldBalanceCustomEvents = [
     { key: 'ArrowRight', handler: handleOldBalanceSign },
     { key: 'E', handler: handleOldBalanceEdit },
+    { key: 'D', handler: handleOldBalanceDelete },
     { key: 'Enter', handler: handleOldBalanceEdit }
   ];
 

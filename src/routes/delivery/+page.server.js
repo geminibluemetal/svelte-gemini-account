@@ -10,6 +10,7 @@ import { getAllItems } from '$lib/entity/items/items.service.js';
 import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
 import {
   createOldBalance,
+  deleteOldBalance,
   getAllOldBalance,
   getAllParty,
   signOldBalanceById,
@@ -123,6 +124,16 @@ export const actions = {
     const formData = await request.formData();
     const data = formDataToObject(formData);
     signOldBalanceById(data.id, data.current);
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
+  },
+
+  // Delete Old Balance
+  oldBalanceDelete: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    deleteOldBalance(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
     sseEmit({ type: 'CASH.LIST' });

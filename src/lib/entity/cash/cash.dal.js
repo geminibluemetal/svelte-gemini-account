@@ -9,7 +9,7 @@ export function fetchAllCash(date) {
         WHEN c.order_id IS NOT NULL THEN 'OA-' || o.order_number
         ELSE ''
       END AS serial,
-      TIME(c.time, 'localtime') AS time
+      strftime('%Y-%m-%dT%H:%M:%SZ', c.created_at) AS time
     FROM cash c
     LEFT JOIN orders o ON c.order_id = o.id
     WHERE DATE(c.created_at) = ?;
@@ -88,7 +88,6 @@ export function deleteCashById(id) {
   const stat = db.prepare(query);
   return stat.run(id);
 }
-
 
 export function signCashById(id, value) {
   const query = `UPDATE cash SET sign = ? WHERE id = ?`;

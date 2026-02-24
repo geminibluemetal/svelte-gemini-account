@@ -7,7 +7,8 @@ const formatters = {
     return getFormattedDate(value);
   },
   time: function (value) {
-    value = parseTime(value)
+    if (value.includes('T')) value = new Date(value);
+    else value = parseTime(value);
     return getFormattedTime(value);
   },
   currency: function (value) {

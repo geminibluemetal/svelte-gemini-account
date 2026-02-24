@@ -46,6 +46,7 @@ export function insertOrder(data) {
       phone,
       item,
       total_qty,
+      amount_time,
       amount_type,
       amount,
       advance,
@@ -59,7 +60,7 @@ export function insertOrder(data) {
       notes,
       status,
       delivery_sheet_verified
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const stat = db.prepare(query);
@@ -73,6 +74,7 @@ export function insertOrder(data) {
     data.phone || null,
     data.item,
     data.total_qty || 0,
+    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
     data.amount_type,
     data.amount || 0,
     data.advance || 0,
@@ -98,6 +100,7 @@ export function updateOrderById(id, data) {
       phone = ?,
       item = ?,
       total_qty = ?,
+      amount_time = ?,
       amount_type = ?,
       amount = ?,
       advance = ?,
@@ -119,6 +122,7 @@ export function updateOrderById(id, data) {
     data.phone || null,
     data.item,
     data.total_qty || 0,
+    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
     data.amount_type,
     data.amount || 0,
     data.advance || 0,

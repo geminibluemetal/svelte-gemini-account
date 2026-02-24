@@ -7,6 +7,7 @@ import {
   updatePartyById
 } from './party.dal';
 import {
+  deletePartyStatementById,
   fetchAllOldBalanceByDate,
   insertPartyOldBalance,
   signOldBalance,
@@ -119,4 +120,8 @@ export async function getAllOldBalance(date) {
 export async function signOldBalanceById(id, current) {
   const newValue = current == 1 ? 0 : 1;
   return signOldBalance(id, newValue);
+}
+
+export function deleteOldBalance(id) {
+  deletePartyStatementById(id);
 }

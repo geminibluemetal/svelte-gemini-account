@@ -2,7 +2,7 @@ import db from '$lib/core/server/db';
 
 export function fetchAllReportsByDate(date) {
   const query = `
-    SELECT *
+    SELECT id, strftime('%Y-%m-%dT%H:%M:%SZ', created_at) AS created_at
     FROM cash_reports
     WHERE DATE(created_at) = ?
     ORDER BY created_at ASC

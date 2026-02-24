@@ -1,5 +1,14 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import { createCash, createNewCashReport, deleteCash, deleteCashReport, getAllCash, getAllReports, signCash, updateCash } from '$lib/entity/cash/cash.service.js';
+import {
+  createCash,
+  createNewCashReport,
+  deleteCash,
+  deleteCashReport,
+  getAllCash,
+  getAllReports,
+  signCash,
+  updateCash
+} from '$lib/entity/cash/cash.service.js';
 import { fetchAllCashDescription } from '$lib/entity/cash/cash_description.dal.js';
 import { getAllDeliveryCash } from '$lib/entity/delivery/delivery.dal.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
@@ -21,14 +30,15 @@ export async function load({ depends, url }) {
     : formatDateTime('YY-MM-DD');
 
   // 2. Fetch all data in parallel (Avoiding Waterfalls)
-  const [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] = await Promise.all([
-    getAllReports(formattedDate),
-    getAllCash(formattedDate),
-    getAllDeliveryCash(formattedDate),
-    getAllOldBalanceCash(formattedDate),
-    fetchAllCashDescription(),
-    getAllParty()
-  ]);
+  const [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] =
+    await Promise.all([
+      getAllReports(formattedDate),
+      getAllCash(formattedDate),
+      getAllDeliveryCash(formattedDate),
+      getAllOldBalanceCash(formattedDate),
+      fetchAllCashDescription(),
+      getAllParty()
+    ]);
 
   // 3. Determine Report Time Boundaries
   const { fromDate, toDate } = getReportBoundaries(reports, reportIndex);
@@ -36,15 +46,17 @@ export async function load({ depends, url }) {
   // 4. Filter and Categorize Data
   // Pre-filter helper to keep things DRY
   const isWithinReport = (item) => {
-    const created = new Date(item.created_at);
+    const created = new Date(item.time);
     return created > fromDate && created < toDate;
   };
 
-  const income = [...directCash, ...deliveryCash, ...oldBalanceCash]
-    .filter(c => c.entry_type !== 'EXPENSE' && isWithinReport(c));
+  let income = [...directCash, ...deliveryCash, ...oldBalanceCash].filter(
+    (c) => c.entry_type !== 'EXPENSE' && isWithinReport(c)
+  );
+  income.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-  const expense = directCash
-    .filter(c => c.entry_type === 'EXPENSE' && isWithinReport(c));
+  let expense = directCash.filter((c) => c.entry_type === 'EXPENSE' && isWithinReport(c));
+  expense.sort((a, b) => new Date(a.time) - new Date(b.time));
 
   return {
     income,
@@ -79,7 +91,7 @@ export const actions = {
   form: async ({ request }) => {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
-    let result
+    let result;
     if (editId) {
       result = await updateCash(data, editId);
     } else {
@@ -97,7 +109,7 @@ export const actions = {
   sign: async ({ request }) => {
     const formData = await request.formData();
     const { id, current } = formDataToObject(formData);
-    let result
+    let result;
     if (id) {
       result = await signCash(id, current);
     }
@@ -113,7 +125,7 @@ export const actions = {
   delete: async ({ request }) => {
     const formData = await request.formData();
     const { id } = formDataToObject(formData);
-    let result
+    let result;
     if (id) {
       result = await deleteCash(id);
     }
@@ -139,7 +151,7 @@ export const actions = {
   deleteReport: async ({ request }) => {
     const formData = await request.formData();
     const { id } = formDataToObject(formData);
-    let result
+    let result;
     if (id) {
       result = await deleteCashReport(id);
     }
@@ -150,5 +162,5 @@ export const actions = {
 
     sseEmit({ type: 'CASH.LIST' });
     return result;
-  },
-}
+  }
+};

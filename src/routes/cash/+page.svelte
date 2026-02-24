@@ -57,8 +57,7 @@
   let helperOpened = $state(false);
   let editableItem = $state();
   let currentReportIndex = $state(data.reports.length > 0 ? data.reports.length - 1 : 0);
-  let lastSeenLength = $state(data.reports.length);
-  let pendingSnap = $state(false);
+  let lastKnownLength = $state(data.reports.length);
 
   // Number Safe
   const num = (value) => Number(value) || 0;
@@ -137,6 +136,11 @@
     $commonDate = value;
   }
 
+  function gotoCurrentReport() {
+    $commonDate = new Date();
+    currentReportIndex = data.reports.length - 1;
+  }
+
   function handleNextReport() {
     if (currentReportIndex < data.reports.length - 1) {
       currentReportIndex = Number(currentReportIndex) + 1;
@@ -150,22 +154,7 @@
   }
 
   async function handleNewReport() {
-    // Record length BEFORE we start the network request
-    const lengthBefore = data.reports.length;
-
     const result = await transportAction('?/newReport');
-
-    if (result.type === 'success') {
-      // Check: Did the SSE already update the data while we were waiting?
-      if (data.reports.length > lengthBefore) {
-        // Yes, SSE was faster. Snap immediately.
-        currentReportIndex = data.reports.length - 1;
-        lastSeenLength = data.reports.length;
-      } else {
-        // No, SSE hasn't arrived yet. Set the flag to snap when it does.
-        pendingSnap = true;
-      }
-    }
   }
 
   function handleDeleteReport() {
@@ -219,7 +208,7 @@
     keyboardEventBus.on('1', handlePreviousReport);
     keyboardEventBus.on('2', handleNextReport);
     keyboardEventBus.on('4', gotoDeliverySheet);
-    // keyboardEventBus.on('5', handleHelper);
+    keyboardEventBus.on('5', gotoCurrentReport);
     keyboardEventBus.on('6', gotoOrderBook);
     keyboardEventBus.on('7', handleNewReport);
     keyboardEventBus.on('8', handleDeleteReport);
@@ -231,27 +220,20 @@
     keyboardEventBus.off('1', handlePreviousReport);
     keyboardEventBus.off('2', handleNextReport);
     keyboardEventBus.off('4', gotoDeliverySheet);
-    // keyboardEventBus.off('5', handleHelper);
+    keyboardEventBus.off('5', gotoCurrentReport);
     keyboardEventBus.off('6', gotoOrderBook);
     keyboardEventBus.off('7', handleNewReport);
     keyboardEventBus.off('8', handleDeleteReport);
     syncOff('CASH.LIST');
   });
 
-  // This effect watches both the flag AND the data length
   $effect(() => {
-    // We trigger if EITHER the flag is turned on OR the data length grows
-    if (pendingSnap) {
-      if (data.reports.length > lastSeenLength) {
-        // The data arrived after we clicked
-        currentReportIndex = data.reports.length - 1;
-        lastSeenLength = data.reports.length;
-        pendingSnap = false;
-      } else if (/* logic for the race condition */ true) {
-        // If the data is already here (SSE was faster than the function)
-        // we still want to snap.
-      }
+    // Only snap to end if a new report was actually added to the array
+    if (data.reports.length > lastKnownLength) {
+      currentReportIndex = data.reports.length - 1;
     }
+    // Update the tracker
+    lastKnownLength = data.reports.length;
   });
 
   // 1. Define a derived state for the URL string to prevent unnecessary updates
@@ -335,7 +317,7 @@
       </div>
       <div class="flex gap-2 *:flex-1 dark">
         <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>
-        <Button color="fuchsia" corner="5">Current</Button>
+        <Button color="fuchsia" corner="5" onclick={gotoCurrentReport}>Current</Button>
         <Button color="primary" corner="6" onclick={gotoOrderBook}>OB</Button>
       </div>
       <div class="flex gap-2 *:flex-1 font-bold">

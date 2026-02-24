@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS delivery (
     serial INTEGER NOT NULL,
     token_time TEXT,
     delivery_time TEXT,
+    amount_time TEXT,
     order_number TEXT,
     party_name TEXT,
     address TEXT,

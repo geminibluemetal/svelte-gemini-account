@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS orders (
     phone TEXT,
     item TEXT NOT NULL,
     total_qty DECIMAL(10, 2) NOT NULL,
+    amount_time TEXT,
     amount_type TEXT NOT NULL,
     amount DECIMAL(10, 2) DEFAULT 0,
     advance DECIMAL(10, 2) DEFAULT 0,

@@ -4,11 +4,17 @@ export const tableName = 'party_statements';
 
 export function insertPartyOldBalance(data) {
   const query = `
-    INSERT INTO ${tableName} (party_id, amount_type, amount, entry_type)
-    VALUES (?, ?, ?, ?)
+    INSERT INTO ${tableName} (party_id, amount_type, amount, entry_type, time)
+    VALUES (?, ?, ?, ?, ?)
   `;
   const stat = db.prepare(query);
-  return stat.run(data.party_id, data.amount_type, data.amount, data.entry_type);
+  return stat.run(
+    data.party_id,
+    data.amount_type,
+    data.amount,
+    data.entry_type,
+    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : ''
+  );
 }
 
 export function updatePartyOldBalance(data, id) {
@@ -17,11 +23,19 @@ export function updatePartyOldBalance(data, id) {
     SET party_id = ?,
         amount_type = ?,
         amount = ?,
-        entry_type = ?
+        entry_type = ?,
+        time = ?
     WHERE id = ?
   `;
   const stat = db.prepare(query);
-  return stat.run(data.party_id, data.amount_type, data.amount, data.entry_type, id);
+  return stat.run(
+    data.party_id,
+    data.amount_type,
+    data.amount,
+    data.entry_type,
+    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
+    id
+  );
 }
 
 export function fetchAllOldBalanceByDate(date) {
@@ -50,7 +64,7 @@ export function getAllOldBalanceCash(date) {
       ob.id,
       ob.party_id,
       'OB' AS serial,
-      TIME(ob.time, 'localtime') AS time,
+      strftime('%Y-%m-%dT%H:%M:%Sz', ob.time) AS time,
       p.name || ' O/B' AS description,
       ob.amount_type,
       ob.amount,
@@ -73,4 +87,10 @@ export function getAllOldBalanceCash(date) {
 export function signOldBalance(id, newValue) {
   const stat = db.prepare(`UPDATE ${tableName} SET sign = ? WHERE id = ?`);
   return stat.run(newValue, id);
+}
+
+export function deletePartyStatementById(id) {
+  const query = `DELETE FROM ${tableName} WHERE id = ?`;
+  const stmt = db.prepare(query);
+  return stmt.run(id);
 }
