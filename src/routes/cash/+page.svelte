@@ -1,5 +1,5 @@
 <script>
-  import { goto } from '$app/navigation';
+  import { goto, invalidate } from '$app/navigation';
   import { page } from '$app/stores';
   import Button from '$lib/components/Button.svelte';
   import CashTable from '$lib/components/CashTable.svelte';
@@ -14,10 +14,7 @@
   import { onDestroy, onMount } from 'svelte';
   import CashForm from './CashForm.svelte';
   import { showToast } from '$lib/stores/toast';
-  import {
-    commonDate,
-    commonCurrontCashReportIndex as currentReportIndex
-  } from '$lib/stores/common';
+  import { commonDate } from '$lib/stores/common';
 
   const { data } = $props();
 
@@ -59,6 +56,9 @@
   let formOpened = $state(false);
   let helperOpened = $state(false);
   let editableItem = $state();
+  let currentReportIndex = $state(data.reports.length > 0 ? data.reports.length - 1 : 0);
+  let lastSeenLength = $state(data.reports.length);
+  let pendingSnap = $state(false);
 
   // Number Safe
   const num = (value) => Number(value) || 0;
@@ -138,32 +138,47 @@
   }
 
   function handleNextReport() {
-    if ($currentReportIndex < data.reports.length - 1) {
-      $currentReportIndex = Number($currentReportIndex) + 1;
+    if (currentReportIndex < data.reports.length - 1) {
+      currentReportIndex = Number(currentReportIndex) + 1;
     }
   }
 
   function handlePreviousReport() {
-    if ($currentReportIndex > 0) {
-      $currentReportIndex = Number($currentReportIndex) - 1;
+    if (currentReportIndex > 0) {
+      currentReportIndex = Number(currentReportIndex) - 1;
     }
   }
 
-  function handleNewReport() {
-    transportAction('?/newReport');
+  async function handleNewReport() {
+    // Record length BEFORE we start the network request
+    const lengthBefore = data.reports.length;
+
+    const result = await transportAction('?/newReport');
+
+    if (result.type === 'success') {
+      // Check: Did the SSE already update the data while we were waiting?
+      if (data.reports.length > lengthBefore) {
+        // Yes, SSE was faster. Snap immediately.
+        currentReportIndex = data.reports.length - 1;
+        lastSeenLength = data.reports.length;
+      } else {
+        // No, SSE hasn't arrived yet. Set the flag to snap when it does.
+        pendingSnap = true;
+      }
+    }
   }
 
   function handleDeleteReport() {
-    if (data.reports[$currentReportIndex]?.id === 'current') {
-      transportAction('?/deleteReport', {
-        id: data.reports[$currentReportIndex - 1]?.id
-      });
-    } else {
-      if (!data.income.length && !data.expense.length) {
-        transportAction('?/deleteReport', { id: data.reports[$currentReportIndex]?.id });
+    if (!data.income.length && !data.expense.length) {
+      if (data.reports[currentReportIndex]?.id === 'current') {
+        transportAction('?/deleteReport', {
+          id: data.reports[currentReportIndex - 1]?.id
+        });
       } else {
-        showToast('Only empty reports can be deleted', 'danger');
+        transportAction('?/deleteReport', { id: data.reports[currentReportIndex]?.id });
       }
+    } else {
+      showToast('Only empty reports can be deleted', 'danger');
     }
   }
 
@@ -223,28 +238,55 @@
     syncOff('CASH.LIST');
   });
 
+  // This effect watches both the flag AND the data length
+  $effect(() => {
+    // We trigger if EITHER the flag is turned on OR the data length grows
+    if (pendingSnap) {
+      if (data.reports.length > lastSeenLength) {
+        // The data arrived after we clicked
+        currentReportIndex = data.reports.length - 1;
+        lastSeenLength = data.reports.length;
+        pendingSnap = false;
+      } else if (/* logic for the race condition */ true) {
+        // If the data is already here (SSE was faster than the function)
+        // we still want to snap.
+      }
+    }
+  });
+
   // 1. Define a derived state for the URL string to prevent unnecessary updates
   const searchParamsString = $derived.by(() => {
     const params = new URLSearchParams();
     // Ensure date is formatted correctly (YYYY-MM-DD or ISO)
     const dateStr = $commonDate instanceof Date ? $commonDate.toISOString() : $commonDate;
-    const reportVal = $currentReportIndex;
+    const reportVal = currentReportIndex ?? data.reports.length - 1;
 
     params.set('date', dateStr);
     params.set('report', reportVal);
     return params.toString();
   });
 
-  // 2. Use one effect to sync the URL
+  // URL Sync Effect
   $effect(() => {
-    const currentParams = $page.url.searchParams.toString();
+    const params = new URLSearchParams($page.url.searchParams);
+    const dateStr =
+      $commonDate instanceof Date ? $commonDate.toISOString().split('T')[0] : $commonDate;
 
-    // Only navigate if the calculated params differ from the current URL
-    if (searchParamsString !== currentParams) {
-      goto(`?${searchParamsString}`, {
+    // Safety check for index out of bounds (useful after deletes)
+    if (currentReportIndex >= data.reports.length) {
+      currentReportIndex = Math.max(0, data.reports.length - 1);
+    }
+
+    const reportVal = String(currentReportIndex);
+
+    if (params.get('report') !== reportVal || params.get('date') !== dateStr) {
+      params.set('date', dateStr);
+      params.set('report', reportVal);
+
+      goto(`?${params.toString()}`, {
         keepFocus: true,
         replaceState: true,
-        invalidateAll: false // Use this to prevent full page reloads if only the UI needs to sync
+        invalidateAll: false
       });
     }
   });
@@ -262,7 +304,7 @@
   customEvents={cashCustomEvents}
 >
   {#snippet right()}
-    <span class="p-1">Report 1</span>
+    <span class="p-1">{`Cash ${currentReportIndex + 1}`}</span>
   {/snippet}
   {#snippet sidebar()}
     <div class="flex flex-col gap-2 w-48">
@@ -283,7 +325,7 @@
           onPrevious={handlePreviousReport}
         >
           <span>
-            {`Cash ${$currentReportIndex + 1}`}
+            {`Cash ${currentReportIndex + 1}`}
           </span>
         </NavigateButton>
       </div>
