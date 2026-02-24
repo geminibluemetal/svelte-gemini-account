@@ -7,7 +7,8 @@
   const { open, onClose, item } = $props();
   let initialData = {
     name: '',
-    phone: ''
+    phone: '',
+    opening_balance: 0
   };
 
   let data = $state(initialData);
@@ -47,5 +48,11 @@
     {/if}
     <InputField name="name" value={data.name} placeholder="Party Name" autoComplete="off" />
     <InputField name="phone" value={data.phone} type="number" placeholder="Phone" />
+    <InputField
+      name="opening_balance"
+      value={data.opening_balance}
+      type="number"
+      placeholder="Opening Balance"
+    />
   </Form>
 </Model>

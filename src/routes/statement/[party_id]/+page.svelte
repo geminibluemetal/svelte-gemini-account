@@ -6,28 +6,20 @@
   import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { goto } from '$app/navigation';
+  import display from '$lib/core/client/display.js';
 
   const { data } = $props();
 
   const headers = [
-    { name: 'Name', align: 'left', key: 'name', width: 300 },
-    { name: 'Phone', align: 'center', key: 'phone', width: 150 },
-    {
-      name: 'Open Balance',
-      align: 'right',
-      key: 'opening_balance',
-      width: 125,
-      display: 'currency'
-    },
-    { name: 'Total Amount', align: 'right', key: 'total_debit', width: 125, display: 'currency' },
-    { name: 'Total Payment', align: 'right', key: 'total_credit', width: 125, display: 'currency' },
-    {
-      name: 'Current Balance',
-      align: 'right',
-      key: 'current_balance',
-      width: 125,
-      display: 'currency'
-    }
+    { name: 'Date', align: 'center', key: 'date', width: 100, display: 'date' },
+    { name: 'Time', align: 'center', key: 'time', width: 80, display: 'time' },
+    { name: 'Vehicle', align: 'left', key: 'vehicle', width: 70 },
+    { name: 'Address', align: 'left', key: 'address', width: 230 },
+    { name: 'Item', align: 'left', key: 'item' },
+    { name: 'Qty', key: 'qty', align: 'right', width: 50, display: 'decimal' },
+    { name: 'Credit', align: 'right', key: 'credit', width: 110, display: 'currency' },
+    { name: 'Debit', align: 'right', key: 'debit', width: 110, display: 'currency' },
+    { name: 'Balance', align: 'right', key: 'running_balance', width: 110, display: 'currency' }
   ];
 
   const availableOptions = [
@@ -58,6 +50,10 @@
     goto(`/statement/${item.id}`);
   }
 
+  function gotoBalanceSheet() {
+    goto(`/balance`);
+  }
+
   function handleBalanceReset(item) {
     // console.log(item);
     // goto(`/statement/${item.id}`);
@@ -70,15 +66,17 @@
 
   onMount(() => {
     keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('Backspace', gotoBalanceSheet);
     syncOn('BALANCE.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('Backspace', gotoBalanceSheet);
     syncOff('BALANCE.LIST');
   });
 </script>
 
-<Table title="Balance Sheet" {headers} items={data.balance} {customEvents} />
+<Table title={data.party?.name} {headers} items={data.statement} {customEvents} />
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>

@@ -11,7 +11,8 @@
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
-    { name: 'Phone', align: 'center', key: 'phone' }
+    { name: 'Phone', align: 'center', key: 'phone' },
+    { name: 'Opening Balance', align: 'right', key: 'opening_balance', display: 'currency' }
   ];
 
   const availableOptions = [

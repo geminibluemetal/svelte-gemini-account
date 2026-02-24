@@ -2,13 +2,16 @@ import {
   checkPartyNameExists,
   deletePartyById,
   fetchAllParty,
+  fetchSinglePartyById,
   fetchSinglePartyByName,
   insertParty,
   updatePartyById
 } from './party.dal';
 import {
   deletePartyStatementById,
+  fetchAllBalanceForParty,
   fetchAllOldBalanceByDate,
+  fetchPartyStatementByPartyId,
   insertPartyOldBalance,
   signOldBalance,
   updatePartyOldBalance
@@ -16,6 +19,10 @@ import {
 
 export async function getAllParty() {
   return fetchAllParty();
+}
+
+export function getSingleParty(id) {
+  return fetchSinglePartyById(id)
 }
 
 export async function createParty(data) {
@@ -124,4 +131,12 @@ export async function signOldBalanceById(id, current) {
 
 export function deleteOldBalance(id) {
   deletePartyStatementById(id);
+}
+
+export function getAllBalance() {
+  return fetchAllBalanceForParty()
+}
+
+export function getPartyStatement(id) {
+  return fetchPartyStatementByPartyId(id)
 }

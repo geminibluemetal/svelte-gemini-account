@@ -94,3 +94,77 @@ export function deletePartyStatementById(id) {
   const stmt = db.prepare(query);
   return stmt.run(id);
 }
+
+export function fetchAllBalanceForParty() {
+  const query = `
+    SELECT
+        p.id,
+        p.name,
+        p.phone,
+        p.opening_balance,
+        COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
+        COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) as total_debit,
+        (p.opening_balance +
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) -
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0)
+        ) AS current_balance
+    FROM party p
+    LEFT JOIN party_statements ps ON p.id = ps.party_id
+    GROUP BY p.id
+    HAVING current_balance != 0
+    ORDER BY p.name ASC
+  `;
+
+  try {
+    const stmt = db.prepare(query);
+    return stmt.all();
+  } catch (error) {
+    console.error("Failed to fetch party balances:", error);
+    return [];
+  }
+}
+
+export function fetchPartyStatementByPartyId(id) {
+  const query = `
+    SELECT
+      ps.id,
+      -- Extract date from ISO string or use as is
+      DATE(ps.time) as date,
+      ps.time,
+      ps.vehicle,
+      ps.address,
+      ps.item,
+      ps.qty,
+      ps.amount,
+      ps.entry_type,
+      ps.sign,
+      -- Conditional columns for UI display
+      CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END as credit,
+      CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END as debit,
+      -- Running Balance Calculation
+      (
+        p.opening_balance +
+        SUM(
+          CASE
+            WHEN ps.entry_type = 'CREDIT' THEN ps.amount
+            WHEN ps.entry_type = 'DEBIT' THEN -ps.amount
+            ELSE 0
+          END
+        ) OVER (
+          ORDER BY ps.time ASC, ps.id ASC
+        )
+      ) as running_balance
+    FROM party_statements ps
+    JOIN party p ON ps.party_id = p.id
+    WHERE ps.party_id = ?
+    ORDER BY ps.time ASC, ps.id ASC
+  `;
+
+  try {
+    const stmt = db.prepare(query);
+    return stmt.all(id);
+  } catch (error) {
+    console.error("Failed to fetch party ledger:", error);
+    return [];
+  }
+}

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS party (
 `;
 
 export const seedData = [
-  { name: 'ADS', phone: '987642310' },
+  { name: 'ADS', phone: '9790029726' },
   { name: 'AGS', phone: '9894217717' },
   { name: 'Akbar Kousar', phone: '9751066446' },
   { name: 'Amir Bhai', phone: '' },

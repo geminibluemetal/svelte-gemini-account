@@ -15,6 +15,12 @@ export function fetchSinglePartyByName(name) {
   return stat.get();
 }
 
+export function fetchSinglePartyById(id) {
+  const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`;
+  const stat = db.prepare(query);
+  return stat.get();
+}
+
 export function updatePhoneByPartyName(name, phone) {
   const query = `
     UPDATE ${tableName}
@@ -27,8 +33,8 @@ export function updatePhoneByPartyName(name, phone) {
 
 export function insertParty(data) {
   const query = `
-    INSERT INTO ${tableName} (name, phone)
-    VALUES (?, ?)
+    INSERT INTO ${tableName} (name, phone, opening_balance)
+    VALUES (?, ?, ?)
   `;
   const stat = db.prepare(query);
   return stat.run(data.name, data.phone || null);
@@ -38,12 +44,13 @@ export function updatePartyById(data, id) {
   const query = `
     UPDATE ${tableName}
     SET name = ?,
-        phone = ?
+        phone = ?,
+        opening_balance = ?
     WHERE id = ?
   `;
 
   const stmt = db.prepare(query);
-  return stmt.run(data.name, data.phone || null, id);
+  return stmt.run(data.name, data.phone || null, data.opening_balance || 0, id);
 }
 export function deletePartyById(id) {
   const query = `DELETE FROM party WHERE id = ?`;

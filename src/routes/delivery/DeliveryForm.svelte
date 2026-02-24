@@ -46,6 +46,7 @@
     if (item) {
       formData.set('vehicle', item.vehicle);
       formData.set('sign', item.sign);
+      formData.set('amount_type_2', item.amount_type_2);
     }
     return async ({ result }) => {
       if (result.type == 'failure') {

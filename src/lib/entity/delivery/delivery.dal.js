@@ -1,6 +1,10 @@
+import { calculateAmount } from '$lib/core/helper';
 import db from '$lib/core/server/db';
+import { fetchSingleAddressByName } from '../address/address.dal';
+import { fetchSingleItemByName } from '../items/items.dal';
 import { fetchSingleOrderByOrderNumber } from '../orders/order.dal';
 import { examineStatusByQuantity } from '../orders/order.service';
+import { fetchSinglePartyByName } from '../party/party.dal';
 
 const tableName = 'delivery'; // Token also uses delivery table
 
@@ -144,6 +148,65 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
   }
 };
 
+const syncLedgerFromDelivery = (delivery) => {
+  const num = (val) => Number(val) || 0;
+  const isAc = delivery.amount_type_1 == 'AC' || delivery.amount_type_2 == 'AC'
+  const party_name = delivery.party_name
+  let amount =
+    (delivery.amount_type_1 === 'AC' ? num(delivery.amount_1) : 0) +
+    (delivery.amount_type_2 === 'AC' ? num(delivery.amount_2) : 0);
+  if (!isAc || !party_name) {
+    return { success: true }
+  }
+
+  const address = fetchSingleAddressByName(delivery.address)
+  const item = fetchSingleItemByName(delivery.delivery_item)
+  amount = amount ? amount : calculateAmount(address, item, delivery.delivery_quantity)
+
+  const statementDeleteQuery = `DELETE FROM party_statements WHERE delivery_id = ?`;
+  const statementDelete = db.prepare(statementDeleteQuery);
+
+  // Delete Existing Statement
+  statementDelete.run(delivery.id)
+
+  // Create New Statement
+  const party = fetchSinglePartyByName(party_name)
+  const statementCreateQuery = `
+  INSERT INTO party_statements
+    (
+      party_id,
+      delivery_id,
+      amount_type,
+      entry_type,
+      amount,
+      item,
+      qty,
+      vehicle,
+      address,
+      time,
+      sign
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  const statementCreate = db.prepare(statementCreateQuery);
+  const data = [
+    party.id,
+    delivery.id,
+    null,
+    'DEBIT',
+    amount,
+    delivery.delivery_item,
+    delivery.delivery_quantity,
+    delivery.vehicle,
+    delivery.address,
+    delivery.delivery_item,
+    delivery.sign
+  ]
+  const result = statementCreate.run(data)
+  if (result?.changes) {
+    return { success: true }
+  }
+};
+
 export function updateDeliveryById(data, id) {
   const oldDelivery = fetchDeliveryById(id);
 
@@ -187,8 +250,10 @@ export function updateDeliveryById(data, id) {
   const newDelivery = fetchDeliveryById(id);
 
   // Additional Things
-  // 1) Updaste Orders
+  // 1) Update Orders
   syncOrderFromDelivery(oldDelivery, newDelivery);
+  // 2) Update Ledger
+  syncLedgerFromDelivery(newDelivery);
   return { success: true };
 }
 
@@ -216,7 +281,13 @@ export function updateDeliveryAmountById(data, id) {
   ];
 
   const stmt = db.prepare(query);
-  return stmt.run(params);
+  const result = stmt.run(params);
+  if (!result?.changes) {
+    return { message: 'Delivery Amount not Updated', ok: false };
+  }
+
+  const delivery = fetchDeliveryById(id)
+  return syncLedgerFromDelivery(delivery);
 }
 
 export function signDelivery(id, newValue) {

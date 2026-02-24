@@ -53,7 +53,9 @@
       name="amount_type_1"
       value={data.amount_type_1}
       placeholder="Amount Type 1"
-      options={item?.party_name ? amountType : amountType.filter((x) => x !== 'AC')}
+      options={item?.party_name && data.amount_type_2 != 'AC'
+        ? amountType
+        : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
     <InputField name="amount_1" value={data.amount_1} placeholder="Amount 1" autoComplete="off" />
@@ -64,7 +66,9 @@
       name="amount_type_2"
       value={data.amount_type_2}
       placeholder="Amount Type 2"
-      options={item?.party_name ? amountType : amountType.filter((x) => x !== 'AC')}
+      options={item?.party_name && data.amount_type_1 != 'AC'
+        ? amountType
+        : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
     <InputField name="amount_2" value={data.amount_2} placeholder="Amount 2" autoComplete="off" />
