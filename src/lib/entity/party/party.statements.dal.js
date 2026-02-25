@@ -13,7 +13,7 @@ export function insertPartyOldBalance(data) {
     data.amount_type,
     data.amount,
     data.entry_type,
-    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : ''
+    new Date().toISOString()
   );
 }
 
@@ -23,8 +23,7 @@ export function updatePartyOldBalance(data, id) {
     SET party_id = ?,
         amount_type = ?,
         amount = ?,
-        entry_type = ?,
-        time = ?
+        entry_type = ?
     WHERE id = ?
   `;
   const stat = db.prepare(query);
@@ -33,7 +32,6 @@ export function updatePartyOldBalance(data, id) {
     data.amount_type,
     data.amount,
     data.entry_type,
-    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
     id
   );
 }
@@ -96,17 +94,18 @@ export function deletePartyStatementById(id) {
 }
 
 export function fetchAllBalanceForParty() {
+  // Logic is generally correct here
   const query = `
     SELECT
         p.id,
         p.name,
         p.phone,
         p.opening_balance,
-        COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) as total_debit,
+        COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
         (p.opening_balance +
-         COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) -
-         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0)
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) -
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0)
         ) AS current_balance
     FROM party p
     LEFT JOIN party_statements ps ON p.id = ps.party_id
@@ -128,8 +127,7 @@ export function fetchPartyStatementByPartyId(id) {
   const query = `
     SELECT
       ps.id,
-      -- Extract date from ISO string or use as is
-      DATE(ps.time) as date,
+      DATE(ps.created_at) as date,
       ps.time,
       ps.vehicle,
       ps.address,
@@ -137,27 +135,26 @@ export function fetchPartyStatementByPartyId(id) {
       ps.qty,
       ps.amount,
       ps.entry_type,
-      ps.sign,
-      -- Conditional columns for UI display
-      CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END as credit,
-      CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END as debit,
-      -- Running Balance Calculation
+      -- FIX 1: Map the display columns correctly
+      CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE NULL END as debit,
+      CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE NULL END as credit,
+      -- FIX 2: Running Balance must use the SAME order as the final query
       (
         p.opening_balance +
         SUM(
           CASE
-            WHEN ps.entry_type = 'CREDIT' THEN ps.amount
-            WHEN ps.entry_type = 'DEBIT' THEN -ps.amount
+            WHEN ps.entry_type = 'DEBIT' THEN ps.amount
+            WHEN ps.entry_type = 'CREDIT' THEN -ps.amount
             ELSE 0
           END
         ) OVER (
-          ORDER BY ps.time ASC, ps.id ASC
+          ORDER BY ps.created_at ASC, ps.id ASC -- Use Date + ID for stable sorting
         )
       ) as running_balance
     FROM party_statements ps
     JOIN party p ON ps.party_id = p.id
     WHERE ps.party_id = ?
-    ORDER BY ps.time ASC, ps.id ASC
+    ORDER BY ps.created_at ASC, ps.id ASC
   `;
 
   try {

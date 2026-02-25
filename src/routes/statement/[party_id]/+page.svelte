@@ -7,8 +7,13 @@
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { goto } from '$app/navigation';
   import display from '$lib/core/client/display.js';
+  import { HighlightCell } from '$lib/utils/highlight.js';
 
   const { data } = $props();
+
+  const debitColor = (value) => (value ? { ...HighlightCell.red, background: '' } : null);
+  const creditColor = (value) => (value ? { ...HighlightCell.green, background: '' } : null);
+  const balanceColor = (value) => (value ? { ...HighlightCell.blue, background: '' } : null);
 
   const headers = [
     { name: 'Date', align: 'center', key: 'date', width: 100, display: 'date' },
@@ -17,9 +22,30 @@
     { name: 'Address', align: 'left', key: 'address', width: 230 },
     { name: 'Item', align: 'left', key: 'item' },
     { name: 'Qty', key: 'qty', align: 'right', width: 50, display: 'decimal' },
-    { name: 'Credit', align: 'right', key: 'credit', width: 110, display: 'currency' },
-    { name: 'Debit', align: 'right', key: 'debit', width: 110, display: 'currency' },
-    { name: 'Balance', align: 'right', key: 'running_balance', width: 110, display: 'currency' }
+    {
+      name: 'Debit',
+      align: 'right',
+      key: 'debit',
+      width: 110,
+      display: 'currency',
+      color: debitColor
+    },
+    {
+      name: 'Credit',
+      align: 'right',
+      key: 'credit',
+      width: 110,
+      display: 'currency',
+      color: creditColor
+    },
+    {
+      name: 'Balance',
+      align: 'right',
+      key: 'running_balance',
+      width: 110,
+      display: 'currency',
+      color: balanceColor
+    }
   ];
 
   const availableOptions = [

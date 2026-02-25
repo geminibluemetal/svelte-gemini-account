@@ -1,7 +1,17 @@
+import { fetchSingleAddressByName } from "$lib/entity/address/address.dal";
+import { fetchSingleItemByName } from "$lib/entity/items/items.dal";
+
 export function calculateAmount(address, item, qty) {
+  address = typeof address === 'object' && address !== null ? address : fetchSingleAddressByName(address)
+  item = typeof item === 'object' && item !== null ? item : fetchSingleItemByName(item)
+
   let creditAmount = 0;
   // Get base item amount based on quantity
   creditAmount = getAmountByItemQuantity(item, qty);
+
+  if (creditAmount == 0) {
+    return { success: false, message: `Price is missing for: "${item.name}"` }
+  }
 
   // Only process delivery if address exists
   if (address && address.name && address.name.trim().length > 0) {
@@ -23,8 +33,7 @@ export function calculateAmount(address, item, qty) {
 
   // RoundOff Amount
   creditAmount = roundAmount(creditAmount);
-  console.log(creditAmount)
-  return creditAmount;
+  return { success: true, data: creditAmount }
 }
 
 // Helper function to get amount based on item quantity

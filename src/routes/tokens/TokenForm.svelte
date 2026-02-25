@@ -4,6 +4,7 @@
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
+  import { formDataToObject } from '$lib/utils/form';
 
   const { open, onClose, item, options } = $props();
   let initialData = {

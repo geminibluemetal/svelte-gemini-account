@@ -77,7 +77,7 @@ export function updateTokenById(data, id) {
     data.token_item !== undefined ? data.token_item : null,
     data.token_quantity !== undefined ? data.token_quantity : null,
     data.vehicle !== undefined ? data.vehicle : null,
-    data.is_cancelled !== undefined ? (data.is_cancelled ? 1 : 0) : null,
+    data.is_cancelled ? 1 : 0,
     id
   ];
 
@@ -152,6 +152,7 @@ const syncLedgerFromDelivery = (delivery) => {
   const num = (val) => Number(val) || 0;
   const isAc = delivery.amount_type_1 == 'AC' || delivery.amount_type_2 == 'AC'
   const party_name = delivery.party_name
+  const isCancelled = delivery.is_cancelled
   let amount =
     (delivery.amount_type_1 === 'AC' ? num(delivery.amount_1) : 0) +
     (delivery.amount_type_2 === 'AC' ? num(delivery.amount_2) : 0);
@@ -161,13 +162,25 @@ const syncLedgerFromDelivery = (delivery) => {
 
   const address = fetchSingleAddressByName(delivery.address)
   const item = fetchSingleItemByName(delivery.delivery_item)
-  amount = amount ? amount : calculateAmount(address, item, delivery.delivery_quantity)
+
+  if (!amount) {
+    const amountResult = calculateAmount(address, item, delivery.delivery_quantity)
+    if (amountResult.success) {
+      amount = amountResult.data
+    } else {
+      return amountResult
+    }
+  }
 
   const statementDeleteQuery = `DELETE FROM party_statements WHERE delivery_id = ?`;
   const statementDelete = db.prepare(statementDeleteQuery);
 
   // Delete Existing Statement
   statementDelete.run(delivery.id)
+
+  if (isCancelled) {
+    return { success: true }
+  }
 
   // Create New Statement
   const party = fetchSinglePartyByName(party_name)
@@ -198,7 +211,7 @@ const syncLedgerFromDelivery = (delivery) => {
     delivery.delivery_quantity,
     delivery.vehicle,
     delivery.address,
-    delivery.delivery_item,
+    delivery.delivery_time,
     delivery.sign
   ]
   const result = statementCreate.run(data)
@@ -253,8 +266,8 @@ export function updateDeliveryById(data, id) {
   // 1) Update Orders
   syncOrderFromDelivery(oldDelivery, newDelivery);
   // 2) Update Ledger
-  syncLedgerFromDelivery(newDelivery);
-  return { success: true };
+  const syncResult = syncLedgerFromDelivery(newDelivery);
+  return syncResult
 }
 
 export function updateDeliveryAmountById(data, id) {
@@ -287,7 +300,8 @@ export function updateDeliveryAmountById(data, id) {
   }
 
   const delivery = fetchDeliveryById(id)
-  return syncLedgerFromDelivery(delivery);
+  const syncResult = syncLedgerFromDelivery(delivery);
+  return syncResult
 }
 
 export function signDelivery(id, newValue) {

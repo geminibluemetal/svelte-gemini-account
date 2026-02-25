@@ -49,7 +49,7 @@
   }
 
   async function handleTokenDelete(item) {
-    const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
+    const confirmed = await confirm(`Are you Sure to Delete?`);
     if (confirmed) {
       const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') {

@@ -20,7 +20,12 @@
   }
 
   function handleFormSubmit({ formData }) {
-    if (item) formData.set('sign', item.sign);
+    if (item) {
+      formData.set('sign', item.sign);
+      formData.set('address', item.address);
+      formData.set('delivery_item', item.delivery_item);
+      formData.set('delivery_quantity', item.delivery_quantity);
+    }
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');
