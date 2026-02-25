@@ -27,13 +27,7 @@ export function updatePartyOldBalance(data, id) {
     WHERE id = ?
   `;
   const stat = db.prepare(query);
-  return stat.run(
-    data.party_id,
-    data.amount_type,
-    data.amount,
-    data.entry_type,
-    id
-  );
+  return stat.run(data.party_id, data.amount_type, data.amount, data.entry_type, id);
 }
 
 export function fetchAllOldBalanceByDate(date) {
@@ -118,7 +112,7 @@ export function fetchAllBalanceForParty() {
     const stmt = db.prepare(query);
     return stmt.all();
   } catch (error) {
-    console.error("Failed to fetch party balances:", error);
+    console.error('Failed to fetch party balances:', error);
     return [];
   }
 }
@@ -128,7 +122,7 @@ export function fetchPartyStatementByPartyId(id) {
     SELECT
       ps.id,
       DATE(ps.created_at) as date,
-      ps.time,
+      strftime('%I:%M %p', datetime(ps.created_at, '+5 hours', '+30 minutes')) AS time,
       ps.vehicle,
       ps.address,
       ps.item,
@@ -161,7 +155,7 @@ export function fetchPartyStatementByPartyId(id) {
     const stmt = db.prepare(query);
     return stmt.all(id);
   } catch (error) {
-    console.error("Failed to fetch party ledger:", error);
+    console.error('Failed to fetch party ledger:', error);
     return [];
   }
 }

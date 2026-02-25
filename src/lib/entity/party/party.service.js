@@ -22,7 +22,7 @@ export async function getAllParty() {
 }
 
 export function getSingleParty(id) {
-  return fetchSinglePartyById(id)
+  return fetchSinglePartyById(id);
 }
 
 export async function createParty(data) {
@@ -134,9 +134,9 @@ export function deleteOldBalance(id) {
 }
 
 export function getAllBalance() {
-  return fetchAllBalanceForParty()
+  return fetchAllBalanceForParty();
 }
 
 export function getPartyStatement(id) {
-  return fetchPartyStatementByPartyId(id)
+  return fetchPartyStatementByPartyId(id);
 }
