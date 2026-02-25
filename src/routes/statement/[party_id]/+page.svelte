@@ -45,6 +45,13 @@
       width: 110,
       display: 'currency',
       color: balanceColor
+    },
+    {
+      name: 'Sign',
+      align: 'center',
+      key: 'sign',
+      display: 'boolean',
+      color: SignColor
     }
   ];
 
@@ -55,6 +62,10 @@
   ];
 
   let helperOpened = $state(false);
+
+  function SignColor(value) {
+    return value == 1 ? HighlightCell.green : null;
+  }
 
   async function transportAction(url, data) {
     const formData = new FormData();

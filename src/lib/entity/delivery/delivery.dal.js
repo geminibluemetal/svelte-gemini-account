@@ -150,25 +150,22 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
 
 const syncLedgerFromDelivery = (delivery) => {
   const num = (val) => Number(val) || 0;
-  const isAc = delivery.amount_type_1 == 'AC' || delivery.amount_type_2 == 'AC'
-  const party_name = delivery.party_name
-  const isCancelled = delivery.is_cancelled
+  const isAc = delivery.amount_type_1 == 'AC' || delivery.amount_type_2 == 'AC';
+  const party_name = delivery.party_name;
+  const isCancelled = delivery.is_cancelled;
   let amount =
     (delivery.amount_type_1 === 'AC' ? num(delivery.amount_1) : 0) +
     (delivery.amount_type_2 === 'AC' ? num(delivery.amount_2) : 0);
-  if (!isAc || !party_name) {
-    return { success: true }
-  }
 
-  const address = fetchSingleAddressByName(delivery.address)
-  const item = fetchSingleItemByName(delivery.delivery_item)
+  const address = fetchSingleAddressByName(delivery.address);
+  const item = fetchSingleItemByName(delivery.delivery_item);
 
   if (!amount) {
-    const amountResult = calculateAmount(address, item, delivery.delivery_quantity)
+    const amountResult = calculateAmount(address, item, delivery.delivery_quantity);
     if (amountResult.success) {
-      amount = amountResult.data
+      amount = amountResult.data;
     } else {
-      return amountResult
+      return amountResult;
     }
   }
 
@@ -176,14 +173,14 @@ const syncLedgerFromDelivery = (delivery) => {
   const statementDelete = db.prepare(statementDeleteQuery);
 
   // Delete Existing Statement
-  statementDelete.run(delivery.id)
+  statementDelete.run(delivery.id);
 
-  if (isCancelled) {
-    return { success: true }
+  if (isCancelled || !isAc || !party_name) {
+    return { success: true };
   }
 
   // Create New Statement
-  const party = fetchSinglePartyByName(party_name)
+  const party = fetchSinglePartyByName(party_name);
   const statementCreateQuery = `
   INSERT INTO party_statements
     (
@@ -213,10 +210,10 @@ const syncLedgerFromDelivery = (delivery) => {
     delivery.address,
     delivery.delivery_time,
     delivery.sign
-  ]
-  const result = statementCreate.run(data)
+  ];
+  const result = statementCreate.run(data);
   if (result?.changes) {
-    return { success: true }
+    return { success: true };
   }
 };
 
@@ -267,7 +264,7 @@ export function updateDeliveryById(data, id) {
   syncOrderFromDelivery(oldDelivery, newDelivery);
   // 2) Update Ledger
   const syncResult = syncLedgerFromDelivery(newDelivery);
-  return syncResult
+  return syncResult;
 }
 
 export function updateDeliveryAmountById(data, id) {
@@ -299,9 +296,9 @@ export function updateDeliveryAmountById(data, id) {
     return { message: 'Delivery Amount not Updated', ok: false };
   }
 
-  const delivery = fetchDeliveryById(id)
+  const delivery = fetchDeliveryById(id);
   const syncResult = syncLedgerFromDelivery(delivery);
-  return syncResult
+  return syncResult;
 }
 
 export function signDelivery(id, newValue) {
@@ -324,6 +321,14 @@ export function signDelivery(id, newValue) {
       WHERE order_number = ?
     `
     ).run(adjustment, row.order_number);
+
+    db.prepare(
+      `
+      UPDATE party_statements
+      SET sign = ?
+      WHERE delivery_id = ?
+    `
+    ).run(value, targetId);
 
     // 3. Update the sign column in the delivery table
     // (Assuming tableName is 'delivery' based on your context)

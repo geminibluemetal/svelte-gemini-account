@@ -128,6 +128,7 @@ export function fetchPartyStatementByPartyId(id) {
       ps.item,
       ps.qty,
       ps.amount,
+      ps.sign,
       ps.entry_type,
       -- FIX 1: Map the display columns correctly
       CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE NULL END as debit,

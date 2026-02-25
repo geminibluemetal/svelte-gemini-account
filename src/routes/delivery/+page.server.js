@@ -56,6 +56,7 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'CASH.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
     return result;
   },
 
@@ -71,6 +72,7 @@ export const actions = {
 
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'CASH.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
     return result;
   },
 
@@ -82,6 +84,7 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'CASH.LIST' });
+    sseEmit({ type: 'BALANCE.LIST' });
   },
 
   // Mark Delivery Entry
