@@ -87,7 +87,20 @@ export function deletePartyStatementById(id) {
   return stmt.run(id);
 }
 
-export function fetchAllBalanceForParty() {
+export function fetchAllBalanceForParty(type) {
+  type = type ? type : 'pending'
+  let filter = ''
+  switch (type) {
+    case 'pending':
+      filter = 'HAVING current_balance != 0'
+      break;
+    case 'all':
+      filter = ''
+      break;
+    case 'nil':
+      filter = 'HAVING current_balance == 0'
+      break;
+  }
   // Logic is generally correct here
   const query = `
     SELECT
@@ -104,7 +117,7 @@ export function fetchAllBalanceForParty() {
     FROM party p
     LEFT JOIN party_statements ps ON p.id = ps.party_id
     GROUP BY p.id
-    HAVING current_balance != 0
+    ${filter}
     ORDER BY p.name ASC
   `;
 
@@ -130,6 +143,7 @@ export function fetchPartyStatementByPartyId(id) {
       ps.amount,
       ps.sign,
       ps.entry_type,
+      ps.amount_type,
       -- FIX 1: Map the display columns correctly
       CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE NULL END as debit,
       CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE NULL END as credit,

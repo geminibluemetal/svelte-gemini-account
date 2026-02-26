@@ -51,7 +51,7 @@
 
 <div class="flex h-dvh">
   <!-- main content -->
-  <div class="flex-1 overflow-auto">
+  <div class="flex-1 overflow-auto" id="main">
     {@render children(apps)}
   </div>
 

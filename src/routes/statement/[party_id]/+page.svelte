@@ -30,6 +30,7 @@
       display: 'currency',
       color: debitColor
     },
+    { name: 'AT', key: 'amount_type', align: 'center', width: 100, color: AmountTypeColor },
     {
       name: 'Credit',
       align: 'right',
@@ -55,11 +56,32 @@
     }
   ];
 
-  const availableOptions = [
-    { key: 'H', description: 'List available Shortcut' },
-    { key: 'R', description: 'Reset Balance' },
-    { key: 'Enter', description: 'Open Party Ledger' }
-  ];
+  function AmountTypeColor(value) {
+    switch (value) {
+      case 'Bunk':
+        return HighlightCell.purple;
+      case 'AC':
+        return HighlightCell.yellow;
+      case 'CP':
+        return HighlightCell.green;
+      case 'Paytm':
+        return HighlightCell.red;
+      case 'Gpay':
+        return HighlightCell.blue;
+      case 'Bunk Cash':
+        return HighlightCell.green;
+      case 'Bunk Ac':
+        return HighlightCell.yellow;
+      case 'Gemini Ac':
+        return HighlightCell.yellow;
+      case 'Cash':
+        return HighlightCell.green;
+      case 'Cheque':
+        return HighlightCell.purple;
+    }
+  }
+
+  const availableOptions = [{ key: 'H', description: 'List available Shortcut' }];
 
   let helperOpened = $state(false);
 
@@ -83,22 +105,13 @@
     helperOpened = !helperOpened;
   }
 
-  function gotoPartyLedger(item) {
-    goto(`/statement/${item.id}`);
-  }
-
   function gotoBalanceSheet() {
     goto(`/balance`);
   }
 
-  function handleBalanceReset(item) {
-    // console.log(item);
-    // goto(`/statement/${item.id}`);
-  }
-
   const customEvents = [
-    { key: 'Enter', handler: gotoPartyLedger },
-    { key: 'R', handler: handleBalanceReset }
+    // { key: 'Enter', handler: gotoPartyLedger },
+    // { key: 'R', handler: handleBalanceReset }
   ];
 
   onMount(() => {

@@ -133,8 +133,8 @@ export function deleteOldBalance(id) {
   deletePartyStatementById(id);
 }
 
-export function getAllBalance() {
-  return fetchAllBalanceForParty();
+export function getAllBalance(type) {
+  return fetchAllBalanceForParty(type);
 }
 
 export function getPartyStatement(id) {

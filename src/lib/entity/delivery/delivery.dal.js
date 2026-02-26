@@ -1,5 +1,6 @@
 import { calculateAmount } from '$lib/core/helper';
 import db from '$lib/core/server/db';
+import { parseTime } from '$lib/utils/dateTimeParser';
 import { fetchSingleAddressByName } from '../address/address.dal';
 import { fetchSingleItemByName } from '../items/items.dal';
 import { fetchSingleOrderByOrderNumber } from '../orders/order.dal';
@@ -194,8 +195,9 @@ const syncLedgerFromDelivery = (delivery) => {
       vehicle,
       address,
       time,
-      sign
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      sign,
+      created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   const statementCreate = db.prepare(statementCreateQuery);
   const data = [
@@ -209,7 +211,8 @@ const syncLedgerFromDelivery = (delivery) => {
     delivery.vehicle,
     delivery.address,
     delivery.delivery_time,
-    delivery.sign
+    delivery.sign,
+    parseTime(delivery.delivery_time).toISOString().replace('T', ' ').slice(0, 19)
   ];
   const result = statementCreate.run(data);
   if (result?.changes) {
