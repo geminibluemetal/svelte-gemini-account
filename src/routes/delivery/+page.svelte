@@ -34,7 +34,7 @@
     { name: 'Amount1', key: 'amount_1', align: 'center', color: Amount1Color },
     { name: 'AT2', key: 'amount_type_2', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
-    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
+    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
   ];
 
   const oldBalanceHeaders = [
@@ -42,7 +42,7 @@
     { name: 'Party', key: 'party_name', width: '220' },
     { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '100' },
     { name: 'Amount', key: 'amount', align: 'right', color: AmountOBColor, display: 'currency' },
-    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor }
+    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
   ];
 
   const viewList = $derived({
@@ -56,12 +56,12 @@
           d.amount_type_1 == 'CP' ||
           d.amount_type_1 == 'Paytm' ||
           d.amount_type_2 == 'CP' ||
-          d.amount_type_2 == 'Paytm'
+          d.amount_type_2 == 'Paytm',
       )
       .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
       .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
     Blank: data.token.filter(
-      (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2
+      (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2,
     ),
     AC_Unsigned: data.token
       .filter((d) => (d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC') && !d.sign)
@@ -73,10 +73,10 @@
             d.amount_type_1 == 'Paytm' ||
             d.amount_type_2 == 'CP' ||
             d.amount_type_2 == 'Paytm') &&
-          !d.sign
+          !d.sign,
       )
       .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
-      .sort((a, b) => a?.party_name?.localeCompare(b.party_name))
+      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
   });
 
   const sales = $derived(
@@ -105,7 +105,7 @@
       }
 
       return acc;
-    }, {})
+    }, {}),
   );
 
   const loads = $derived(
@@ -118,7 +118,7 @@
       }
 
       return acc;
-    }, {})
+    }, {}),
   );
 
   const vehicleSummary = $derived(
@@ -136,7 +136,7 @@
       }
 
       return acc;
-    }, {})
+    }, {}),
   );
 
   const partyCounts = $derived(
@@ -150,9 +150,9 @@
           }
 
           return acc;
-        }, {})
-      ).filter(([_, count]) => count > 1)
-    )
+        }, {}),
+      ).filter(([_, count]) => count > 1),
+    ),
   );
 
   // Array of only Paytm amounts (numbers)
@@ -169,7 +169,7 @@
       }
 
       return acc;
-    }, [])
+    }, []),
   );
 
   function orderColor(v) {
@@ -273,7 +273,7 @@
     { key: 'C', description: 'Clear Delivery Sheet' },
     { key: 'D', description: 'Delete Old Balance' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
-    { key: 'Enter', description: 'Delivery Entry or Edit old balance' }
+    { key: 'Enter', description: 'Delivery Entry or Edit old balance' },
   ];
 
   let formOpened = $state(false);
@@ -332,7 +332,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -430,14 +430,14 @@
     { key: 'ArrowRight', handler: handleDeliverySign },
     { key: 'E', handler: handleDeliveryEdit },
     { key: 'M', handler: handleDeliveryMark },
-    { key: 'Enter', handler: handleDeliveryEdit }
+    { key: 'Enter', handler: handleDeliveryEdit },
   ];
 
   const oldBalanceCustomEvents = [
     { key: 'ArrowRight', handler: handleOldBalanceSign },
     { key: 'E', handler: handleOldBalanceEdit },
     { key: 'D', handler: handleOldBalanceDelete },
-    { key: 'Enter', handler: handleOldBalanceEdit }
+    { key: 'Enter', handler: handleOldBalanceEdit },
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -500,26 +500,26 @@
 >
   {#snippet left()}
     <button
-      class="m-0 p-0 cursor-pointer bg-white rounded-full hover:bg-white/90"
+      class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"
       onclick={handleFullDelete}
       title="Delete Current Delivery Sheet"
     >
-      <Trash size={23} class="text-red-500 p-1" />
+      <Trash size={23} class="p-1 text-red-500" />
     </button>
     <div>&nbsp;</div>
     <button
-      class="m-0 p-0 cursor-pointer bg-white rounded-full hover:bg-white/90"
+      class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"
       onclick={handleReviewMode}
       title="Turn on Reconciliation & Review Mode"
     >
-      <CheckCheck size={23} class="text-red-500 p-1" />
+      <CheckCheck size={23} class="p-1 text-red-500" />
     </button>
   {/snippet}
   {#snippet right()}
     <span class="mr-2">{view.replaceAll('_', ' ')}</span>
   {/snippet}
   {#snippet sidebar()}
-    <div class="flex flex-col gap-2 w-48">
+    <div class="flex w-48 flex-col gap-2">
       <div class="flex gap-2 *:flex-1">
         <DateNavigator
           class="focus:bg-amber-50"
@@ -543,7 +543,7 @@
       <div class="dark flex gap-2 *:flex-1">
         <Button corner="8" color="accent" onclick={handleVehicleSummary}>Vehicle Summary</Button>
       </div>
-      <div class="flex flex-col gap-2 w-full overflow-auto">
+      <div class="flex w-full flex-col gap-2 overflow-auto">
         {#if Object.entries(sales).length}
           <table class="w-full border-2">
             <thead>
@@ -618,9 +618,9 @@
                 </tr>
               {/each}
               <tr>
-                <td class=" border border-black bg-black text-white px-1">Total</td>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
-                <td class=" border border-black bg-black text-white px-1 text-right">
+                <td class=" border border-black bg-black px-1 text-right text-white">
                   {paytmAmountsArray.reduce((total, num) => total + num, 0)}
                 </td>
                 <!-- Quantity with 2 decimals -->
@@ -645,10 +645,10 @@
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 mb-2 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 mb-2 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>
@@ -678,24 +678,24 @@
 
 <!-- Vehicle Summary -->
 <Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>
-  <div class="text-center mt-5 mx-5 flex justify-center">Vehicle Summary</div>
+  <div class="mx-5 mt-5 flex justify-center text-center">Vehicle Summary</div>
   <!-- <div class="text-center mt-5 mx-5 flex items-center">
     <InputField />
   </div> -->
   <div
-    class="bg-white p-5 max-w-7xl flex gap-2 justify-start whitespace-nowrap items-start overflow-x-auto"
+    class="flex max-w-7xl items-start justify-start gap-2 overflow-x-auto bg-white p-5 whitespace-nowrap"
   >
     {#if Object.entries(vehicleSummary).length}
       {#each Object.entries(vehicleSummary) as [vehicle, data]}
         <table class="border-2">
           <thead>
             <tr>
-              <th class="border px-1 bg-black text-white" colspan="3">{vehicle}</th>
+              <th class="border bg-black px-1 text-white" colspan="3">{vehicle}</th>
             </tr>
             <tr>
-              <th class="border px-1 bg-black text-white">S.no</th>
-              <th class="border px-1 bg-black text-white">Time</th>
-              <th class="border px-1 bg-black text-white">Address</th>
+              <th class="border bg-black px-1 text-white">S.no</th>
+              <th class="border bg-black px-1 text-white">Time</th>
+              <th class="border bg-black px-1 text-white">Address</th>
             </tr>
           </thead>
           <tbody>
@@ -710,7 +710,7 @@
         </table>
       {/each}
     {:else}
-      <div class="text-gray-500 flex gap-2">
+      <div class="flex gap-2 text-gray-500">
         <SearchXIcon />
         <div>No Data to Show</div>
       </div>

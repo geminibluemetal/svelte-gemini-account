@@ -10,12 +10,12 @@
 <button
   type="button"
   onclick={toggle}
-  class={`w-12 h-6 flex items-center rounded-full cursor-pointer p-1 min-w-12 ml-5 ${
+  class={`ml-5 flex h-6 w-12 min-w-12 cursor-pointer items-center rounded-full p-1 ${
     enabled ? 'bg-emerald-500 dark:bg-emerald-700' : 'bg-gray-300 dark:bg-gray-500'
   }`}
 >
   <div
-    class={`w-4 h-4 bg-white dark:bg-gray-300 rounded-full shadow-md transform transition-transform ${
+    class={`h-4 w-4 transform rounded-full bg-white shadow-md transition-transform dark:bg-gray-300 ${
       enabled ? 'translate-x-6' : 'translate-x-0'
     }`}
   ></div>

@@ -23,7 +23,7 @@ export function serializeDoc(doc) {
       result[key] = value.toISOString();
     } else if (Array.isArray(value)) {
       result[key] = value.map((v) =>
-        v && typeof v === 'object' ? serializeDoc(v, hiddenFields) : v
+        v && typeof v === 'object' ? serializeDoc(v, hiddenFields) : v,
       );
     } else if (value && typeof value === 'object') {
       result[key] = serializeDoc(value, hiddenFields);

@@ -12,7 +12,7 @@
   const headers = [
     // { name: 'Full Number', align: 'left', key: 'full_number' },
     { name: 'Number', align: 'left', key: 'short_number' },
-    { name: 'Company Vehicle', align: 'center', key: 'is_company_vehicle', display: 'boolean' }
+    { name: 'Company Vehicle', align: 'center', key: 'is_company_vehicle', display: 'boolean' },
     // { name: 'Capacity', align: 'center', key: 'body_capacity' }
   ];
 
@@ -20,7 +20,7 @@
     { key: '0', description: 'New Vehicle' },
     { key: 'E', description: 'Edit Vehicle' },
     { key: 'D', description: 'Delete Vehicle' },
-    { key: 'H', description: 'List available Shortcut' }
+    { key: 'H', description: 'List available Shortcut' },
   ];
 
   let formOpened = $state(false);
@@ -48,7 +48,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -64,7 +64,7 @@
 
   const customEvents = [
     { key: 'E', handler: handleVehicleEdit },
-    { key: 'D', handler: handleVehicleDelete }
+    { key: 'D', handler: handleVehicleDelete },
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -90,10 +90,10 @@
 />
 
 <Model open={helperOpened} onClose={toggleHelper}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 p-0.5 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

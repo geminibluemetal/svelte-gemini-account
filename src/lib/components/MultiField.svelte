@@ -50,10 +50,10 @@
 </script>
 
 <div
-  class="overflow-hidden rounded-md border-2 border-gray-400 **:border-gray-400 font-semibold mb-3"
+  class="mb-3 overflow-hidden rounded-md border-2 border-gray-400 font-semibold **:border-gray-400"
 >
   <div
-    class="border-b-2 px-2 py-1 text-center font-bold bg-gray-300/50 dark:bg-gray-800/50 flex justify-between"
+    class="flex justify-between border-b-2 bg-gray-300/50 px-2 py-1 text-center font-bold dark:bg-gray-800/50"
   >
     <span>{title}</span>
     <button
@@ -66,27 +66,27 @@
         value = [...value, newRow];
         length = length + 1;
       }}
-      class="size-6 rounded-full bg-green-600 text-white
-         inline-flex items-center justify-center
+      class="inline-flex size-6 cursor-pointer items-center
+         justify-center rounded-full bg-green-600
          text-xl font-bold
+         text-white
          outline-offset-1
+         hover:outline-2 hover:outline-green-600
          focus-visible:outline-2
-         hover:outline-2 cursor-pointer
-         hover:outline-green-600
          focus-visible:outline-green-600"
     >
-      <span class="leading-none -mt-1">+</span>
+      <span class="-mt-1 leading-none">+</span>
     </button>
   </div>
 
   <table class="w-full border-collapse">
     <thead class="bg-gray-300/50 dark:bg-gray-800/50">
       <tr class="border-b-2">
-        <th class="px-2 py-1 border-r-2 w-0">#</th>
+        <th class="w-0 border-r-2 px-2 py-1">#</th>
         {#each fields as field}
-          <th class="px-2 py-1 border-r-2">{field.title}</th>
+          <th class="border-r-2 px-2 py-1">{field.title}</th>
         {/each}
-        <th class="px-2 py-1 w-0">@</th>
+        <th class="w-0 px-2 py-1">@</th>
       </tr>
     </thead>
 
@@ -97,7 +97,7 @@
           {#each fields as { placeholder, ...field }, j (j)}
             <td class="border-r-2">
               <input
-                class="w-full px-2 py-1 focus:outline-amber-500 focus:outline-2 focus:bg-amber-50 dark:focus:bg-amber-950"
+                class="w-full px-2 py-1 focus:bg-amber-50 focus:outline-2 focus:outline-amber-500 dark:focus:bg-amber-950"
                 placeholder={`${placeholder} ${i + 1}`}
                 {...field}
                 bind:value={row[field.name]}
@@ -115,16 +115,16 @@
                 value = value.filter((_, idx) => idx !== i);
                 length = length - 1;
               }}
-              class="size-6 rounded-full bg-amber-600 text-white
-                inline-flex items-center justify-center
+              class="inline-flex size-6 cursor-pointer items-center
+                justify-center rounded-full bg-amber-600
                 text-xl font-bold
+                text-white
                 outline-offset-1
+                hover:outline-2 hover:outline-amber-600
                 focus-visible:outline-2
-                hover:outline-2 cursor-pointer
-                hover:outline-amber-600
                 focus-visible:outline-amber-600"
             >
-              <span class="leading-none -mt-1">-</span>
+              <span class="-mt-1 leading-none">-</span>
             </button>
           </td>
         </tr>

@@ -7,7 +7,7 @@
     Moon,
     PanelRightClose,
     Settings,
-    Sun
+    Sun,
   } from 'lucide-svelte';
   import IconButton from './IconButton.svelte';
   import { env } from '$env/dynamic/public';
@@ -28,9 +28,9 @@
   keyboardEventBus.on('Alt+Q', () => navigate('/shutdown'));
 </script>
 
-<div class="flex flex-col h-full border-l-2">
+<div class="flex h-full flex-col border-l-2">
   <!-- Sidebar Header -->
-  <div class="border-b-2 flex gap-2 flex-wrap p-2 justify-evenly">
+  <div class="flex flex-wrap justify-evenly gap-2 border-b-2 p-2">
     <!-- Theme Toggle -->
     <IconButton title="Toggle theme (Alt+D)" onclick={theme.toggle}>
       {#if $theme === LIGHT}
@@ -74,7 +74,7 @@
 
   <!-- Sidebar Footer -->
   <div class="border-t-2">
-    <div class="text-xs text-center p-1">
+    <div class="p-1 text-center text-xs">
       <span class="select-all">{url}</span> <br />
       <span>User: <span class="font-bold">{user?.username}</span> </span> <br />
       <span>{env.PUBLIC_COMPANY_NAME}</span>

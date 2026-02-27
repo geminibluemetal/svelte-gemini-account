@@ -6,7 +6,7 @@ import {
   deleteToken,
   getAllToken,
   printTokenById,
-  updateToken
+  updateToken,
 } from '$lib/entity/token/token.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
 import { formatDateTime } from '$lib/utils/dateTime';
@@ -16,11 +16,11 @@ import { fail } from '@sveltejs/kit';
 export async function load({ depends, url }) {
   depends('DELIVERY.TOKEN.LIST');
 
-  const date = url.searchParams.get('date')
-  let formattedDate = formatDateTime('YY-MM-DD')
+  const date = url.searchParams.get('date');
+  let formattedDate = formatDateTime('YY-MM-DD');
 
   if (Date.parse(date)) {
-    formattedDate = formatDateTime('YY-MM-DD', date)
+    formattedDate = formatDateTime('YY-MM-DD', date);
   }
 
   const token = await getAllToken(formattedDate);
@@ -70,5 +70,5 @@ export const actions = {
     const formData = await request.formData();
     const data = formDataToObject(formData);
     printTokenById(data?.id);
-  }
+  },
 };

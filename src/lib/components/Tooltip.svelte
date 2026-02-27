@@ -7,7 +7,7 @@
     class: userClass = '',
     tooltipClass = '',
     delay = 150,
-    children
+    children,
   } = $props();
 
   let show = $state(false);
@@ -140,11 +140,11 @@
       role="tooltip"
       class="
         pointer-events-none z-50
-        text-xs rounded-md
-        bg-gray-900 text-white
-        dark:bg-white dark:text-black
-        shadow-md
-        whitespace-nowrap
+        rounded-md bg-gray-900
+        text-xs whitespace-nowrap
+        text-white shadow-md
+        dark:bg-white
+        dark:text-black
         {tooltipClass}
       "
       style="position: fixed; top: {tooltipStyle.top}px; left: {tooltipStyle.left}px; transform: {tooltipStyle.transform};"

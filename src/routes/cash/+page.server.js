@@ -7,7 +7,7 @@ import {
   getAllCash,
   getAllReports,
   signCash,
-  updateCash
+  updateCash,
 } from '$lib/entity/cash/cash.service.js';
 import { fetchAllCashDescription } from '$lib/entity/cash/cash_description.dal.js';
 import { getAllDeliveryCash } from '$lib/entity/delivery/delivery.dal.js';
@@ -37,7 +37,7 @@ export async function load({ depends, url }) {
       getAllDeliveryCash(formattedDate),
       getAllOldBalanceCash(formattedDate),
       fetchAllCashDescription(),
-      getAllParty()
+      getAllParty(),
     ]);
 
   // 3. Determine Report Time Boundaries
@@ -51,7 +51,7 @@ export async function load({ depends, url }) {
   };
 
   let income = [...directCash, ...deliveryCash, ...oldBalanceCash].filter(
-    (c) => c.entry_type !== 'EXPENSE' && isWithinReport(c)
+    (c) => c.entry_type !== 'EXPENSE' && isWithinReport(c),
   );
   income.sort((a, b) => new Date(a.time) - new Date(b.time));
 
@@ -63,7 +63,7 @@ export async function load({ depends, url }) {
     expense,
     reports,
     party,
-    cashDescription
+    cashDescription,
   };
 }
 
@@ -83,7 +83,7 @@ function getReportBoundaries(reports, index) {
 
   return {
     fromDate: previousReport ? new Date(previousReport.created_at) : new Date(todayStart),
-    toDate: currentReport?.created_at ? new Date(currentReport.created_at) : new Date(todayEnd)
+    toDate: currentReport?.created_at ? new Date(currentReport.created_at) : new Date(todayEnd),
   };
 }
 
@@ -162,5 +162,5 @@ export const actions = {
 
     sseEmit({ type: 'CASH.LIST' });
     return result;
-  }
+  },
 };

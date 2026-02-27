@@ -9,7 +9,7 @@
     amount_type_1: null, // AC, CP, Paytm, Gpay, Bunk
     amount_1: null,
     amount_type_2: null, // AC, CP, Paytm, Gpay, Bunk
-    amount_2: null
+    amount_2: null,
   };
 
   let data = $state(initialData);
@@ -65,7 +65,7 @@
     />
     <InputField name="amount_1" value={data.amount_1} placeholder="Amount 1" autoComplete="off" />
 
-    <div class="mb-5 mt-2 mx-auto"></div>
+    <div class="mx-auto mt-2 mb-5"></div>
 
     <InputField
       name="amount_type_2"

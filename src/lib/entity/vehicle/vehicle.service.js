@@ -4,7 +4,7 @@ import {
   fetchAllVehicle,
   fetchSingleVehicleByShortName,
   insertVehicle,
-  updateVehicleById
+  updateVehicleById,
 } from './vehicle.dal';
 
 export async function getAllVehicle() {

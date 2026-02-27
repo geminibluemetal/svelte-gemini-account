@@ -54,6 +54,6 @@ export const scrollToMiddle = (element, container) => {
 
   // Apply scroll with optional smooth behavior
   container.scrollTo({
-    top: scrollPosition
+    top: scrollPosition,
   });
 };

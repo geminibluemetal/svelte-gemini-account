@@ -31,9 +31,9 @@
 
   <!-- Dialog -->
   {#if open}
-    <div class="absolute bg-black/40 w-dvw h-dvh inset-0 z-20">
+    <div class="absolute inset-0 z-20 h-dvh w-dvw bg-black/40">
       <div
-        class="bg-white min-w-md absolute top-10 left-1/2 -translate-x-1/2 rounded overflow-auto {userClass}"
+        class="absolute top-10 left-1/2 min-w-md -translate-x-1/2 overflow-auto rounded bg-white {userClass}"
       >
         {@render content({ toggle, show, hide, open })}
       </div>

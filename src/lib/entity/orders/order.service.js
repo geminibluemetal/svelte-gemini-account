@@ -10,7 +10,7 @@ import {
   fetchSingleOrderByOrderNumber,
   insertOrder,
   updateOrderById,
-  updateSingleOrderColumn
+  updateSingleOrderColumn,
 } from './order.dal';
 import { printOut } from '$lib/core/server/print';
 import { formatFixed } from '$lib/utils/number';
@@ -293,7 +293,7 @@ export async function createTokenFromOrder(id, data) {
     party_name: order.party_name,
     vehicle: data.vehicle,
     token_item: order.item,
-    token_quantity: data.qty || order.total_qty
+    token_quantity: data.qty || order.total_qty,
   };
   const result = await createToken(tokenData, false);
   if (result.lastInsertRowid) {
@@ -306,7 +306,7 @@ export async function createTokenFromOrder(id, data) {
       Item: token.token_item,
       Qty: formatFixed(data.qty || token.token_quantity),
       Date: getFormattedDate(),
-      Time: getFormattedTime()
+      Time: getFormattedTime(),
     });
     orderStatusToLoading(id);
     return { message: 'Token Created', ok: true };
@@ -333,7 +333,7 @@ function syncCashReport(order, isUpdate) {
         ? `${order.party_name} Ad`
         : order.address
           ? `${order.address} Ad`
-          : ''
+          : '',
     };
     const cash = fetchCashByOrderId(data.order_id);
     if (isUpdate && cash?.id) updateIncome(data, cash.id);

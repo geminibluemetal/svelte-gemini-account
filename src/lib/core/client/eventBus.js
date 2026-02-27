@@ -164,5 +164,5 @@ export const keyboardEventBus = {
   /**
    * Cleanup (use on app destroy if needed)
    */
-  destroy
+  destroy,
 };

@@ -25,7 +25,7 @@ export function createEventStream() {
       return () => {
         clients.delete(send);
       };
-    }
+    },
   });
 }
 

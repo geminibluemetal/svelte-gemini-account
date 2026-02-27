@@ -9,19 +9,19 @@
     success: 'bg-green-600 dark:bg-green-700',
     danger: 'bg-red-600 dark:bg-red-700',
     primary: 'bg-blue-600 dark:bg-blue-700',
-    amber: 'bg-amber-600 dark:bg-amber-700'
+    amber: 'bg-amber-600 dark:bg-amber-700',
   };
 </script>
 
 <Teleport>
-  <div class="fixed bottom-5 right-5 z-[9999] flex flex-col gap-4">
+  <div class="fixed right-5 bottom-5 z-[9999] flex flex-col gap-4">
     {#each $toasts as toast (toast.id)}
       <div
         class={`
-          px-3 py-2 rounded-xl shadow-lg min-w-[280px]
-          flex items-center justify-between gap-5
+          animate-slide-in flex min-w-[280px] items-center justify-between
+          gap-5 rounded-xl px-3 py-2
           text-white
-          animate-slide-in
+          shadow-lg
           ${styles[toast.type] || styles.success}
         `}
         in:fly={{ x: 200, duration: 200 }}
@@ -35,16 +35,16 @@
         <button
           on:click={() => closeToast(toast.id)}
           class="
-            flex justify-center items-center
-            w-9 h-9
-            text-3xl
+            flex h-9 w-9
+            shrink-0 cursor-pointer
+            items-center
+            justify-center
             rounded-full
+            text-3xl
             text-white/80
-            hover:text-white
-            hover:bg-white/25
             transition
-            cursor-pointer
-            shrink-0
+            hover:bg-white/25
+            hover:text-white
           "
           aria-label="Close"
         >

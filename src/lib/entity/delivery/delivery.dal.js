@@ -54,7 +54,7 @@ export function insertToken(data) {
     data.token_quantity || 0,
     data.is_cancelled ? 1 : 0,
     data.serial || 0,
-    data.token_time || ''
+    data.token_time || '',
   ];
 
   const stmt = db.prepare(query);
@@ -79,7 +79,7 @@ export function updateTokenById(data, id) {
     data.token_quantity !== undefined ? data.token_quantity : null,
     data.vehicle !== undefined ? data.vehicle : null,
     data.is_cancelled ? 1 : 0,
-    id
+    id,
   ];
 
   const stmt = db.prepare(query);
@@ -108,7 +108,7 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
     updates.status = examineStatusByQuantity(
       num(oldOrder.total_qty),
       num(updates.delivered_qty),
-      num(updates.balance_qty)
+      num(updates.balance_qty),
     );
     updates.delivery_sheet_verified = oldDelivery.sign
       ? num(oldOrder.delivery_sheet_verified) - 1
@@ -120,7 +120,7 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
       updates.balance_qty || 0,
       updates.status || 'New',
       updates.delivery_sheet_verified || 0,
-      updates.order_number
+      updates.order_number,
     );
   }
 
@@ -132,7 +132,7 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
     updates.status = examineStatusByQuantity(
       num(newOrder.total_qty),
       num(updates.delivered_qty),
-      num(updates.balance_qty)
+      num(updates.balance_qty),
     );
     updates.delivery_sheet_verified = newDelivery.sign
       ? num(newOrder.delivery_sheet_verified) + 1
@@ -144,7 +144,7 @@ const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
       updates.balance_qty || 0,
       updates.status || 'New',
       updates.delivery_sheet_verified || 0,
-      updates.order_number
+      updates.order_number,
     );
   }
 };
@@ -212,7 +212,7 @@ const syncLedgerFromDelivery = (delivery) => {
     delivery.address,
     delivery.delivery_time,
     delivery.sign,
-    parseTime(delivery.delivery_time).toISOString().replace('T', ' ').slice(0, 19)
+    parseTime(delivery.delivery_time).toISOString().replace('T', ' ').slice(0, 19),
   ];
   const result = statementCreate.run(data);
   if (result?.changes) {
@@ -251,7 +251,7 @@ export function updateDeliveryById(data, id) {
     data.amount_type_1 ? data.amount_type_1 : oldDelivery.amount_type_1 == 'AC' ? '' : null, // TODO
     data.amount_type_1 == 'AC' ? 0 : null, // TODO
     data.is_cancelled ? 1 : 0,
-    id
+    id,
   ];
   const stmt = db.prepare(query);
   const result = stmt.run(params);
@@ -290,7 +290,7 @@ export function updateDeliveryAmountById(data, id) {
     data.amount_1 !== undefined ? data.amount_1 : null,
     data.amount_type_2 !== undefined ? data.amount_type_2 : null,
     data.amount_2 !== undefined ? data.amount_2 : null,
-    id
+    id,
   ];
 
   const stmt = db.prepare(query);
@@ -322,7 +322,7 @@ export function signDelivery(id, newValue) {
       UPDATE orders
       SET delivery_sheet_verified = delivery_sheet_verified + ?
       WHERE order_number = ?
-    `
+    `,
     ).run(adjustment, row.order_number);
 
     db.prepare(
@@ -330,7 +330,7 @@ export function signDelivery(id, newValue) {
       UPDATE party_statements
       SET sign = ?
       WHERE delivery_id = ?
-    `
+    `,
     ).run(value, targetId);
 
     // 3. Update the sign column in the delivery table

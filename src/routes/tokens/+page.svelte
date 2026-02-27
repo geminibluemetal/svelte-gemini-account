@@ -21,7 +21,7 @@
     { name: 'Party', align: 'left', key: 'party_name', width: '300' },
     { name: 'Item', align: 'left', key: 'token_item', width: '125' },
     { name: 'Quantity', align: 'center', key: 'token_quantity', display: 'decimal' },
-    { name: 'Vehicle', align: 'left', key: 'vehicle', width: '70' }
+    { name: 'Vehicle', align: 'left', key: 'vehicle', width: '70' },
   ];
 
   const availableOptions = [
@@ -29,7 +29,7 @@
     { key: 'E', description: 'Edit Token' },
     { key: 'D', description: 'Delete Token' },
     { key: 'P', description: 'Print Token' },
-    { key: 'H', description: 'List available Shortcut' }
+    { key: 'H', description: 'List available Shortcut' },
   ];
 
   let formOpened = $state(false);
@@ -40,7 +40,7 @@
   const viewList = $derived({
     all: data.token,
     closed: data.token.filter((t) => t.delivery_item && t.delivery_quantity),
-    opened: data.token.filter((t) => !t.delivery_item || !t.delivery_quantity)
+    opened: data.token.filter((t) => !t.delivery_item || !t.delivery_quantity),
   });
 
   function handleTokenEdit(item) {
@@ -70,7 +70,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -106,7 +106,7 @@
   const customEvents = [
     { key: 'E', handler: handleTokenEdit },
     { key: 'D', handler: handleTokenDelete },
-    { key: 'P', handler: handleTokenPrint }
+    { key: 'P', handler: handleTokenPrint },
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -136,23 +136,23 @@
   {rowHighlight}
 >
   {#snippet right()}
-    <span class="capitalize px-2">{view}</span>
+    <span class="px-2 capitalize">{view}</span>
   {/snippet}
   {#snippet sidebar()}
     <div>
-      <div class="p-3 flex flex-col gap-2">
+      <div class="flex flex-col gap-2 p-3">
         <DateNavigator
           class="focus:bg-amber-50"
           value={$commonDate}
           onDateChange={handleDateNavigationChange}
         />
-        <Button onclick={viewAllToken} color="primary" class="flex dark justify-between gap-2">
+        <Button onclick={viewAllToken} color="primary" class="dark flex justify-between gap-2">
           <span>All</span> <span>{viewList.all.length}</span>
         </Button>
-        <Button onclick={viewOpenedToken} color="primary" class="flex dark justify-between gap-2">
+        <Button onclick={viewOpenedToken} color="primary" class="dark flex justify-between gap-2">
           <span>Opened</span> <span>{viewList.opened.length}</span>
         </Button>
-        <Button onclick={viewClosedToken} color="primary" class="flex dark justify-between gap-2">
+        <Button onclick={viewClosedToken} color="primary" class="dark flex justify-between gap-2">
           <span>Closed</span> <span>{viewList.closed.length}</span>
         </Button>
       </div>
@@ -162,10 +162,10 @@
 <TokenForm open={formOpened} onClose={handleFormClose} item={editableToken} options={data} />
 
 <Model open={helperOpened} onClose={toggleHelper}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 p-0.5 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

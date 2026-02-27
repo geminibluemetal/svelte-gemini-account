@@ -12,11 +12,11 @@
   });
 </script>
 
-<table class="border w-full text-sm font-medium">
+<table class="w-full border text-sm font-medium">
   <thead>
     <tr>
-      <th colspan="4" class="text-left px-2">{title}</th>
-      <th colspan="4" class="text-right px-2">{getFormattedTimeStamp()}</th>
+      <th colspan="4" class="px-2 text-left">{title}</th>
+      <th colspan="4" class="px-2 text-right">{getFormattedTimeStamp()}</th>
     </tr>
     <tr class="*:border">
       <th>S.No</th>

@@ -22,7 +22,7 @@
   let quickToken = $state({
     id: null,
     vehicle: null,
-    qty: null
+    qty: null,
   });
   const vehicleList = $derived(data.vehicle.map((v) => v.short_number));
   const viewList = $derived({
@@ -34,8 +34,8 @@
     cancelled: data.orders.filter((o) => o.status == 'Cancelled'),
     finished: data.orders.filter((o) => o.status == 'Finished'),
     pending: data.orders.filter(
-      (o) => o.status == 'New' || o.status == 'Loading' || o.status == 'Partial'
-    )
+      (o) => o.status == 'New' || o.status == 'Loading' || o.status == 'Partial',
+    ),
   });
 
   const headers = [
@@ -55,7 +55,7 @@
     { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal', width: '53' },
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal', width: '53' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
-    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified', color: DSVColor }
+    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified', color: DSVColor },
   ];
 
   const availableOptions = [
@@ -78,7 +78,7 @@
     { key: 'C', description: 'Set Cancelled status for Order' },
     { key: 'F', description: 'Set Finished status for Order' },
     { key: 'R', description: 'Reset Current status Automatically' },
-    { key: 'Enter', description: 'Single Load Cash Bill Print' }
+    { key: 'Enter', description: 'Single Load Cash Bill Print' },
   ];
 
   function notesDisplay(value, item) {
@@ -180,7 +180,7 @@
         quickToken = {
           id: null,
           vehicle: null,
-          qty: null
+          qty: null,
         };
       }
     };
@@ -193,7 +193,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -225,7 +225,7 @@
     quickToken = {
       id: null,
       vehicle: null,
-      qty: null
+      qty: null,
     };
   }
 
@@ -241,7 +241,7 @@
     { key: 'F', handler: handleOrderFinish },
     { key: 'R', handler: handleOrderStatusReset },
     { key: 'Enter', handler: handleSinglePrint },
-    { key: 'ArrowRight', handler: handleSignOrder }
+    { key: 'ArrowRight', handler: handleSignOrder },
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -285,11 +285,11 @@
   {rowHighlight}
 >
   {#snippet right()}
-    <span class="capitalize mr-2">{view}</span>
+    <span class="mr-2 capitalize">{view}</span>
   {/snippet}
   {#snippet sidebar()}
     <div>
-      <div class="p-1 dark flex flex-col gap-2">
+      <div class="dark flex flex-col gap-2 p-1">
         {#if true}
           <Button color="danger" onclick={handleOrderClear}>
             <span class="w-full">Clear</span>
@@ -365,10 +365,10 @@
 </Table>
 <OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
 <Model open={helperOpened} onClose={toggleHelper}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 mb-2 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 mb-2 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

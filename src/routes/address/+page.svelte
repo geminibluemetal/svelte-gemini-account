@@ -13,14 +13,14 @@
     { name: 'Name', align: 'left', key: 'name' },
     { name: '0.25 Delivery', align: 'right', key: 'delivery_025' },
     { name: '1.00 Delivery', align: 'right', key: 'delivery_050_100' },
-    { name: '2.00 Delivery', align: 'right', key: 'delivery_max' }
+    { name: '2.00 Delivery', align: 'right', key: 'delivery_max' },
   ];
 
   const availableOptions = [
     { key: '0', description: 'New Address' },
     { key: 'E', description: 'Edit Address' },
     { key: 'D', description: 'Delete Address' },
-    { key: 'H', description: 'List available Shortcut' }
+    { key: 'H', description: 'List available Shortcut' },
   ];
 
   let formOpened = $state(false);
@@ -48,7 +48,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -64,7 +64,7 @@
 
   const customEvents = [
     { key: 'E', handler: handleAddressEdit },
-    { key: 'D', handler: handleAddressDelete }
+    { key: 'D', handler: handleAddressDelete },
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
@@ -90,10 +90,10 @@
 />
 
 <Model open={helperOpened} onClose={toggleHelper}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 p-0.5 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 p-0.5 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

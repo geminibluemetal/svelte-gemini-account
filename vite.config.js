@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   server: {
     host: true,
-    allowedHosts: true // ⚠️ Allows ALL hosts
-  }
+    allowedHosts: true, // ⚠️ Allows ALL hosts
+  },
 });

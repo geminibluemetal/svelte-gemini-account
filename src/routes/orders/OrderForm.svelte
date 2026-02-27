@@ -22,7 +22,7 @@
     balance_qty: '',
     notes: '',
     status: '',
-    delivery_sheet_verified: ''
+    delivery_sheet_verified: '',
   };
 
   let data = $state(initialData);

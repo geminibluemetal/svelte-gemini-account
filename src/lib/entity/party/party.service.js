@@ -5,7 +5,7 @@ import {
   fetchSinglePartyById,
   fetchSinglePartyByName,
   insertParty,
-  updatePartyById
+  updatePartyById,
 } from './party.dal';
 import {
   deletePartyStatementById,
@@ -14,7 +14,7 @@ import {
   fetchPartyStatementByPartyId,
   insertPartyOldBalance,
   signOldBalance,
-  updatePartyOldBalance
+  updatePartyOldBalance,
 } from './party.statements.dal';
 
 export async function getAllParty() {

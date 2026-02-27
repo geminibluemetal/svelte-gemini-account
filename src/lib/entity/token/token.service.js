@@ -7,7 +7,7 @@ import {
   fetchDeliveryById,
   fetchLastSerialByDate,
   insertToken,
-  updateTokenById
+  updateTokenById,
 } from '../delivery/delivery.dal';
 
 export async function getAllToken(date = formatDateTime('YY-MM-DD')) {
@@ -36,7 +36,7 @@ export async function createToken(data, takePrint = true) {
         Item: data.token_item,
         Qty: formatFixed(data.token_quantity),
         Date: getFormattedDate(),
-        Time: getFormattedTime()
+        Time: getFormattedTime(),
       });
     }
     return { message: `Token created`, ok: true, lastInsertRowid: result.lastInsertRowid };
@@ -68,7 +68,8 @@ export async function printToken(data) {
 }
 
 export async function updateToken(data, editId, takePrint = true) {
-  if (data.delivery_item && data.delivery_quantity) return { message: 'Can not modify delivered token', ok: false };
+  if (data.delivery_item && data.delivery_quantity)
+    return { message: 'Can not modify delivered token', ok: false };
   if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
   if (!data.token_item) return { message: 'Item is Required', ok: false };
   if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
@@ -87,7 +88,7 @@ export async function updateToken(data, editId, takePrint = true) {
           Item: token.token_item,
           Qty: formatFixed(token.token_quantity),
           Date: getFormattedDate(),
-          Time: getFormattedTime()
+          Time: getFormattedTime(),
         });
     }
     return { message: `Token updated`, ok: true };
@@ -98,18 +99,18 @@ export async function deleteToken(id) {
   const token = fetchDeliveryById(id);
   let lastSerial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
   if (token.serial != lastSerial) return { message: 'Can only delete last token', ok: false };
-  if (token.delivery_item && token.delivery_quantity) return { message: "Can't Delete Delivered Token", ok: false };
+  if (token.delivery_item && token.delivery_quantity)
+    return { message: "Can't Delete Delivered Token", ok: false };
   if (token.sign) return { message: "Can't Delete Signed Token", ok: false };
 
   const createdDate = new Date(token.created_at);
   if (getFormattedDate() != getFormattedDate(createdDate))
     return { message: "Can't delete old token", ok: false };
 
-  const result = deleteTokenById(id)
+  const result = deleteTokenById(id);
   if (result.changes) {
-    return { message: "Last Token Deleted", ok: true };
+    return { message: 'Last Token Deleted', ok: true };
   }
-
 }
 
 export async function printTokenById(id) {
@@ -122,7 +123,7 @@ export async function printTokenById(id) {
       Item: token.token_item,
       Qty: formatFixed(token.token_quantity),
       Date: getFormattedDate(),
-      Time: getFormattedTime()
+      Time: getFormattedTime(),
     });
   }
 }

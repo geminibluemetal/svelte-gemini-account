@@ -1,4 +1,4 @@
-import db from "$lib/core/server/db";
+import db from '$lib/core/server/db';
 
 export function fetchAllCashDescription() {
   const stmt = db.prepare(`

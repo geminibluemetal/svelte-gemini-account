@@ -8,7 +8,7 @@
   const { open, onClose, item, allVehicle } = $props();
   let initialData = {
     name: '',
-    phone: ''
+    phone: '',
   };
 
   let data = $state(initialData);

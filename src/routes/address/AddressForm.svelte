@@ -9,7 +9,7 @@
     name: '',
     delivery_025: '',
     delivery_050_100: '',
-    delivery_max: ''
+    delivery_max: '',
   };
 
   let data = $state(initialData);

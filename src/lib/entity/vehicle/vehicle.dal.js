@@ -25,7 +25,7 @@ export function insertVehicle(data) {
     data.full_number || null,
     data.short_number || null,
     data.is_company_vehicle ? 1 : 0, // Convert boolean to integer
-    data.body_capacity || null
+    data.body_capacity || null,
   );
 }
 
@@ -45,7 +45,7 @@ export function updateVehicleById(data, id) {
     data.short_number || null,
     data.is_company_vehicle ? 1 : 0, // Convert boolean to integer
     data.body_capacity || null,
-    id
+    id,
   );
 }
 export function deleteVehicleById(id) {

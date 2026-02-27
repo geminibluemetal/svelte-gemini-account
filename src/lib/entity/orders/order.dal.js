@@ -87,7 +87,7 @@ export function insertOrder(data) {
     data.balance_qty || 0,
     data.notes || '',
     data.status || 'New',
-    data.delivery_sheet_verified || 0
+    data.delivery_sheet_verified || 0,
   );
 }
 
@@ -133,7 +133,7 @@ export function updateOrderById(id, data) {
     data.tracktor_only ? 1 : 0,
     data.status || 'New',
     data.notes || '',
-    id
+    id,
   );
 }
 

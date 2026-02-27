@@ -10,7 +10,7 @@
 <div class="flex gap-2 {full ? 'w-full' : 'w-50'}">
   <button
     type="button"
-    class="border-2 rounded flex items-center justify-center w-9 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
+    class="flex w-9 cursor-pointer items-center justify-center rounded border-2 border-gray-400 outline-none focus:border-amber-500"
     onclick={() => (value = new Date(value.setDate(value.getDate() - 1)))}
   >
     <ArrowBigLeft size={20} />
@@ -20,7 +20,7 @@
   </div>
   <button
     type="button"
-    class="border-2 rounded flex items-center justify-center w-9 border-gray-400 outline-none focus:border-amber-500 cursor-pointer"
+    class="flex w-9 cursor-pointer items-center justify-center rounded border-2 border-gray-400 outline-none focus:border-amber-500"
     onclick={() => (value = new Date(value.setDate(value.getDate() + 1)))}
   >
     <ArrowBigRight size={20} />

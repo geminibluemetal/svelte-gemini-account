@@ -19,7 +19,7 @@
       align: 'right',
       key: 'opening_balance',
       width: 125,
-      display: 'currency'
+      display: 'currency',
     },
     { name: 'Total Amount', align: 'right', key: 'total_debit', width: 125, display: 'currency' },
     { name: 'Total Payment', align: 'right', key: 'total_credit', width: 125, display: 'currency' },
@@ -28,8 +28,8 @@
       align: 'right',
       key: 'current_balance',
       width: 125,
-      display: 'currency'
-    }
+      display: 'currency',
+    },
   ];
 
   const availableOptions = [
@@ -40,7 +40,7 @@
     { key: '1', description: 'All Filter' },
     { key: '2', description: 'Pending Filter' },
     { key: '3', description: 'Nil Filter' },
-    { key: 'Enter', description: 'Open Party Ledger' }
+    { key: 'Enter', description: 'Open Party Ledger' },
   ];
 
   let helperOpened = $state(false);
@@ -53,7 +53,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -94,7 +94,7 @@
   const customEvents = [
     { key: 'Enter', handler: gotoPartyLedger },
     { key: 'R', handler: handleBalanceReset },
-    { key: 'N', handler: handleBalanceNil }
+    { key: 'N', handler: handleBalanceNil },
   ];
 
   onMount(() => {
@@ -122,7 +122,7 @@
 <div class="visible-content">
   <Table title="Balance Sheet" {headers} items={data.balance} {customEvents}>
     {#snippet sidebar()}
-      <div class="flex flex-col gap-2 w-25">
+      <div class="flex w-25 flex-col gap-2">
         <Button corner="1" color="primary" onclick={handleAllFilter}>All</Button>
         <Button corner="2" color="primary" onclick={handlePendingFilter}>Pending</Button>
         <Button corner="3" color="primary" onclick={handleNilFilter}>Nil</Button>
@@ -133,10 +133,10 @@
 
   <!-- Helper Dialog -->
   <Model open={helperOpened} onClose={() => (helperOpened = false)}>
-    <div class="bg-white p-5 min-w-md">
+    <div class="min-w-md bg-white p-5">
       {#each availableOptions as o}
-        <div class="m-1 mb-2 flex gap-2 items-center">
-          <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+        <div class="m-1 mb-2 flex items-center gap-2">
+          <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
           <span>=</span>
           <span class="flex-11">{o.description}</span>
         </div>

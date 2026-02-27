@@ -1,16 +1,17 @@
-import { fetchSingleAddressByName } from "$lib/entity/address/address.dal";
-import { fetchSingleItemByName } from "$lib/entity/items/items.dal";
+import { fetchSingleAddressByName } from '$lib/entity/address/address.dal';
+import { fetchSingleItemByName } from '$lib/entity/items/items.dal';
 
 export function calculateAmount(address, item, qty) {
-  address = typeof address === 'object' && address !== null ? address : fetchSingleAddressByName(address)
-  item = typeof item === 'object' && item !== null ? item : fetchSingleItemByName(item)
+  address =
+    typeof address === 'object' && address !== null ? address : fetchSingleAddressByName(address);
+  item = typeof item === 'object' && item !== null ? item : fetchSingleItemByName(item);
 
   let creditAmount = 0;
   // Get base item amount based on quantity
   creditAmount = getAmountByItemQuantity(item, qty);
 
   if (creditAmount == 0) {
-    return { success: false, message: `Price is missing for: "${item.name}"` }
+    return { success: false, message: `Price is missing for: "${item.name}"` };
   }
 
   // Only process delivery if address exists
@@ -20,10 +21,10 @@ export function calculateAmount(address, item, qty) {
     if (deliveryCharge === 0) {
       // SET ENTIRE AMOUNT TO 0 when delivery is required but charge is missing
       creditAmount = 0;
-      return { success: false, message: `Delivery Charges Missing for Address: "${address.name}"` }
+      return { success: false, message: `Delivery Charges Missing for Address: "${address.name}"` };
     } else {
       if (creditAmount === 0) {
-        return { success: false, message: `Price is Missing for Item: "${item.name}"` }
+        return { success: false, message: `Price is Missing for Item: "${item.name}"` };
       } else {
         creditAmount = creditAmount + deliveryCharge;
         console.log(`Credit Amount: ${creditAmount}, Delivery Charge: ${deliveryCharge}`);
@@ -33,7 +34,7 @@ export function calculateAmount(address, item, qty) {
 
   // RoundOff Amount
   creditAmount = roundAmount(creditAmount);
-  return { success: true, data: creditAmount }
+  return { success: true, data: creditAmount };
 }
 
 // Helper function to get amount based on item quantity

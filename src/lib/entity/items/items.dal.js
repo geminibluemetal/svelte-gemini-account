@@ -27,7 +27,7 @@ export function insertItem(data) {
     data.price_050 || null,
     data.price_100 || null,
     data.price_150 || null,
-    data.price_200 || null
+    data.price_200 || null,
   );
 }
 
@@ -51,7 +51,7 @@ export function updateItemById(data, id) {
     data.price_100 || null,
     data.price_150 || null,
     data.price_200 || null,
-    id
+    id,
   );
 }
 export function deleteItemById(id) {

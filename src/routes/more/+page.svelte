@@ -1,4 +1,4 @@
-<div class="bg-white p-5 max-w-7xl flex gap-2 justify-start items-start overflow-x-auto">
+<div class="flex max-w-7xl items-start justify-start gap-2 overflow-x-auto bg-white p-5">
   {#each Array.from({ length: 20 }) as _}
     {#each Array.from({ length: 3 }) as _}
       <table class="border-2">

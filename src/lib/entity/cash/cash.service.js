@@ -6,14 +6,14 @@ import {
   fetchSingleCashById,
   insertCash,
   signCashById,
-  updateCash as UpdateCashInDal
+  updateCash as UpdateCashInDal,
 } from './cash.dal';
 import { checkDescriptionExist, insertCashDescription } from './cash_description.dal';
 import {
   checkReportExistsByDate,
   deleteCashReportById,
   fetchAllReportsByDate,
-  insertCashReport
+  insertCashReport,
 } from './cash_reports.dal';
 
 export function getAllCash(date) {

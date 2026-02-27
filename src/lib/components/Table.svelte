@@ -21,7 +21,7 @@
     customCellHighlight = () => {},
     sidebar = () => {},
     right = () => {},
-    left = () => {}
+    left = () => {},
   } = $props();
 
   let overRow = $state(-1);
@@ -33,11 +33,11 @@
   const headersGridColumnsWidth = $derived(
     headers.reduce((acc, header) => {
       return header?.width ? `${acc}${header.width}px ` : `${acc}auto `;
-    }, '')
+    }, ''),
   );
 
   const gridTemplate = $derived(
-    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`
+    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`,
   );
 
   // Navigation functions
@@ -104,7 +104,7 @@
   });
 </script>
 
-<div class="p-2 {autoHight ? 'h-full' : 'h-screen'} flex flex-row w-fit gap-2">
+<div class="p-2 {autoHight ? 'h-full' : 'h-screen'} flex w-fit flex-row gap-2">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <div class="overflow-auto border-2 border-black" bind:this={container}>
@@ -112,10 +112,10 @@
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <!-- TITLE ROW -->
       <div
-        class="col-span-full text-white text-center font-bold border-b-2 border-white sticky top-0 flex
+        class="sticky top-0 col-span-full flex border-b-2 border-white text-center font-bold text-white
         {headerColor == 'blue' ? 'bg-blue-700' : 'bg-red-700'}"
       >
-        <div class="flex-1 text-left flex">{@render left()}</div>
+        <div class="flex flex-1 text-left">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
         <div class="flex-1 text-right">{@render right()}</div>
       </div>
@@ -123,7 +123,7 @@
       <!-- HEADER -->
       {#if !hideSerial}
         <div
-          class="sticky top-6.5 z-20 bg-black text-white border-r-2 border-white text-center px-1"
+          class="sticky top-6.5 z-20 border-r-2 border-white bg-black px-1 text-center text-white"
         >
           SN
         </div>
@@ -131,7 +131,7 @@
 
       {#each headers as header, index (index)}
         <div
-          class="sticky top-6.5 z-20 bg-black text-white border-white text-center px-1
+          class="sticky top-6.5 z-20 border-white bg-black px-1 text-center text-white
           {hideAction && index == headers.length - 1 ? 'border-r-0' : 'border-r-2'}"
         >
           {header.name}
@@ -139,11 +139,11 @@
       {/each}
 
       {#if !hideAction}
-        <div class="sticky top-6.5 z-20 bg-black text-white text-center px-1">Action</div>
+        <div class="sticky top-6.5 z-20 bg-black px-1 text-center text-white">Action</div>
       {/if}
 
       {#if items.length == 0}
-        <div class="col-span-full font-bold h-20 flex justify-center items-center">
+        <div class="col-span-full flex h-20 items-center justify-center font-bold">
           <span class="text-gray-500">
             <SearchX class="inline" /> No Data Found
           </span>
@@ -157,7 +157,7 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             <div
-              class="border-r border-b px-1 border-gray-500 text-center
+              class="border-r border-b border-gray-500 px-1 text-center
                 {overRow == row ? 'bg-black/20' : rowColor?.background}"
               onmousemove={() => (overRow = row)}
             >
@@ -205,7 +205,7 @@
           <!-- svelte-ignore a11y_mouse_events_have_key_events -->
           {#if !hideAction}
             <div
-              class="border-b px-1 border-gray-500 text-center
+              class="border-b border-gray-500 px-1 text-center
                 {overRow == row ? 'bg-black/20' : rowColor?.background}"
               onmousemove={() => (overRow = row)}
             ></div>

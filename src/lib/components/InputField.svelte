@@ -41,7 +41,7 @@
   let filtered = $derived(
     fullSearch
       ? options.filter((o) => o.toLowerCase().includes(value?.toLowerCase()))
-      : options.filter((o) => o.toLowerCase().startsWith(value?.toLowerCase()))
+      : options.filter((o) => o.toLowerCase().startsWith(value?.toLowerCase())),
   );
 
   // Auto-scroll when selectedOptionIndex changes
@@ -50,7 +50,7 @@
       // Wait for DOM to update, then scroll
       setTimeout(() => {
         const selectedElement = document.querySelector(
-          `[data-option-index="${selectedOptionIndex}"]`
+          `[data-option-index="${selectedOptionIndex}"]`,
         );
         if (selectedElement) {
           selectedElement.scrollIntoView({ block: 'nearest' });
@@ -128,7 +128,7 @@
       title: stringCase.title,
       para: stringCase.para,
       smartTitle: stringCase.smartTitle,
-      smartTitleChars: stringCase.smartTitleChars
+      smartTitleChars: stringCase.smartTitleChars,
     };
     if (caseMode == 'smartTitleChars') {
       value = handlers[caseMode]?.(newVal, allowedChars) ?? newVal;
@@ -162,18 +162,18 @@
 </script>
 
 <div
-  class="group inline-flex items-center border-2 border-gray-400 rounded-md font-semibold relative
-  focus-within:border-amber-500 w-full mb-3 last:mb-0 focus-within:bg-amber-50 dark:focus-within:bg-amber-950
+  class="group relative mb-3 inline-flex w-full items-center rounded-md border-2
+  border-gray-400 font-semibold last:mb-0 focus-within:border-amber-500 focus-within:bg-amber-50 dark:focus-within:bg-amber-950
   {(disabled || readonly) && 'bg-gray-100 dark:bg-gray-800'}
   {hasError && 'error'} {userClass}"
 >
   {#if prefix}
     <span
       role="button"
-      class="p-1 border-r-2 text-gray-400 *:inline-block group-focus-within:text-amber-500 border-gray-400 group-focus-within:border-amber-500
+      class="border-r-2 border-gray-400 p-1 text-gray-400 *:inline-block group-focus-within:border-amber-500 group-focus-within:text-amber-500
         {hasError && 'border-red-500 group-focus-within:border-red-500'}
         {hasError && 'text-red-500 group-focus-within:text-red-500'}
-        {onPrefixClick != dummyFunction && 'hover:text-amber-500 cursor-pointer'}"
+        {onPrefixClick != dummyFunction && 'cursor-pointer hover:text-amber-500'}"
       onmousedown={onPrefixClick}
       tabindex="ignore"
     >
@@ -182,7 +182,7 @@
   {/if}
 
   <input
-    class="outline-none py-1 px-2 w-full text-{textAlign}"
+    class="w-full px-2 py-1 outline-none text-{textAlign}"
     autocomplete="off"
     bind:value
     {placeholder}
@@ -200,10 +200,10 @@
   {#if suffix}
     <span
       role="button"
-      class="p-1 border-l-2 text-gray-400 *:inline-block group-focus-within:text-amber-500 border-gray-400 group-focus-within:border-amber-500'
+      class="group-focus-within:border-amber-500' border-l-2 border-gray-400 p-1 text-gray-400 *:inline-block group-focus-within:text-amber-500
         {hasError && 'border-red-500 group-focus-within:border-red-500'}
         {hasError && 'text-red-500 group-focus-within:text-red-500'}
-        {onSuffixClick != dummyFunction && 'hover:text-amber-500 cursor-pointer'}"
+        {onSuffixClick != dummyFunction && 'cursor-pointer hover:text-amber-500'}"
       onmousedown={onSuffixClick}
       tabindex="ignore"
     >
@@ -214,7 +214,7 @@
   {#if options.length}
     {#if showOptions && filtered.length}
       <div
-        class="absolute top-full max-h-50 overflow-auto left-0 w-full border-amber-500 border-2 rounded-b-md bg-white dark:bg-gray-950 z-10"
+        class="absolute top-full left-0 z-10 max-h-50 w-full overflow-auto rounded-b-md border-2 border-amber-500 bg-white dark:bg-gray-950"
       >
         {#each filtered as option, index (option)}
           <div
@@ -232,10 +232,10 @@
       </div>
     {:else if showOptions && filtered.length == 0 && newValue == 'create'}
       <div
-        class="absolute top-full max-h-50 overflow-auto left-0 w-full border-amber-500 border-2 rounded-b-md bg-white z-1000"
+        class="absolute top-full left-0 z-1000 max-h-50 w-full overflow-auto rounded-b-md border-2 border-amber-500 bg-white"
       >
         <div
-          class="bg-white dark:bg-gray-950 px-2 py-1 hover:bg-amber-50 dark:hover:bg-gray-800 cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis"
+          class="cursor-pointer overflow-hidden bg-white px-2 py-1 text-ellipsis whitespace-nowrap hover:bg-amber-50 dark:bg-gray-950 dark:hover:bg-gray-800"
           title={value}
           onmousedown={handleCreateOption}
           role="button"
@@ -243,13 +243,13 @@
         >
           {#if optionLoading}
             <div class="flex items-center gap-2 text-amber-600">
-              <span class="animate-spin inline-block"><Loader2Icon /></span> Creating...
+              <span class="inline-block animate-spin"><Loader2Icon /></span> Creating...
             </div>
           {:else if optionCreateError}
             <span class="text-red-500">Error Occured</span>
           {:else}
             <span class="text-green-600 dark:text-green-400">
-              <PlusCircle class="inline-block mb-0.5" /> Create
+              <PlusCircle class="mb-0.5 inline-block" /> Create
             </span>
             <span class="text-blue-600 dark:text-blue-400">'{value}'</span>
           {/if}

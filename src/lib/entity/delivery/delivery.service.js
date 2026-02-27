@@ -22,7 +22,7 @@ export async function updateDelivery(data, id) {
       return { message: `Both amount type can't be AC`, ok: false };
   }
 
-  const priceResult = calculateAmount(data.address, data.delivery_item, data.delivery_quantity)
+  const priceResult = calculateAmount(data.address, data.delivery_item, data.delivery_quantity);
   if (!priceResult.success) {
     return { message: priceResult?.message, ok: false };
   }
@@ -44,7 +44,7 @@ export async function updateDeliveryAmount(data, id) {
   if (data.amount_type_1 == 'AC' && data.amount_type_2 == 'AC')
     return { message: `Both amount type can't be AC`, ok: false };
 
-  const priceResult = calculateAmount(data.address, data.delivery_item, data.delivery_quantity)
+  const priceResult = calculateAmount(data.address, data.delivery_item, data.delivery_quantity);
   if (!priceResult.success) {
     return { message: priceResult?.message, ok: false };
   }

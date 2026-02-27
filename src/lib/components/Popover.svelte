@@ -25,7 +25,7 @@
     'top-right': 'bottom-full mb-2 right-0',
     'bottom-left': 'top-full mt-2',
     'bottom-center': 'top-full mt-2 -translate-x-1/2 left-1/2',
-    'bottom-right': 'top-full mt-2 right-0'
+    'bottom-right': 'top-full mt-2 right-0',
   };
 
   const svgConfig = {
@@ -34,7 +34,7 @@
     'top-right': '-bottom-2 right-4',
     'bottom-left': '-top-2 rotate-180 left-4',
     'bottom-center': '-top-2 rotate-180 left-1/2 -translate-x-1/2',
-    'bottom-right': '-top-2 rotate-180 right-4'
+    'bottom-right': '-top-2 rotate-180 right-4',
   };
 
   function handleClickOutside(event) {
@@ -93,8 +93,8 @@
   {#if show}
     <div
       class="
-        absolute z-40 p-2 rounded-md shadow-lg
-        bg-white dark:bg-amber-950
+        absolute z-40 rounded-md bg-white p-2
+        shadow-lg dark:bg-amber-950
         {positionConfig[position]} {popoverClass}
       "
       bind:this={popoverElement}

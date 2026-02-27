@@ -534,5 +534,5 @@ export const seedData = [
   { full_number: null, short_number: '9901', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '9241', is_company_vehicle: 0, body_capacity: null },
   { full_number: null, short_number: '0363', is_company_vehicle: 0, body_capacity: null },
-  { full_number: null, short_number: '5455', is_company_vehicle: 0, body_capacity: null }
+  { full_number: null, short_number: '5455', is_company_vehicle: 0, body_capacity: null },
 ];

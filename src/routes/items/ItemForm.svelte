@@ -11,7 +11,7 @@
     price_050: '',
     price_100: '',
     price_150: '',
-    price_200: ''
+    price_200: '',
   };
 
   let nameOptions = $state([]);

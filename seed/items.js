@@ -21,7 +21,7 @@ export const seedData = [
     price_050: 2300.0,
     price_100: 4400.0,
     price_150: 6700.0,
-    price_200: 8800.0
+    price_200: 8800.0,
   },
   {
     name: 'PS',
@@ -29,7 +29,7 @@ export const seedData = [
     price_050: 2300.0,
     price_100: 4500.0,
     price_150: 6800.0,
-    price_200: 9000.0
+    price_200: 9000.0,
   },
   {
     name: '20mm',
@@ -37,7 +37,7 @@ export const seedData = [
     price_050: 1500.0,
     price_100: 2800.0,
     price_150: 4300.0,
-    price_200: 5600.0
+    price_200: 5600.0,
   },
   {
     name: '50mm',
@@ -45,7 +45,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2400.0,
     price_150: 3700.0,
-    price_200: 4800.0
+    price_200: 4800.0,
   },
   {
     name: '40mm',
@@ -53,7 +53,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2400.0,
     price_150: 3700.0,
-    price_200: 4800.0
+    price_200: 4800.0,
   },
   {
     name: '12mm',
@@ -61,7 +61,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2500.0,
     price_150: 3800.0,
-    price_200: 5000.0
+    price_200: 5000.0,
   },
   {
     name: '6mm',
@@ -69,7 +69,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2500.0,
     price_150: 3800.0,
-    price_200: 5000.0
+    price_200: 5000.0,
   },
   {
     name: 'Dust',
@@ -77,7 +77,7 @@ export const seedData = [
     price_050: 1500.0,
     price_100: 2800.0,
     price_150: 4300.0,
-    price_200: 5600.0
+    price_200: 5600.0,
   },
   {
     name: 'Allmix',
@@ -85,7 +85,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2400.0,
     price_150: 3700.0,
-    price_200: 4800.0
+    price_200: 4800.0,
   },
   {
     name: 'Mixing',
@@ -93,7 +93,7 @@ export const seedData = [
     price_050: 700.0,
     price_100: 1400.0,
     price_150: 2200.0,
-    price_200: 2800.0
+    price_200: 2800.0,
   },
   {
     name: 'MW',
@@ -101,7 +101,7 @@ export const seedData = [
     price_050: 250.0,
     price_100: 400.0,
     price_150: 650.0,
-    price_200: 800.0
+    price_200: 800.0,
   },
   {
     name: '6sb',
@@ -109,7 +109,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '4sb',
@@ -117,7 +117,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'MS + 20mm',
@@ -125,7 +125,7 @@ export const seedData = [
     price_050: 2000.0,
     price_100: 3800.0,
     price_150: null,
-    price_200: 7400.0
+    price_200: 7400.0,
   },
   {
     name: 'MS + Dust',
@@ -133,7 +133,7 @@ export const seedData = [
     price_050: 2000.0,
     price_100: 3800.0,
     price_150: null,
-    price_200: 7400.0
+    price_200: 7400.0,
   },
   {
     name: 'MS + PS',
@@ -141,7 +141,7 @@ export const seedData = [
     price_050: 2300.0,
     price_100: 5000.0,
     price_150: null,
-    price_200: 9000.0
+    price_200: 9000.0,
   },
   {
     name: '12mm + 6mm',
@@ -149,7 +149,7 @@ export const seedData = [
     price_050: 1300.0,
     price_100: 2500.0,
     price_150: null,
-    price_200: 5000.0
+    price_200: 5000.0,
   },
   {
     name: 'PS + 20mm',
@@ -157,7 +157,7 @@ export const seedData = [
     price_050: null,
     price_100: 3800.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'MS + 12mm',
@@ -165,7 +165,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: 6900.0
+    price_200: 6900.0,
   },
   {
     name: 'MS + 50mm',
@@ -173,7 +173,7 @@ export const seedData = [
     price_050: null,
     price_100: 3500.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'MS + 6mm',
@@ -181,7 +181,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'MS + 40mm',
@@ -189,7 +189,7 @@ export const seedData = [
     price_050: null,
     price_100: 3500.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'PS + 12mm',
@@ -197,7 +197,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'PS + 40mm',
@@ -205,7 +205,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'PS + 50mm',
@@ -213,7 +213,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'PS + 6mm',
@@ -221,7 +221,7 @@ export const seedData = [
     price_050: null,
     price_100: 3600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: 'PS + Dust',
@@ -229,7 +229,7 @@ export const seedData = [
     price_050: null,
     price_100: 3800.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '12mm + 20mm',
@@ -237,7 +237,7 @@ export const seedData = [
     price_050: null,
     price_100: 2800.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '12mm + 40mm',
@@ -245,7 +245,7 @@ export const seedData = [
     price_050: null,
     price_100: 2600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '12mm + 50mm',
@@ -253,7 +253,7 @@ export const seedData = [
     price_050: null,
     price_100: 2600.0,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '12mm + Dust',
@@ -261,7 +261,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '20mm + 40mm',
@@ -269,7 +269,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '20mm + 50mm',
@@ -277,7 +277,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '20mm + Allmix',
@@ -285,7 +285,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '20mm + Mix',
@@ -293,7 +293,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '20mm + Dust',
@@ -301,7 +301,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '40mm + 50mm',
@@ -309,7 +309,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '40mm + 6mm',
@@ -317,7 +317,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '40mm + Allmix',
@@ -325,7 +325,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '40mm + Mix',
@@ -333,7 +333,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '40mm + Dust',
@@ -341,7 +341,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '50mm + 6mm',
@@ -349,7 +349,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '50mm + Allmix',
@@ -357,7 +357,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '50mm + Mix',
@@ -365,7 +365,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '50mm + Dust',
@@ -373,7 +373,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '6mm + Allmix',
@@ -381,7 +381,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '6mm + Mix',
@@ -389,7 +389,7 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
+    price_200: null,
   },
   {
     name: '6mm + Dust',
@@ -397,6 +397,6 @@ export const seedData = [
     price_050: null,
     price_100: null,
     price_150: null,
-    price_200: null
-  }
+    price_200: null,
+  },
 ];

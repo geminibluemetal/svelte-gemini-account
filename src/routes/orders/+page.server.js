@@ -15,7 +15,7 @@ import {
   orderStatusToFinished,
   orderStatusToLoading,
   signOrderById,
-  updateOrder
+  updateOrder,
 } from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
@@ -151,5 +151,5 @@ export const actions = {
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     return result;
-  }
+  },
 };

@@ -3,7 +3,7 @@ import {
   createVehicle,
   deleteVehicle,
   getAllVehicle,
-  updateVehicle
+  updateVehicle,
 } from '$lib/entity/vehicle/vehicle.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
@@ -47,5 +47,5 @@ export const actions = {
 
     sseEmit({ type: 'VEHICLE.LIST' });
     return result;
-  }
+  },
 };

@@ -28,7 +28,7 @@ export const formatNumber = (n, locale = 'en-IN') => new Intl.NumberFormat(local
 export const formatCompact = (n, locale = 'en-IN', long = false) =>
   new Intl.NumberFormat(locale, {
     notation: 'compact',
-    compactDisplay: long ? 'long' : 'short'
+    compactDisplay: long ? 'long' : 'short',
   }).format(n);
 
 /**
@@ -46,7 +46,7 @@ export const formatCurrency = (n, showDigit = false, currency = 'INR', locale = 
   new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,
-    maximumFractionDigits: showDigit ? 2 : 0
+    maximumFractionDigits: showDigit ? 2 : 0,
   }).format(n);
 
 /**
@@ -62,7 +62,7 @@ export const formatCurrency = (n, showDigit = false, currency = 'INR', locale = 
 export const formatPercent = (n, locale = 'en-IN') =>
   new Intl.NumberFormat(locale, {
     style: 'percent',
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(n);
 
 /**
@@ -77,7 +77,7 @@ export const formatPercent = (n, locale = 'en-IN') =>
  */
 export const formatOrdinal = (n, locale = 'en-IN') =>
   new Intl.NumberFormat(locale, {
-    style: 'ordinal'
+    style: 'ordinal',
   }).format(n);
 
 /**
@@ -94,7 +94,7 @@ export const formatOrdinal = (n, locale = 'en-IN') =>
 export const formatFixed = (n, digits = 2, locale = 'en-IN') =>
   new Intl.NumberFormat(locale, {
     minimumFractionDigits: digits,
-    maximumFractionDigits: digits
+    maximumFractionDigits: digits,
   }).format(n);
 
 /**

@@ -4,7 +4,7 @@ import {
   fetchAllAddress,
   fetchSingleAddressByName,
   insertAddress,
-  updateAddressById
+  updateAddressById,
 } from './address.dal';
 
 export async function getAllAddress() {

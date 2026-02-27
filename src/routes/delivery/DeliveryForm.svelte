@@ -13,7 +13,7 @@
     delivery_item: '',
     delivery_quantity: 0,
     is_cancelled: 0,
-    amount_type_1: ''
+    amount_type_1: '',
     // amount_1: null,
     // amount_type_2: '',
     // amount_2: null,

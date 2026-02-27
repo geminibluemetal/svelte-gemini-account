@@ -28,7 +28,7 @@
       key: 'debit',
       width: 110,
       display: 'currency',
-      color: debitColor
+      color: debitColor,
     },
     { name: 'AT', key: 'amount_type', align: 'center', width: 100, color: AmountTypeColor },
     {
@@ -37,7 +37,7 @@
       key: 'credit',
       width: 110,
       display: 'currency',
-      color: creditColor
+      color: creditColor,
     },
     {
       name: 'Balance',
@@ -45,15 +45,15 @@
       key: 'running_balance',
       width: 110,
       display: 'currency',
-      color: balanceColor
+      color: balanceColor,
     },
     {
       name: 'Sign',
       align: 'center',
       key: 'sign',
       display: 'boolean',
-      color: SignColor
-    }
+      color: SignColor,
+    },
   ];
 
   function AmountTypeColor(value) {
@@ -96,7 +96,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -130,10 +130,10 @@
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 mb-2 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 mb-2 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

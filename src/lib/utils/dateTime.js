@@ -37,23 +37,23 @@ export function getDateTimeParts(date = new Date()) {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    hour12: true
+    hour12: true,
   });
 
   const monthNameFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'long'
+    month: 'long',
   });
 
   const monthShortFormatter = new Intl.DateTimeFormat('en-US', {
-    month: 'short'
+    month: 'short',
   });
 
   const weekdayNameFormatter = new Intl.DateTimeFormat('en-US', {
-    weekday: 'long'
+    weekday: 'long',
   });
 
   const weekdayShortFormatter = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short'
+    weekday: 'short',
   });
 
   const baseParts = baseFormatter.formatToParts(date);
@@ -122,7 +122,7 @@ export function formatDateTime(pattern = '', date = new Date()) {
     MN: p.monthName,
     MS: p.monthShort,
     DN: p.weekdayName,
-    DS: p.weekdayShort
+    DS: p.weekdayShort,
   };
 
   let output = pattern;
@@ -157,7 +157,7 @@ export function formatDateTime(pattern = '', date = new Date()) {
 export function getDefaultDateTimeFormat(date = new Date()) {
   return {
     date: formatDateTime('DD-MM-YY', date),
-    time: formatDateTime('HH:II AA', date)
+    time: formatDateTime('HH:II AA', date),
   };
 }
 

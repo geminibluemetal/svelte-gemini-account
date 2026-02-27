@@ -13,7 +13,7 @@ export function insertPartyOldBalance(data) {
     data.amount_type,
     data.amount,
     data.entry_type,
-    new Date().toISOString()
+    new Date().toISOString(),
   );
 }
 
@@ -88,17 +88,17 @@ export function deletePartyStatementById(id) {
 }
 
 export function fetchAllBalanceForParty(type) {
-  type = type ? type : 'pending'
-  let filter = ''
+  type = type ? type : 'pending';
+  let filter = '';
   switch (type) {
     case 'pending':
-      filter = 'HAVING current_balance != 0'
+      filter = 'HAVING current_balance != 0';
       break;
     case 'all':
-      filter = ''
+      filter = '';
       break;
     case 'nil':
-      filter = 'HAVING current_balance == 0'
+      filter = 'HAVING current_balance == 0';
       break;
   }
   // Logic is generally correct here

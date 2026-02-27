@@ -4,7 +4,7 @@ import {
   markDelivery,
   signDeliveryById,
   updateDelivery,
-  updateDeliveryAmount
+  updateDeliveryAmount,
 } from '$lib/entity/delivery/delivery.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
 import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
@@ -14,7 +14,7 @@ import {
   getAllOldBalance,
   getAllParty,
   signOldBalanceById,
-  updateOldBalance
+  updateOldBalance,
 } from '$lib/entity/party/party.service.js';
 import { getAllToken } from '$lib/entity/token/token.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
@@ -140,5 +140,5 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
     sseEmit({ type: 'CASH.LIST' });
-  }
+  },
 };

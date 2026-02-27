@@ -62,7 +62,7 @@ async function runSeeds() {
           module.seedData.length > 0
         ) {
           console.log(
-            `  🌱 Seeding ${module.seedData.length} records into '${module.tableName}'...`
+            `  🌱 Seeding ${module.seedData.length} records into '${module.tableName}'...`,
           );
 
           const columns = Object.keys(module.seedData[0]);

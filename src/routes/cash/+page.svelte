@@ -23,7 +23,7 @@
     { name: 'Referance', align: 'left', key: 'serial', width: '82', color: ReferanceColor },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' }
+    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' },
   ];
 
   const expenseHeader = [
@@ -31,7 +31,7 @@
     { hide: true },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' }
+    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' },
   ];
 
   const availableOptions = [
@@ -50,7 +50,7 @@
     { key: 'E', description: 'Edit Cash Entry' },
     // { key: 'C', description: 'Clear Delivery Sheet' },
     // { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
-    { key: 'Enter', description: 'Edit Cash Entry' }
+    { key: 'Enter', description: 'Edit Cash Entry' },
   ];
 
   let formOpened = $state(false);
@@ -109,13 +109,13 @@
   const sortedIncome = $derived(
     data.income.sort((a, b) => {
       return parseTime(a.time) - parseTime(b.time);
-    })
+    }),
   );
 
   const sortedExpense = $derived(
     data.expense.sort((a, b) => {
       return parseTime(a.time) - parseTime(b.time);
-    })
+    }),
   );
 
   function handleCashEdit(item) {
@@ -161,7 +161,7 @@
     if (!data.income.length && !data.expense.length) {
       if (data.reports[currentReportIndex]?.id === 'current') {
         transportAction('?/deleteReport', {
-          id: data.reports[currentReportIndex - 1]?.id
+          id: data.reports[currentReportIndex - 1]?.id,
         });
       } else {
         transportAction('?/deleteReport', { id: data.reports[currentReportIndex]?.id });
@@ -187,7 +187,7 @@
     { key: 'ArrowRight', handler: handleCashSign },
     { key: 'E', handler: handleCashEdit },
     { key: 'Enter', handler: handleCashEdit },
-    { key: 'D', handler: handleCashDelete }
+    { key: 'D', handler: handleCashDelete },
   ];
 
   async function transportAction(url, data) {
@@ -197,7 +197,7 @@
     }
     const res = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
     return await res.json();
   }
@@ -268,7 +268,7 @@
       goto(`?${params.toString()}`, {
         keepFocus: true,
         replaceState: true,
-        invalidateAll: false
+        invalidateAll: false,
       });
     }
   });
@@ -289,7 +289,7 @@
     <span class="p-1">{`Cash ${currentReportIndex + 1}`}</span>
   {/snippet}
   {#snippet sidebar()}
-    <div class="flex flex-col gap-2 w-48">
+    <div class="flex w-48 flex-col gap-2">
       <div class="flex gap-2 *:flex-1">
         <DateNavigator
           class="focus:bg-amber-50"
@@ -311,43 +311,43 @@
           </span>
         </NavigateButton>
       </div>
-      <div class="flex gap-2 *:flex-1 dark">
+      <div class="dark flex gap-2 *:flex-1">
         <Button color="fuchsia" corner="7" onclick={handleNewReport}>New</Button>
         <Button color="fuchsia" corner="8" onclick={handleDeleteReport}>Delete</Button>
       </div>
-      <div class="flex gap-2 *:flex-1 dark">
+      <div class="dark flex gap-2 *:flex-1">
         <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>
         <Button color="fuchsia" corner="5" onclick={gotoCurrentReport}>Current</Button>
         <Button color="primary" corner="6" onclick={gotoOrderBook}>OB</Button>
       </div>
-      <div class="flex gap-2 *:flex-1 font-bold">
+      <div class="flex gap-2 font-bold *:flex-1">
         <div class="border-2">
           <div class="flex">
             <div
-              class="flex-1 bg-black text-white px-2 py-0.5 border-b-white border-b-2 text-center"
+              class="flex-1 border-b-2 border-b-white bg-black px-2 py-0.5 text-center text-white"
             >
               Total Summary
             </div>
           </div>
           <div class="flex">
-            <div class="flex-3/7 bg-black text-white px-2 py-0.5 border-b-white border-b-2">
+            <div class="flex-3/7 border-b-2 border-b-white bg-black px-2 py-0.5 text-white">
               Income
             </div>
-            <div class="flex-4/7 text-right border-b-2 border-b-black px-2 text-lg text-green-700">
+            <div class="flex-4/7 border-b-2 border-b-black px-2 text-right text-lg text-green-700">
               {formatNumber(totalIncome)}
             </div>
           </div>
           <div class="flex">
-            <div class="flex-3/7 bg-black text-white px-2 py-0.5 border-b-white border-b-2">
+            <div class="flex-3/7 border-b-2 border-b-white bg-black px-2 py-0.5 text-white">
               Expense
             </div>
-            <div class="flex-4/7 text-right border-b-2 border-b-black px-2 text-lg text-red-700">
+            <div class="flex-4/7 border-b-2 border-b-black px-2 text-right text-lg text-red-700">
               {formatNumber(totalExpense)}
             </div>
           </div>
           <div class="flex">
-            <div class="flex-3/7 bg-black text-white px-2 py-0.5">Balance</div>
-            <div class="flex-4/7 text-right px-2 text-lg text-blue-700">
+            <div class="flex-3/7 bg-black px-2 py-0.5 text-white">Balance</div>
+            <div class="flex-4/7 px-2 text-right text-lg text-blue-700">
               {formatNumber(num(totalIncome) - num(totalExpense))}
             </div>
           </div>
@@ -366,10 +366,10 @@
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
-  <div class="bg-white p-5 min-w-md">
+  <div class="min-w-md bg-white p-5">
     {#each availableOptions as o}
-      <div class="m-1 mb-2 flex gap-2 items-center">
-        <span class="inline-block bg-gray-300 px-3 rounded-xs flex-1 text-center">{o.key}</span>
+      <div class="m-1 mb-2 flex items-center gap-2">
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>

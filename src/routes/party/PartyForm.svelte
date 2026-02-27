@@ -8,7 +8,7 @@
   let initialData = {
     name: '',
     phone: '',
-    opening_balance: 0
+    opening_balance: 0,
   };
 
   let data = $state(initialData);

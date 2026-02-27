@@ -12,7 +12,7 @@
     token_item: '',
     token_quantity: '',
     vehicle: '',
-    is_cancelled: 0
+    is_cancelled: 0,
   };
 
   let data = $state(initialData);

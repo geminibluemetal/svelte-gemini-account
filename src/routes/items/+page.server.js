@@ -3,7 +3,7 @@ import {
   createItem,
   deleteItem,
   getAllItems,
-  updateItem
+  updateItem,
 } from '$lib/entity/items/items.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
@@ -47,5 +47,5 @@ export const actions = {
 
     sseEmit({ type: 'ITEMS.LIST' });
     return result;
-  }
+  },
 };

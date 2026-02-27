@@ -234,5 +234,5 @@ export const seedData = [
   { name: 'Tanveer Eng', phone: '' },
   { name: 'Tanveer Engg', phone: '7845613049' },
   { name: 'Giri Govindharaj', phone: '9843336971' },
-  { name: 'Naveen Bunk', phone: '9843373358' }
+  { name: 'Naveen Bunk', phone: '9843373358' },
 ];

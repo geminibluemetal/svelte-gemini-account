@@ -17,7 +17,7 @@
     bottomSpace = true,
     moveToEnd = true,
     left = () => {},
-    right = () => {}
+    right = () => {},
   } = $props();
 
   let overRow = $state(-1);
@@ -30,11 +30,11 @@
   const headersGridColumnsWidth = $derived(
     [...incomeHeader, ...expenseHeader].reduce((acc, header) => {
       return header?.width ? `${acc}${header.width}px ` : `${acc}auto `;
-    }, '')
+    }, ''),
   );
 
   const gridTemplate = $derived(
-    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`
+    `${hideSerial ? '' : '45px'} ${headersGridColumnsWidth} ${hideAction ? '' : '60px'}`,
   );
 
   function handleCellMouseMove(row, type) {
@@ -117,24 +117,24 @@
   });
 </script>
 
-<div class="p-2 h-screen flex flex-row gap-2">
-  <div class="overflow-auto border-2 border-black w-fit" bind:this={container}>
+<div class="flex h-screen flex-row gap-2 p-2">
+  <div class="w-fit overflow-auto border-2 border-black" bind:this={container}>
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <div
-        class="col-span-10 bg-red-700 text-white text-center font-bold border-b-2 border-white sticky top-0 flex"
+        class="sticky top-0 col-span-10 flex border-b-2 border-white bg-red-700 text-center font-bold text-white"
       >
-        <div class="flex-1 text-left flex">{@render left()}</div>
+        <div class="flex flex-1 text-left">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
         <div class="flex-1 text-right">{@render right()}</div>
       </div>
 
       <div
-        class="col-span-5 sticky top-6.5 z-20 bg-black text-white border-r-3 border-white text-center px-1"
+        class="sticky top-6.5 z-20 col-span-5 border-r-3 border-white bg-black px-1 text-center text-white"
       >
         Income
       </div>
       <div
-        class="col-span-5 sticky top-6.5 z-20 bg-black text-white border-r-0 border-white text-center px-1"
+        class="sticky top-6.5 z-20 col-span-5 border-r-0 border-white bg-black px-1 text-center text-white"
       >
         Expense
       </div>
@@ -143,7 +143,7 @@
         <div
           class="sticky top-12.5 z-20 bg-black text-white
           {incomeHeader.length - 1 == i ? 'border-r-3' : 'border-r-2'}
-          border-white text-center px-1 border-t-2"
+          border-t-2 border-white px-1 text-center"
         >
           {header.name}
         </div>
@@ -155,14 +155,14 @@
           <div
             class="sticky top-12.5 z-20 bg-black text-white
             {expenseHeader.length - 1 == i ? 'border-r-0' : 'border-r-2'}
-            border-white text-center px-1 border-t-2"
+            border-t-2 border-white px-1 text-center"
           >
             {header.name}
           </div>
         {/if}
       {/each}
 
-      {#each Array.from( { length: income.length > expense.length ? income.length : expense.length } ) as _, row (row)}
+      {#each Array.from( { length: income.length > expense.length ? income.length : expense.length }, ) as _, row (row)}
         {#each incomeHeader as header, i}
           {@const color = header?.color
             ? header.color(income[row]?.[header.key], income[row])
@@ -171,15 +171,15 @@
           <div
             title={income[row]?.[header.key]}
             class="border-b px-1 text-{header.align || 'left'}
-            {header?.nowrap ? 'overflow-hidden whitespace-nowrap text-ellipsis' : ''}
+            {header?.nowrap ? 'overflow-hidden text-ellipsis whitespace-nowrap' : ''}
               {color?.background
               ? color?.background
               : overRow == row && overType == 'income'
                 ? 'bg-black/20'
                 : ''}
               {incomeHeader.length - 1 == i
-              ? 'border-gray-600 border-r-3'
-              : 'border-gray-500 border-r'}
+              ? 'border-r-3 border-gray-600'
+              : 'border-r border-gray-500'}
               {color?.foreground || ''}"
             onmousemove={() => handleCellMouseMove(row, 'income')}
           >
@@ -205,16 +205,16 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               title={expense[row]?.[header.key]}
-              class="border-b px-1 border-gray-500 text-{header.align || 'left'}
-              {header?.nowrap ? 'overflow-hidden whitespace-nowrap text-ellipsis' : ''}
+              class="border-b border-gray-500 px-1 text-{header.align || 'left'}
+              {header?.nowrap ? 'overflow-hidden text-ellipsis whitespace-nowrap' : ''}
               {color?.background
                 ? color?.background
                 : overRow == row && overType == 'expense'
                   ? 'bg-black/20'
                   : ''}
               {expenseHeader.length - 1 == i
-                ? 'border-gray-600 border-r-0'
-                : 'border-gray-500 border-r'}
+                ? 'border-r-0 border-gray-600'
+                : 'border-r border-gray-500'}
               {color?.foreground || ''}"
               onmousemove={() => handleCellMouseMove(row, 'expense')}
             >

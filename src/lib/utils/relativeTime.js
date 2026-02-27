@@ -13,7 +13,7 @@ export function timeAgo(date = new Date(), comparableDate = new Date(), locale =
     ['day', 60 * 60 * 24],
     ['hour', 60 * 60],
     ['minute', 60],
-    ['second', 1]
+    ['second', 1],
   ];
 
   for (const [unit, sec] of units) {

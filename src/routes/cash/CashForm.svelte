@@ -9,14 +9,14 @@
     order_id: null,
     amount: 0,
     description: '',
-    entry_type: 'EXPENSE'
+    entry_type: 'EXPENSE',
   };
 
   let data = $state(initialData);
   const descriptionOption = $derived(
     Array.from(
-      new Set([...cashDescription.map((cd) => cd.description), ...party.map((p) => p.name)])
-    )
+      new Set([...cashDescription.map((cd) => cd.description), ...party.map((p) => p.name)]),
+    ),
   );
 
   function handleClose() {

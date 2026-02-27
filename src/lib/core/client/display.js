@@ -19,7 +19,7 @@ const formatters = {
   },
   boolean: function (value) {
     return value ? '✓' : '✕';
-  }
+  },
 };
 
 export default function display(format, value) {

@@ -25,7 +25,7 @@ export function insertAddress(data) {
     data.name,
     data.delivery_025 || null,
     data.delivery_050_100 || null,
-    data.delivery_max || null
+    data.delivery_max || null,
   );
 }
 
@@ -45,7 +45,7 @@ export function updateAddressById(data, id) {
     data.delivery_025 || null,
     data.delivery_050_100 || null,
     data.delivery_max || null,
-    id
+    id,
   );
 }
 export function deleteAddressById(id) {

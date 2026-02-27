@@ -3,7 +3,7 @@ import {
   createAddress,
   deleteAddress,
   getAllAddress,
-  updateAddress
+  updateAddress,
 } from '$lib/entity/address/address.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
@@ -47,5 +47,5 @@ export const actions = {
 
     sseEmit({ type: 'ADDRESS.LIST' });
     return result;
-  }
+  },
 };

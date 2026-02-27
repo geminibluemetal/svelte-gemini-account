@@ -33,14 +33,14 @@
     cyan: `bg-cyan-400 text-white hover:bg-cyan-500 focus:bg-cyan-500 outline-cyan-500 active:bg-cyan-600
       dark:bg-cyan-700 dark:hover:bg-cyan-800 dark:focus:bg-cyan-800 dark:outline-cyan-800 dark:active:bg-cyan-900`,
     fuchsia: `bg-fuchsia-400 text-white hover:bg-fuchsia-500 focus:bg-fuchsia-500 outline-fuchsia-500 active:bg-fuchsia-600
-      dark:bg-fuchsia-700 dark:hover:bg-fuchsia-800 dark:focus:bg-fuchsia-800 dark:outline-fuchsia-800 dark:active:bg-fuchsia-900`
+      dark:bg-fuchsia-700 dark:hover:bg-fuchsia-800 dark:focus:bg-fuchsia-800 dark:outline-fuchsia-800 dark:active:bg-fuchsia-900`,
   };
 
   const sizeStyles = {
     xs: 'px-1 py-0.5 text-sm',
     sm: 'px-2 py-1 text-sm',
     md: 'px-3 py-1 text-base',
-    lg: 'px-4 py-2 text-xl'
+    lg: 'px-4 py-2 text-xl',
   };
 
   const radiusStyles = {
@@ -49,7 +49,7 @@
     sm: 'rounded-sm',
     md: 'rounded-md',
     lg: 'rounded-lg',
-    full: 'rounded-full'
+    full: 'rounded-full',
   };
 
   const baseClass =
@@ -62,17 +62,17 @@
 
   // Margin spacing based on size
   const prefixClassSize = $derived(
-    size === 'sm' ? 'mr-1' : size === 'md' ? 'mr-2' : size === 'lg' ? 'mr-3' : 'mr-2'
+    size === 'sm' ? 'mr-1' : size === 'md' ? 'mr-2' : size === 'lg' ? 'mr-3' : 'mr-2',
   );
 
   const suffixClassSize = $derived(
-    size === 'sm' ? 'ml-1' : size === 'md' ? 'ml-2' : size === 'lg' ? 'ml-3' : 'ml-2'
+    size === 'sm' ? 'ml-1' : size === 'md' ? 'ml-2' : size === 'lg' ? 'ml-3' : 'ml-2',
   );
 
   const disabledClass = $derived(
     disabled
       ? 'cursor-not-allowed pointer-events-none opacity-60 hover:bg-gray-300 active:bg-gray-300'
-      : 'cursor-pointer'
+      : 'cursor-pointer',
   );
 </script>
 
@@ -85,15 +85,15 @@
   <a
     {href}
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]}
-    {radiusStyles[radius || size]} relative {userClass}"
+      {radiusStyles[radius || size]} relative {userClass}"
     {...props}
   >
     {#if corner}
       <div
-        class="absolute -top-1 -left-1 size-4 p-1
-             bg-white text-black text-[12px] font-semibold
-             rounded-full flex items-center justify-center
-             border-2 shadow-sm z-10"
+        class="absolute -top-1 -left-1 z-10 flex
+          size-4 items-center justify-center rounded-full
+          border-2 bg-white p-1 text-[12px]
+          font-semibold text-black shadow-sm"
       >
         {corner}
       </div>
@@ -115,7 +115,7 @@
   <!-- Normal Button -->
   <button
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]} {disabledClass}
-    {radiusStyles[radius || size]} relative {userClass}"
+      {radiusStyles[radius || size]} relative {userClass}"
     {onclick}
     {disabled}
     {type}
@@ -123,10 +123,10 @@
   >
     {#if corner}
       <div
-        class="absolute -top-1 -left-1 size-4 p-1
-             bg-white text-black text-[12px] font-semibold
-             rounded-full flex items-center justify-center
-             border-2 shadow-sm z-10"
+        class="absolute -top-1 -left-1 z-10 flex
+          size-4 items-center justify-center rounded-full
+          border-2 bg-white p-1 text-[12px]
+          font-semibold text-black shadow-sm"
       >
         {corner}
       </div>

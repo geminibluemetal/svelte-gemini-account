@@ -10,7 +10,7 @@
     party_id: '',
     party_name: '',
     amount_type: '', // Cash, Paytm, Gpay, Bunk Cash, Bunk Ac, Gemini Ac, Cheque
-    amount: 0
+    amount: 0,
   };
   let data = $state(initialData);
   const partyList = $derived(options.party.map((p) => p.name));

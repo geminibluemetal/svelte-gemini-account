@@ -4,7 +4,7 @@ import {
   fetchAllItems,
   fetchSingleItemByName,
   insertItem,
-  updateItemById
+  updateItemById,
 } from './items.dal';
 
 export async function getAllItems() {

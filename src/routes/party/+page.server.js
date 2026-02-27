@@ -3,7 +3,7 @@ import {
   createParty,
   deleteParty,
   getAllParty,
-  updateParty
+  updateParty,
 } from '$lib/entity/party/party.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { fail } from '@sveltejs/kit';
@@ -47,5 +47,5 @@ export const actions = {
 
     sseEmit({ type: 'PARTY.LIST' });
     return result;
-  }
+  },
 };
