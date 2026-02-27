@@ -1,0 +1,176 @@
+import db from '$lib/core/server/db';
+
+export const tableName = 'party_statements';
+
+export function insertPartyOldBalance(data) {
+  const query = `
+    INSERT INTO ${tableName} (party_id, amount_type, amount, entry_type, time)
+    VALUES (?, ?, ?, ?, ?)
+  `;
+  const stat = db.prepare(query);
+  return stat.run(
+    data.party_id,
+    data.amount_type,
+    data.amount,
+    data.entry_type,
+    new Date().toISOString(),
+  );
+}
+
+export function updatePartyOldBalance(data, id) {
+  const query = `
+    UPDATE ${tableName}
+    SET party_id = ?,
+        amount_type = ?,
+        amount = ?,
+        entry_type = ?
+    WHERE id = ?
+  `;
+  const stat = db.prepare(query);
+  return stat.run(data.party_id, data.amount_type, data.amount, data.entry_type, id);
+}
+
+export function fetchAllOldBalanceByDate(date) {
+  const query = `
+    SELECT
+      ob.id,
+      ob.party_id,
+      p.name as party_name,
+      ob.amount_type,
+      ob.amount,
+      ob.sign,
+      ob.entry_type
+    FROM ${tableName} ob
+    INNER JOIN party p ON ob.party_id = p.id
+    WHERE DATE(ob.created_at) = '${date}'
+    AND ob.entry_type = 'CREDIT';
+  `;
+  const stat = db.prepare(query);
+  db.pragma('wal_checkpoint(TRUNCATE)');
+  return stat.all();
+}
+
+export function getAllOldBalanceCash(date) {
+  const query = `
+    SELECT
+      ob.id,
+      ob.party_id,
+      'OB' AS serial,
+      strftime('%Y-%m-%dT%H:%M:%Sz', ob.time) AS time,
+      p.name || ' O/B' AS description,
+      ob.amount_type,
+      ob.amount,
+      ob.sign,
+      ob.entry_type,
+      ob.created_at,
+      'OB' AS source
+    FROM ${tableName} ob
+    INNER JOIN party p ON ob.party_id = p.id
+    WHERE ob.created_at >= ?
+      AND ob.created_at < date(?, '+1 day')
+      AND ob.entry_type = 'CREDIT'
+      AND ob.amount_type = 'Cash'
+  `;
+
+  const stat = db.prepare(query);
+  return stat.all(date, date);
+}
+
+export function signOldBalance(id, newValue) {
+  const stat = db.prepare(`UPDATE ${tableName} SET sign = ? WHERE id = ?`);
+  return stat.run(newValue, id);
+}
+
+export function deletePartyStatementById(id) {
+  const query = `DELETE FROM ${tableName} WHERE id = ?`;
+  const stmt = db.prepare(query);
+  return stmt.run(id);
+}
+
+export function fetchAllBalanceForParty(type) {
+  type = type ? type : 'pending';
+  let filter = '';
+  switch (type) {
+    case 'pending':
+      filter = 'HAVING current_balance != 0';
+      break;
+    case 'all':
+      filter = '';
+      break;
+    case 'nil':
+      filter = 'HAVING current_balance == 0';
+      break;
+  }
+  // Logic is generally correct here
+  const query = `
+    SELECT
+        p.id,
+        p.name,
+        p.phone,
+        p.opening_balance,
+        COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) as total_debit,
+        COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
+        (p.opening_balance +
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) -
+         COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0)
+        ) AS current_balance
+    FROM party p
+    LEFT JOIN party_statements ps ON p.id = ps.party_id
+    GROUP BY p.id
+    ${filter}
+    ORDER BY p.name ASC
+  `;
+
+  try {
+    const stmt = db.prepare(query);
+    return stmt.all();
+  } catch (error) {
+    console.error('Failed to fetch party balances:', error);
+    return [];
+  }
+}
+
+export function fetchPartyStatementByPartyId(id) {
+  const query = `
+    SELECT
+      ps.id,
+      DATE(ps.created_at) as date,
+      strftime('%I:%M %p', datetime(ps.created_at, '+5 hours', '+30 minutes')) AS time,
+      ps.vehicle,
+      ps.address,
+      ps.item,
+      ps.qty,
+      ps.amount,
+      ps.sign,
+      ps.entry_type,
+      ps.amount_type,
+      -- FIX 1: Map the display columns correctly
+      CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE NULL END as debit,
+      CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE NULL END as credit,
+      -- FIX 2: Running Balance must use the SAME order as the final query
+      (
+        p.opening_balance +
+        SUM(
+          CASE
+            WHEN ps.entry_type = 'DEBIT' THEN ps.amount
+            WHEN ps.entry_type = 'CREDIT' THEN -ps.amount
+            ELSE 0
+          END
+        ) OVER (
+          ORDER BY ps.created_at ASC, ps.id ASC -- Use Date + ID for stable sorting
+        )
+      ) as running_balance
+    FROM party_statements ps
+    JOIN party p ON ps.party_id = p.id
+    WHERE ps.party_id = ?
+    ORDER BY ps.created_at ASC, ps.id ASC
+  `;
+
+  try {
+    const stmt = db.prepare(query);
+    return stmt.all(id);
+  } catch (error) {
+    console.error('Failed to fetch party ledger:', error);
+    return [];
+  }
+}

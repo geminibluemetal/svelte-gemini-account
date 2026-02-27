@@ -1,7 +1,6 @@
 // seed/cash_description.js
 export const collectionName = 'cash_description';
 
-// Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   { description: '1/2 Bold', created_at: new Date() },
   { description: '102 Reddiyur', created_at: new Date() },
@@ -191,6 +190,3 @@ export const seedData = [
   { description: '5067 Toll Bill', created_at: new Date() },
   { description: 'Thindivanam Siva', created_at: new Date() },
 ];
-
-// Specify a unique field to prevent duplicates
-export const uniqueField = 'description';

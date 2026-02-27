@@ -57,17 +57,6 @@ async function runSeeds() {
           continue;
         }
 
-        // 3. Handle Schema/Indexes if present (for MongoDB, this means creating indexes)
-        if (module.indexes && Array.isArray(module.indexes)) {
-          console.log(`  🔧 Creating indexes for '${module.collectionName}'...`);
-          const collection = db.collection(module.collectionName);
-
-          for (const index of module.indexes) {
-            // index should be { spec: { field: 1 }, options: { unique: true } }
-            await collection.createIndex(index.spec, index.options || {});
-          }
-        }
-
         // 4. Handle Seed Data if present
         if (module.seedData && Array.isArray(module.seedData) && module.seedData.length > 0) {
           console.log(
@@ -76,73 +65,20 @@ async function runSeeds() {
 
           const collection = db.collection(module.collectionName);
 
-          // Handle unique fields - can be either a string or an array of strings
-          const uniqueFields = module.uniqueFields || module.uniqueField;
-
-          if (uniqueFields) {
-            let fieldsArray = [];
-
-            // Convert to array if it's a string
-            if (typeof uniqueFields === 'string') {
-              fieldsArray = [uniqueFields];
-            } else if (Array.isArray(uniqueFields)) {
-              fieldsArray = uniqueFields;
-            }
-
-            if (fieldsArray.length > 0) {
-              console.log(`  🔑 Using unique fields: ${fieldsArray.join(', ')}`);
-
-              // Use bulkWrite with updateOne for upsert to avoid duplicates
-              const operations = module.seedData.map((doc) => {
-                // Build filter based on unique fields
-                const filter = {};
-                fieldsArray.forEach((field) => {
-                  filter[field] = doc[field];
-                });
-
-                return {
-                  updateOne: {
-                    filter: filter,
-                    update: { $setOnInsert: doc },
-                    upsert: true,
-                  },
-                };
-              });
-
-              if (operations.length > 0) {
-                const result = await collection.bulkWrite(operations);
-                console.log(
-                  `    📊 Inserted: ${result.upsertedCount}, Updated: ${result.modifiedCount}, Matched: ${result.matchedCount}`,
-                );
-              }
-            }
-          } else {
-            // Simple insert with duplicate prevention
-            try {
-              const result = await collection.insertMany(module.seedData, { ordered: false });
-              console.log(`    📊 Inserted: ${result.insertedCount} records`);
-            } catch (error) {
-              // Ignore duplicate key errors if they occur
-              if (error.code === 11000) {
-                console.log(
-                  `    ⚠️  Some records were duplicates (${error.result?.nInserted || 0} inserted)`,
-                );
-              } else {
-                throw error;
-              }
+          // Simple insert with duplicate prevention
+          try {
+            const result = await collection.insertMany(module.seedData, { ordered: false });
+            console.log(`    📊 Inserted: ${result.insertedCount} records`);
+          } catch (error) {
+            // Ignore duplicate key errors if they occur
+            if (error.code === 11000) {
+              console.log(
+                `    ⚠️  Some records were duplicates (${error.result?.nInserted || 0} inserted)`,
+              );
+            } else {
+              throw error;
             }
           }
-        }
-
-        // 5. Handle collection validations if present (MongoDB schema validation)
-        if (module.validationRules) {
-          console.log(`  🔍 Applying validation rules for '${module.collectionName}'...`);
-          await db.command({
-            collMod: module.collectionName,
-            validator: module.validationRules.validator,
-            validationLevel: module.validationRules.level || 'strict',
-            validationAction: module.validationRules.action || 'error',
-          });
         }
 
         // 6. Record that this file has been successfully executed
