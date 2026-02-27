@@ -1,19 +1,64 @@
 // seed/items.js
-export const tableName = 'items';
+export const collectionName = 'items';
 
-export const tableSchema = `
-CREATE TABLE IF NOT EXISTS items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE,
-    price_025 DECIMAL(10, 2) DEFAULT null,
-    price_050 DECIMAL(10, 2) DEFAULT null,
-    price_100 DECIMAL(10, 2) DEFAULT null,
-    price_150 DECIMAL(10, 2) DEFAULT null,
-    price_200 DECIMAL(10, 2) DEFAULT null,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-`;
+// Define indexes for better query performance
+export const indexes = [
+  { spec: { name: 1 }, options: { unique: true } }, // Unique index on item name
+  { spec: { price_025: 1 } }, // Index for filtering by 0-25 price
+  { spec: { price_050: 1 } }, // Index for filtering by 25-50 price
+  { spec: { price_100: 1 } }, // Index for filtering by 50-100 price
+  { spec: { price_150: 1 } }, // Index for filtering by 100-150 price
+  { spec: { price_200: 1 } }, // Index for filtering by 150-200 price
+];
 
+// Optional: Define MongoDB schema validation
+export const validationRules = {
+  validator: {
+    $jsonSchema: {
+      bsonType: 'object',
+      required: ['name'],
+      properties: {
+        name: {
+          bsonType: 'string',
+          description: 'must be a string and is required',
+        },
+        price_025: {
+          bsonType: ['double', 'null'],
+          minimum: 0,
+          description: 'must be a positive number or null',
+        },
+        price_050: {
+          bsonType: ['double', 'null'],
+          minimum: 0,
+          description: 'must be a positive number or null',
+        },
+        price_100: {
+          bsonType: ['double', 'null'],
+          minimum: 0,
+          description: 'must be a positive number or null',
+        },
+        price_150: {
+          bsonType: ['double', 'null'],
+          minimum: 0,
+          description: 'must be a positive number or null',
+        },
+        price_200: {
+          bsonType: ['double', 'null'],
+          minimum: 0,
+          description: 'must be a positive number or null',
+        },
+        created_at: {
+          bsonType: ['date', 'null'],
+          description: 'must be a date or null',
+        },
+      },
+    },
+  },
+  level: 'strict',
+  action: 'error',
+};
+
+// Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   {
     name: 'MS',
@@ -22,6 +67,7 @@ export const seedData = [
     price_100: 4400.0,
     price_150: 6700.0,
     price_200: 8800.0,
+    created_at: new Date(),
   },
   {
     name: 'PS',
@@ -30,6 +76,7 @@ export const seedData = [
     price_100: 4500.0,
     price_150: 6800.0,
     price_200: 9000.0,
+    created_at: new Date(),
   },
   {
     name: '20mm',
@@ -38,6 +85,7 @@ export const seedData = [
     price_100: 2800.0,
     price_150: 4300.0,
     price_200: 5600.0,
+    created_at: new Date(),
   },
   {
     name: '50mm',
@@ -46,6 +94,7 @@ export const seedData = [
     price_100: 2400.0,
     price_150: 3700.0,
     price_200: 4800.0,
+    created_at: new Date(),
   },
   {
     name: '40mm',
@@ -54,6 +103,7 @@ export const seedData = [
     price_100: 2400.0,
     price_150: 3700.0,
     price_200: 4800.0,
+    created_at: new Date(),
   },
   {
     name: '12mm',
@@ -62,6 +112,7 @@ export const seedData = [
     price_100: 2500.0,
     price_150: 3800.0,
     price_200: 5000.0,
+    created_at: new Date(),
   },
   {
     name: '6mm',
@@ -70,6 +121,7 @@ export const seedData = [
     price_100: 2500.0,
     price_150: 3800.0,
     price_200: 5000.0,
+    created_at: new Date(),
   },
   {
     name: 'Dust',
@@ -78,6 +130,7 @@ export const seedData = [
     price_100: 2800.0,
     price_150: 4300.0,
     price_200: 5600.0,
+    created_at: new Date(),
   },
   {
     name: 'Allmix',
@@ -86,6 +139,7 @@ export const seedData = [
     price_100: 2400.0,
     price_150: 3700.0,
     price_200: 4800.0,
+    created_at: new Date(),
   },
   {
     name: 'Mixing',
@@ -94,6 +148,7 @@ export const seedData = [
     price_100: 1400.0,
     price_150: 2200.0,
     price_200: 2800.0,
+    created_at: new Date(),
   },
   {
     name: 'MW',
@@ -102,6 +157,7 @@ export const seedData = [
     price_100: 400.0,
     price_150: 650.0,
     price_200: 800.0,
+    created_at: new Date(),
   },
   {
     name: '6sb',
@@ -110,6 +166,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '4sb',
@@ -118,6 +175,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'MS + 20mm',
@@ -126,6 +184,7 @@ export const seedData = [
     price_100: 3800.0,
     price_150: null,
     price_200: 7400.0,
+    created_at: new Date(),
   },
   {
     name: 'MS + Dust',
@@ -134,6 +193,7 @@ export const seedData = [
     price_100: 3800.0,
     price_150: null,
     price_200: 7400.0,
+    created_at: new Date(),
   },
   {
     name: 'MS + PS',
@@ -142,6 +202,7 @@ export const seedData = [
     price_100: 5000.0,
     price_150: null,
     price_200: 9000.0,
+    created_at: new Date(),
   },
   {
     name: '12mm + 6mm',
@@ -150,6 +211,7 @@ export const seedData = [
     price_100: 2500.0,
     price_150: null,
     price_200: 5000.0,
+    created_at: new Date(),
   },
   {
     name: 'PS + 20mm',
@@ -158,6 +220,7 @@ export const seedData = [
     price_100: 3800.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'MS + 12mm',
@@ -166,6 +229,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: 6900.0,
+    created_at: new Date(),
   },
   {
     name: 'MS + 50mm',
@@ -174,6 +238,7 @@ export const seedData = [
     price_100: 3500.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'MS + 6mm',
@@ -182,6 +247,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'MS + 40mm',
@@ -190,6 +256,7 @@ export const seedData = [
     price_100: 3500.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'PS + 12mm',
@@ -198,6 +265,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'PS + 40mm',
@@ -206,6 +274,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'PS + 50mm',
@@ -214,6 +283,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'PS + 6mm',
@@ -222,6 +292,7 @@ export const seedData = [
     price_100: 3600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: 'PS + Dust',
@@ -230,6 +301,7 @@ export const seedData = [
     price_100: 3800.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '12mm + 20mm',
@@ -238,6 +310,7 @@ export const seedData = [
     price_100: 2800.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '12mm + 40mm',
@@ -246,6 +319,7 @@ export const seedData = [
     price_100: 2600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '12mm + 50mm',
@@ -254,6 +328,7 @@ export const seedData = [
     price_100: 2600.0,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '12mm + Dust',
@@ -262,6 +337,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '20mm + 40mm',
@@ -270,6 +346,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '20mm + 50mm',
@@ -278,6 +355,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '20mm + Allmix',
@@ -286,6 +364,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '20mm + Mix',
@@ -294,6 +373,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '20mm + Dust',
@@ -302,6 +382,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '40mm + 50mm',
@@ -310,6 +391,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '40mm + 6mm',
@@ -318,6 +400,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '40mm + Allmix',
@@ -326,6 +409,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '40mm + Mix',
@@ -334,6 +418,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '40mm + Dust',
@@ -342,6 +427,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '50mm + 6mm',
@@ -350,6 +436,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '50mm + Allmix',
@@ -358,6 +445,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '50mm + Mix',
@@ -366,6 +454,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '50mm + Dust',
@@ -374,6 +463,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '6mm + Allmix',
@@ -382,6 +472,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '6mm + Mix',
@@ -390,6 +481,7 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
   {
     name: '6mm + Dust',
@@ -398,5 +490,9 @@ export const seedData = [
     price_100: null,
     price_150: null,
     price_200: null,
+    created_at: new Date(),
   },
 ];
+
+// Specify a unique field to prevent duplicates
+export const uniqueField = 'name';

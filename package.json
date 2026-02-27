@@ -34,6 +34,7 @@
     "@fingerprintjs/fingerprintjs": "^5.0.1",
     "better-sqlite3": "^12.6.2",
     "lucide-svelte": "^0.563.0",
+    "mongodb": "^7.1.0",
     "node-thermal-printer": "^4.6.0"
   }
 }
