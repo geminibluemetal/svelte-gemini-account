@@ -1,0 +1,16 @@
+# .gitattributes
+
+# Handle line endings automatically for files detected as text 
+# and leave binary files alone.
+* text=auto eol=lf
+
+# Explicitly treat Svelte and JS/TS files as LF
+*.svelte text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Standard for Windows-specific batch files if you have them
+*.bat text eol=crlf

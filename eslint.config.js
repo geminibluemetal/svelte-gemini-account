@@ -1,3 +1,5 @@
+// eslint.config.js
+
 import prettier from 'eslint-config-prettier';
 import path from 'node:path';
 import { includeIgnoreFile } from '@eslint/compat';
@@ -15,11 +17,20 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
   prettier,
   ...svelte.configs.prettier,
   {
-    languageOptions: { globals: { ...globals.browser, ...globals.node } }
+    languageOptions: { globals: { ...globals.browser, ...globals.node } },
   },
 
   {
     files: ['**/*.svelte', '**/*.svelte.js'],
-    languageOptions: { parserOptions: { svelteConfig } }
-  }
+    languageOptions: { parserOptions: { svelteConfig } },
+  },
+
+  {
+    rules: {
+      // If you want ESLint to specifically enforce 2 spaces,
+      // but usually 'prettier' config above handles this by disabling the rule.
+      indent: ['error', 2],
+      'svelte/indent': ['error', { indent: 2 }],
+    },
+  },
 ];
