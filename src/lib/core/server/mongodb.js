@@ -6,8 +6,8 @@ let client;
 let db;
 
 export async function connectDB() {
-  console.log('Connecting to:', MONGODB_URI);
-  console.log('Using DB:', DB_NAME);
+  // console.log('Connecting to:', MONGODB_URI);
+  // console.log('Using DB:', DB_NAME);
   if (db) return db;
 
   client = new MongoClient(MONGODB_URI);

@@ -12,8 +12,8 @@
   const headers = [
     // { name: 'Full Number', align: 'left', key: 'full_number' },
     { name: 'Number', align: 'left', key: 'short_number' },
+    // { name: 'Capacity', align: 'center', key: 'body_capacity' },
     { name: 'Company Vehicle', align: 'center', key: 'is_company_vehicle', display: 'boolean' },
-    // { name: 'Capacity', align: 'center', key: 'body_capacity' }
   ];
 
   const availableOptions = [
@@ -35,7 +35,7 @@
   async function handleVehicleDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item.id });
+      const result = await transportAction('?/delete', { id: item._id });
       if (result.type === 'failure') showToast('Not Deleted', 'danger');
       else showToast('Deleted Success');
     }
@@ -91,7 +91,7 @@
 
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 p-0.5 text-center">{o.key}</span>
         <span>=</span>
