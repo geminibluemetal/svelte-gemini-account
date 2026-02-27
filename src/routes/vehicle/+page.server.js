@@ -5,13 +5,15 @@ import {
   getAllVehicle,
   updateVehicle,
 } from '$lib/entity/vehicle/vehicle.service.js';
+import VehicleService from '$lib/features/vehicle/VehicleService.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('VEHICLE.LIST');
-  const vehicle = await getAllVehicle();
+  const vehicleService = new VehicleService();
+  const vehicle = await vehicleService.vehicleList();
   return { vehicle: serializeDoc(vehicle) };
 }
 
@@ -21,11 +23,11 @@ export const actions = {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
     let result = null;
-
+    const vehicleService = new VehicleService();
     if (editId) {
       result = await updateVehicle(data, editId);
     } else {
-      result = await createVehicle(data);
+      result = await vehicleService.createVehicle(data);
     }
 
     if (!result?.ok) {

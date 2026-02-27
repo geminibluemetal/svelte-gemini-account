@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import AppError from '$lib/core/server/error';
+import AppError, { handleSuccess } from '$lib/core/server/error';
 
 export default class BaseRepository {
   constructor(db, collectionName, ModelClass) {
@@ -37,7 +37,12 @@ export default class BaseRepository {
       throw new AppError('Database insert failed');
     }
 
-    return await this.findById(result.insertedId);
+    return handleSuccess('Created Success');
+  }
+
+  // Find one
+  async findOne(query) {
+    return await this.collection.findOne(query);
   }
 
   // Find by ID
@@ -66,7 +71,7 @@ export default class BaseRepository {
       throw new AppError('Database update failed');
     }
 
-    return await this.findById(id);
+    return handleSuccess('Updated Success');
   }
 
   // Delete
@@ -79,6 +84,6 @@ export default class BaseRepository {
       throw new AppError('Database delete failed');
     }
 
-    return true;
+    return handleSuccess('Deleted Success');
   }
 }

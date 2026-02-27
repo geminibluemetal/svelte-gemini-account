@@ -10,10 +10,10 @@
   const { data } = $props();
 
   const headers = [
-    // { name: 'Full Number', align: 'left', key: 'full_number' },
-    { name: 'Number', align: 'left', key: 'short_number' },
-    // { name: 'Capacity', align: 'center', key: 'body_capacity' },
-    { name: 'Company Vehicle', align: 'center', key: 'is_company_vehicle', display: 'boolean' },
+    // { name: 'Full Number', align: 'left', key: 'fullNumber' },
+    { name: 'Number', align: 'left', key: 'shortNumber' },
+    // { name: 'Capacity', align: 'center', key: 'bodyCapacity' },
+    { name: 'Company Vehicle', align: 'center', key: 'isCompanyVehicle', display: 'boolean' },
   ];
 
   const availableOptions = [
@@ -35,7 +35,7 @@
   async function handleVehicleDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item._id });
+      const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') showToast('Not Deleted', 'danger');
       else showToast('Deleted Success');
     }

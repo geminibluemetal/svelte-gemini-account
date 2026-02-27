@@ -36,17 +36,17 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?._id} />
+      <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="short_number"
-      value={data.short_number}
+      name="shortNumber"
+      value={data.shortNumber}
       placeholder="Short Number"
       autoComplete="off"
     />
     <CheckBoxField
-      name="is_company_vehicle"
-      value={data.is_company_vehicle}
+      name="isCompanyVehicle"
+      value={data.isCompanyVehicle}
       placeholder="Company Vehicle"
     />
   </Form>

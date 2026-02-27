@@ -1,30 +1,28 @@
-import AppError from '$lib/core/server/error';
-import { connectDB } from '$lib/core/server/mongodb';
-import VehicleRepository from './VehicleRepository'; // Fixed typo
+import { handleServiceError, schemaError } from '$lib/core/server/error';
+import BaseService from '../base/BaseService';
+import VehicleRepository from './VehicleRepository';
 import { vehicleSchema } from './VehicleSchema';
 
-export default class VehicleService {
+export default class VehicleService extends BaseService {
   constructor() {
-    this.repository = null;
+    super(VehicleRepository);
   }
 
-  // Ensure DB and Repo are ready without blocking every call
-  async getRepository() {
-    if (!this.repository) {
-      const db = await connectDB();
-      this.repository = new VehicleRepository(db);
-    }
-    return this.repository;
+  async vehicleList() {
+    const repo = await this.getRepository();
+    return await repo.findAll();
   }
 
   async createVehicle(data) {
-    const repo = await this.getRepository();
-
-    // Validate data
-    const parsed = vehicleSchema.safeParse(data);
-    if (!parsed.success) {
-      throw new AppError(parsed.error.errors[0].message, 400);
+    try {
+      const repo = await this.getRepository();
+      const parsed = await vehicleSchema.safeParseAsync(data);
+      if (!parsed.success) {
+        schemaError(parsed);
+      }
+      return await repo.create(parsed.data);
+    } catch (error) {
+      return handleServiceError(error);
     }
-    return await repo.create(parsed.data);
   }
 }
