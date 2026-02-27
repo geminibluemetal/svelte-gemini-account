@@ -23,27 +23,27 @@ export const validationRules = {
           description: 'must be a string and is required',
         },
         price_025: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
         price_050: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
         price_100: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
         price_150: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
         price_200: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },

@@ -49,7 +49,7 @@ export const validationRules = {
           description: 'must be a string and is required',
         },
         token_quantity: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number and is required',
         },
@@ -58,7 +58,7 @@ export const validationRules = {
           description: 'must be a string or null',
         },
         delivery_quantity: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
@@ -71,12 +71,12 @@ export const validationRules = {
           description: 'must be a string or null',
         },
         amount_1: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },
         amount_2: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },

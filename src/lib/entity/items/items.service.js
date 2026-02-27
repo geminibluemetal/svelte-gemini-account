@@ -8,19 +8,15 @@ import {
 } from './items.dal';
 
 export async function getAllItems() {
-  return fetchAllItems();
+  return await fetchAllItems();
 }
 
 export async function createItem(data) {
-  if (!data.name) {
-    return { message: 'Name is Required', ok: false };
-  }
+  if (!data.name) return { message: 'Name is Required', ok: false };
+  if (data.name.includes('+') && !data.name.includes(' + ')) return { message: 'Add space between +', ok: false };
 
-  if (data.name.includes('+') && !data.name.includes(' + ')) {
-    return { message: 'Add space between +', ok: false };
-  }
 
-  const itemExist = fetchSingleItemByName(data.name);
+  const itemExist = await fetchSingleItemByName(data.name);
 
   if (itemExist) {
     return { message: `'${data.name}' is already exists`, ok: false };
@@ -32,9 +28,9 @@ export async function createItem(data) {
   data.price_150 = parseFloat(data.price_150);
   data.price_200 = parseFloat(data.price_200);
 
-  const result = insertItem(data);
+  const result = await insertItem(data);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Item created`, ok: true };
   }
 }
@@ -48,7 +44,7 @@ export async function updateItem(data, editId) {
     return { message: 'Add space between +', ok: false };
   }
 
-  const itemExist = checkItemNameExists(data.name, editId);
+  const itemExist = await checkItemNameExists(data.name, editId);
 
   if (itemExist) {
     return { message: `'${data.name}' is already exists`, ok: false };
@@ -60,17 +56,17 @@ export async function updateItem(data, editId) {
   data.price_150 = parseFloat(data.price_150);
   data.price_200 = parseFloat(data.price_200);
 
-  const result = updateItemById(data, editId);
+  const result = await updateItemById(data, editId);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Item updated`, ok: true };
   }
 }
 
 export async function deleteItem(id) {
-  const result = deleteItemById(id);
+  const result = await deleteItemById(id);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Item Deleted`, ok: true };
   } else {
     return { message: `Item Not Deleted`, ok: false };

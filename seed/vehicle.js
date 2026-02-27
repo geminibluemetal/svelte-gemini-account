@@ -34,7 +34,7 @@ export const validationRules = {
           description: 'must be a boolean and is required',
         },
         body_capacity: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           maximum: 100,
           description: 'must be a number between 0-100 or null',

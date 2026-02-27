@@ -36,7 +36,7 @@ export const validationRules = {
           description: 'must be either DEBIT or CREDIT and is required',
         },
         amount: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number and is required',
         },
@@ -45,7 +45,7 @@ export const validationRules = {
           description: 'must be a string or null',
         },
         qty: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           minimum: 0,
           description: 'must be a positive number or null',
         },

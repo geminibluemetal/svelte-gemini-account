@@ -25,7 +25,7 @@ export const validationRules = {
           description: 'must be a string or null',
         },
         opening_balance: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },

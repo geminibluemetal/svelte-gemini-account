@@ -5,17 +5,9 @@
   import { showToast } from '$lib/stores/toast';
 
   const { open, onClose, item, allItems } = $props();
-  let initialData = {
-    name: '',
-    price_025: '',
-    price_050: '',
-    price_100: '',
-    price_150: '',
-    price_200: '',
-  };
 
   let nameOptions = $state([]);
-  let data = $state(initialData);
+  let data = $derived({ ...item });
 
   function handleClose() {
     nameOptions = [];
@@ -24,7 +16,7 @@
 
   function handleNameChange(value) {
     if (value.includes(' + ')) {
-      const [prefixName, suffixName] = value.split(' + ');
+      const [prefixName] = value.split(' + ');
       const singleItems = allItems.filter((i) => !i.name.includes(' + '));
       nameOptions = singleItems.map((i) => `${prefixName} + ${i.name}`);
     } else {
@@ -42,10 +34,6 @@
       }
     };
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -59,7 +47,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?.id} />
+      <input type="hidden" name="editId" value={item?._id} />
     {/if}
     <InputField
       name="name"

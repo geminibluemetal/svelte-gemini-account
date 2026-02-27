@@ -1,67 +1,72 @@
-import db from '$lib/core/server/db';
+import { connectDB } from '$lib/core/server/mongodb';
+import { ObjectId } from 'mongodb';
 
-const tableName = 'items';
+const collectionName = 'items';
 
-export function fetchAllItems() {
-  const query = `SELECT * FROM ${tableName}`;
-  const stat = db.prepare(query);
-  db.pragma('wal_checkpoint(TRUNCATE)');
-  return stat.all();
+export async function fetchAllItems() {
+  const db = await connectDB()
+  const items = await db.collection(collectionName).find({}).toArray();
+  return items;
 }
 
-export function fetchSingleItemByName(name) {
-  const query = `SELECT * FROM ${tableName} WHERE name = '${name}'`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchSingleItemByName(name) {
+  const db = await connectDB();
+  const items = await db.collection(collectionName).findOne({ name: name });
+  return items;
 }
 
-export function insertItem(data) {
-  const query = `
-    INSERT INTO ${tableName} (name, price_025, price_050, price_100, price_150, price_200)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `;
-  const stat = db.prepare(query);
-  return stat.run(
-    data.name,
-    data.price_025 || null,
-    data.price_050 || null,
-    data.price_100 || null,
-    data.price_150 || null,
-    data.price_200 || null,
+export async function insertItem(data) {
+  const db = await connectDB();
+
+  const itemDoc = {
+    name: data.name ?? null,
+    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? parseFloat(data.price_025) : null,
+    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? parseFloat(data.price_050) : null,
+    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? parseFloat(data.price_100) : null,
+    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? parseFloat(data.price_150) : null,
+    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? parseFloat(data.price_200) : null,
+    created_at: new Date(),
+  };
+
+  const result = await db.collection(collectionName).insertOne(itemDoc);
+  return result;
+}
+
+export async function updateItemById(data, id) {
+  const db = await connectDB();
+
+  const itemDoc = {
+    name: data.name ?? null,
+    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? parseFloat(data.price_025) : null,
+    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? parseFloat(data.price_050) : null,
+    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? parseFloat(data.price_100) : null,
+    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? parseFloat(data.price_150) : null,
+    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? parseFloat(data.price_200) : null,
+    created_at: new Date(),
+  };
+
+  const result = await db.collection(collectionName).updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: itemDoc,
+    },
   );
+
+  return result;
 }
 
-export function updateItemById(data, id) {
-  const query = `
-    UPDATE ${tableName}
-    SET name = ?,
-        price_025 = ?,
-        price_050 = ?,
-        price_100 = ?,
-        price_150 = ?,
-        price_200 = ?
-    WHERE id = ?
-  `;
-
-  const stmt = db.prepare(query);
-  return stmt.run(
-    data.name,
-    data.price_025 || null,
-    data.price_050 || null,
-    data.price_100 || null,
-    data.price_150 || null,
-    data.price_200 || null,
-    id,
-  );
-}
-export function deleteItemById(id) {
-  const query = `DELETE FROM items WHERE id = ?`;
-  const stmt = db.prepare(query);
-  return stmt.run(id);
+export async function deleteItemById(id) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName).deleteOne({
+    _id: new ObjectId(id),
+  });
+  return result;
 }
 
-export function checkItemNameExists(name, id) {
-  const query = `SELECT * FROM ${tableName} WHERE name = ? AND id != ?`;
-  const stmt = db.prepare(query);
-  return stmt.get(name, id);
+export async function checkItemNameExists(name, id) {
+  const db = await connectDB();
+  return await db.collection(collectionName).findOne({
+    name,
+    _id: { $ne: new ObjectId(id) },
+  });
 }

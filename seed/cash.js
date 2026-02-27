@@ -21,7 +21,7 @@ export const validationRules = {
           description: 'must be an ObjectId or null if not linked to an order',
         },
         amount: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number and is required',
         },

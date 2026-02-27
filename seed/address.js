@@ -21,15 +21,15 @@ export const validationRules = {
           description: 'must be a string and is required',
         },
         delivery_025: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           description: 'must be a number or null if not set',
         },
         delivery_050_100: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           description: 'must be a number or null if not set',
         },
         delivery_max: {
-          bsonType: ['double', 'null'],
+          bsonType: ['number', 'null'],
           description: 'must be a number or null if not set',
         },
         created_at: {

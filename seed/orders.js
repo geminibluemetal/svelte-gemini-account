@@ -44,7 +44,7 @@ export const validationRules = {
           description: 'must be a string and is required',
         },
         total_qty: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number and is required',
         },
@@ -57,22 +57,22 @@ export const validationRules = {
           description: 'must be a string and is required',
         },
         amount: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },
         advance: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },
         discount: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },
         balance: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },
@@ -89,12 +89,12 @@ export const validationRules = {
           description: 'must be a boolean',
         },
         delivered_qty: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },
         balance_qty: {
-          bsonType: 'double',
+          bsonType: 'number',
           minimum: 0,
           description: 'must be a positive number',
         },

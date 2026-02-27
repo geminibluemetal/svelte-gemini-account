@@ -6,12 +6,13 @@ import {
   updateItem,
 } from '$lib/entity/items/items.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('ITEMS.LIST');
   const items = await getAllItems();
-  return { items };
+  return { items: serializeDoc(items) };
 }
 
 export const actions = {
