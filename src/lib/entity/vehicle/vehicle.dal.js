@@ -1,61 +1,65 @@
-import db from '$lib/core/server/db';
+import { connectDB } from '$lib/core/server/mongodb';
+import { ObjectId } from 'mongodb';
 
-const tableName = 'vehicle';
+const collectionName = 'vehicle';
 
-export function fetchAllVehicle() {
-  const query = `SELECT * FROM ${tableName}`;
-  const stat = db.prepare(query);
-  db.pragma('wal_checkpoint(TRUNCATE)');
-  return stat.all();
+export async function fetchAllVehicle() {
+  const db = await connectDB();
+  const vehicles = await db.collection(collectionName).find({}).toArray();
+  return vehicles;
 }
 
-export function fetchSingleVehicleByShortName(short_number) {
-  const query = `SELECT * FROM ${tableName} WHERE short_number = '${short_number}'`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchSingleVehicleByShortName(short_number) {
+  const db = await connectDB();
+  const vehicle = await db.collection(collectionName).findOne({ short_number: short_number });
+  return vehicle;
 }
 
-export function insertVehicle(data) {
-  const query = `
-    INSERT INTO ${tableName} (full_number, short_number, is_company_vehicle, body_capacity)
-    VALUES (?, ?, ?, ?)
-  `;
-  const stat = db.prepare(query);
-  return stat.run(
-    data.full_number || null,
-    data.short_number || null,
-    data.is_company_vehicle ? 1 : 0, // Convert boolean to integer
-    data.body_capacity || null,
+export async function insertVehicle(data) {
+  const db = await connectDB();
+
+  const vehicleDoc = {
+    full_number: data.full_number ?? null,
+    short_number: data.short_number,
+    is_company_vehicle: Boolean(data.is_company_vehicle),
+    body_capacity: data.body_capacity !== undefined ? Number(data.body_capacity) : null,
+    created_at: new Date(),
+  };
+
+  const result = await db.collection(collectionName).insertOne(vehicleDoc);
+  return result;
+}
+
+export async function updateVehicleById(data, id) {
+  const db = await connectDB();
+
+  const result = await db.collection(collectionName).updateOne(
+    { _id: new ObjectId(id) },
+    {
+      $set: {
+        full_number: data.full_number ?? null,
+        short_number: data.short_number,
+        is_company_vehicle: Boolean(data.is_company_vehicle),
+        body_capacity: data.body_capacity !== undefined ? Number(data.body_capacity) : null,
+      },
+    },
   );
+
+  return result;
 }
 
-export function updateVehicleById(data, id) {
-  const query = `
-    UPDATE ${tableName}
-    SET full_number = ?,
-        short_number = ?,
-        is_company_vehicle = ?,
-        body_capacity = ?
-    WHERE id = ?
-  `;
-
-  const stmt = db.prepare(query);
-  return stmt.run(
-    data.full_number || null,
-    data.short_number || null,
-    data.is_company_vehicle ? 1 : 0, // Convert boolean to integer
-    data.body_capacity || null,
-    id,
-  );
-}
-export function deleteVehicleById(id) {
-  const query = `DELETE FROM vehicle WHERE id = ?`;
-  const stmt = db.prepare(query);
-  return stmt.run(id);
+export async function deleteVehicleById(id) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName).deleteOne({
+    _id: new ObjectId(id),
+  });
+  return result;
 }
 
-export function checkVehicleShortNameExists(short_number, id) {
-  const query = `SELECT * FROM ${tableName} WHERE short_number = ? AND id != ?`;
-  const stmt = db.prepare(query);
-  return stmt.get(short_number, id);
+export async function checkVehicleShortNameExists(short_number, id) {
+  const db = await connectDB();
+  return await db.collection(collectionName).findOne({
+    short_number,
+    _id: { $ne: new ObjectId(id) },
+  });
 }

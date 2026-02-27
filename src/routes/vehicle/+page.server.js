@@ -6,12 +6,13 @@ import {
   updateVehicle,
 } from '$lib/entity/vehicle/vehicle.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('VEHICLE.LIST');
   const vehicle = await getAllVehicle();
-  return { vehicle };
+  return { vehicle: serializeDoc(vehicle) };
 }
 
 export const actions = {
