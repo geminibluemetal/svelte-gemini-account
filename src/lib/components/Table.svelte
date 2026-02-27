@@ -2,7 +2,7 @@
   import display from '$lib/core/client/display';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
-  import { SearchX, Table, Table2, TableProperties } from 'lucide-svelte';
+  import { SearchX } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
 
   const {
@@ -72,6 +72,7 @@
     keyboardEventBus.on('PageDown', jump20Bottom);
 
     // Register custom events
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
     const handlersMap = new Map();
     customEvents.forEach(({ key, handler }) => {
       const wrappedHandler = () => {
@@ -106,14 +107,13 @@
 
 <div class="p-2 {autoHight ? 'h-full' : 'h-screen'} flex w-fit flex-row gap-2">
   <!-- svelte-ignore a11y_no_static_element_interactions -->
-  <!-- svelte-ignore a11y_mouse_events_have_key_events -->
   <div class="overflow-auto border-2 border-black" bind:this={container}>
     <!-- ONE GRID -->
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <!-- TITLE ROW -->
       <div
         class="sticky top-0 col-span-full flex border-b-2 border-white text-center font-bold text-white
-        {headerColor == 'blue' ? 'bg-blue-700' : 'bg-red-700'}"
+          {headerColor == 'blue' ? 'bg-blue-700' : 'bg-red-700'}"
       >
         <div class="flex flex-1 text-left">{@render left()}</div>
         <div class="flex-1 text-center">{title}</div>
@@ -132,7 +132,7 @@
       {#each headers as header, index (index)}
         <div
           class="sticky top-6.5 z-20 border-white bg-black px-1 text-center text-white
-          {hideAction && index == headers.length - 1 ? 'border-r-0' : 'border-r-2'}"
+            {hideAction && index == headers.length - 1 ? 'border-r-0' : 'border-r-2'}"
         >
           {header.name}
         </div>
@@ -155,7 +155,6 @@
           {@const groupColor = customCellHighlight(item)}
           {#if !hideSerial}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             <div
               class="border-r border-b border-gray-500 px-1 text-center
                 {overRow == row ? 'bg-black/20' : rowColor?.background}"
@@ -166,8 +165,6 @@
           {/if}
 
           {#each headers as header, col (col)}
-            <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <!-- svelte-ignore a11y_mouse_events_have_key_events -->
             {@const color = header?.color ? header.color(item[header.key], item) : null}
             <div
               class="px-1
@@ -202,7 +199,6 @@
           {/each}
 
           <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <!-- svelte-ignore a11y_mouse_events_have_key_events -->
           {#if !hideAction}
             <div
               class="border-b border-gray-500 px-1 text-center

@@ -10,8 +10,8 @@
   import Form from '$lib/components/Form.svelte';
   import InputField from '$lib/components/InputField.svelte';
   import Button from '$lib/components/Button.svelte';
-  import Badge from '$lib/components/Badge.svelte';
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   const { data } = $props();
   let view = $state('pending');
@@ -39,7 +39,7 @@
   });
 
   const headers = [
-    { name: 'Date', align: 'center', key: 'date', display: 'date', width: '96' },
+    { name: 'Date', align: 'center', key: 'created_at', display: 'date', width: '96' },
     { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor, width: '38' },
     { name: 'Party', align: 'left', key: 'party_name', width: '220' },
     { name: 'Address', align: 'left', key: 'address', width: '220' },
@@ -51,7 +51,7 @@
     { name: 'Advan', align: 'right', key: 'advance', display: 'currency' },
     { name: 'Dis', align: 'right', key: 'discount', display: 'currency' },
     { name: 'Bal', align: 'right', key: 'balance', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', display: 'boolean', color: SignColor },
+    { name: 'Sign', align: 'center', key: 'sign', display: 'sign', color: SignColor },
     { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal', width: '53' },
     { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal', width: '53' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
@@ -97,15 +97,14 @@
   }
 
   function rowHighlight(item) {
-    switch (item.status) {
-      case 'Partial':
-        return HighlightRow.yellow;
-      case 'Delivered':
-        return HighlightRow.emerald; // Enhanced Green Color
-      case 'Cancelled':
-        return HighlightRow.red;
-      case 'Finished':
-        return HighlightRow.blue;
+    if (item.status === 'Partial') {
+      return HighlightRow.yellow;
+    } else if (item.status === 'Delivered') {
+      return HighlightRow.emerald;
+    } else if (item.status === 'Cancelled') {
+      return HighlightRow.red;
+    } else if (item.status === 'Finished') {
+      return HighlightRow.blue;
     }
   }
 
@@ -114,18 +113,16 @@
   }
 
   function AmountTypeColor(value) {
-    // COD, AC, Cash, Paytm, Gpay
-    switch (value) {
-      case 'COD':
-        return HighlightCell.purple;
-      case 'AC':
-        return HighlightCell.yellow;
-      case 'Cash':
-        return HighlightCell.green;
-      case 'Paytm':
-        return HighlightCell.red;
-      case 'Gpay':
-        return HighlightCell.blue;
+    if (value === 'COD') {
+      return HighlightCell.purple;
+    } else if (value === 'AC') {
+      return HighlightCell.yellow;
+    } else if (value === 'Cash') {
+      return HighlightCell.green;
+    } else if (value === 'Paytm') {
+      return HighlightCell.red;
+    } else if (value === 'Gpay') {
+      return HighlightCell.blue;
     }
   }
 
@@ -134,18 +131,18 @@
     editableOrder = item;
   }
 
-  async function handleOrderDelete(item) {
-    if (item.sign) {
-      showToast('Signed Order Can not delete', 'amber');
-      return;
-    }
-    const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
-    if (confirmed) {
-      const result = await transportAction('?/delete', { id: item.id });
-      if (result.type === 'failure') showToast('Not Deleted', 'danger');
-      else showToast('Deleted Success');
-    }
-  }
+  // async function handleOrderDelete(item) {
+  //   if (item.sign) {
+  //     showToast('Signed Order Can not delete', 'amber');
+  //     return;
+  //   }
+  //   const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
+  //   if (confirmed) {
+  //     const result = await transportAction('?/delete', { id: item._id });
+  //     if (result.type === 'failure') showToast('Not Deleted', 'danger');
+  //     else showToast('Deleted Success');
+  //   }
+  // }
 
   const handleSinglePrint = (item) => {
     const qty = prompt('Enter Quantity');
@@ -153,22 +150,22 @@
     const amount = prompt('Enter Amount');
     if (!amount) return;
     const tip = prompt('Enter Tip Amount');
-    transportAction('?/singlePrint', { id: item.id, qty, amount, tip });
+    transportAction('?/singlePrint', { id: item._id, qty, amount, tip });
   };
   const handleFullPrint = (item) => {
     const tip = prompt('Enter Tip Amount');
     if (!tip) return;
-    transportAction('?/fullPrint', { id: item.id, tip });
+    transportAction('?/fullPrint', { id: item._id, tip });
   };
-  const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item.id });
-  const handleOrderLoading = (item) => transportAction('?/changeToLoading', { id: item.id });
-  const handleOrderCancel = (item) => transportAction('?/changeToCancelled', { id: item.id });
-  const handleOrderFinish = (item) => transportAction('?/changeToFinished', { id: item.id });
-  const handleOrderStatusReset = (item) => transportAction('?/resetStatus', { id: item.id });
-  const handleSignOrder = (item) => transportAction('?/sign', { id: item.id, current: item.sign });
+  const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item._id });
+  const handleOrderLoading = (item) => transportAction('?/changeToLoading', { id: item._id });
+  const handleOrderCancel = (item) => transportAction('?/changeToCancelled', { id: item._id });
+  const handleOrderFinish = (item) => transportAction('?/changeToFinished', { id: item._id });
+  const handleOrderStatusReset = (item) => transportAction('?/resetStatus', { id: item._id });
+  const handleSignOrder = (item) => transportAction('?/sign', { id: item._id, current: item.sign });
   const handleTokenCreation = async (item) => {
     tokenOpened = true;
-    quickToken.id = item.id;
+    quickToken._id = item._id;
   };
 
   const handleQuickTokenSubmit = () => {
@@ -245,8 +242,8 @@
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
-  const gotoDeliverySheet = () => goto('/delivery');
-  const gotoCashReport = () => goto('/cash');
+  const gotoDeliverySheet = () => goto(resolve('/delivery'));
+  const gotoCashReport = () => goto(resolve('/cash'));
   const handleFilterAll = () => (view = view == 'all' ? 'pending' : 'all');
   const handleFilterDelivered = () => (view = view == 'delivered' ? 'pending' : 'delivered');
   const handleFilterCancelled = () => (view = view == 'cancelled' ? 'pending' : 'cancelled');
@@ -366,7 +363,7 @@
 <OrderForm open={formOpened} onClose={handleFormClose} item={editableOrder} options={data} />
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 mb-2 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
@@ -387,7 +384,7 @@
     enhance={handleQuickTokenSubmit}
     submitButtonText={['Generate']}
   >
-    <input type="hidden" name="id" bind:value={quickToken.id} />
+    <input type="hidden" name="id" bind:value={quickToken._id} />
     <InputField
       name="vehicle"
       bind:value={quickToken.vehicle}

@@ -1,25 +1,38 @@
-import db from '$lib/core/server/db';
+import { connectDB } from "$lib/core/server/mongodb";
 
-const tableName = 'settings';
+const collectionName = 'settings';
 
-export function fetchSettings() {
-  const query = `SELECT * FROM ${tableName}`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchSettings() {
+  const db = await connectDB()
+  const settings = await db.collection(collectionName).findOne({});
+  return settings;
 }
 
-export function setSettings(settingsObj) {
+export async function setSettings(settingsObj) {
   if (!settingsObj || typeof settingsObj !== 'object') {
     throw new Error('Settings must be an object');
   }
 
-  // Build query
-  const columns = Object.keys(settingsObj);
-  const values = Object.values(settingsObj);
-  const setClause = columns.map((col) => `${col} = ?`).join(', ');
+  const db = await await connectDB();
+  const existingSettings = await db.collection(collectionName).findOne({});
 
-  const query = `UPDATE ${tableName} SET ${setClause}`;
-  const stat = db.prepare(query);
-
-  return stat.run(...values);
+  if (!existingSettings) {
+    // If no settings exist, insert new document
+    const result = await db.collection(collectionName).insertOne({
+      ...settingsObj,
+      created_at: new Date()
+    });
+    return result;
+  } else {
+    // Update existing document with all fields from settingsObj
+    const result = await db.collection(collectionName).updateOne(
+      { _id: existingSettings._id },
+      {
+        $set: {
+          ...settingsObj
+        }
+      }
+    );
+    return result;
+  }
 }

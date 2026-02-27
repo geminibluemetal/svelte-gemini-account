@@ -29,8 +29,8 @@ const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
     rules: {
       // If you want ESLint to specifically enforce 2 spaces,
       // but usually 'prettier' config above handles this by disabling the rule.
-      indent: ['error', 2],
-      'svelte/indent': ['error', { indent: 2 }],
+      // indent: ['error', 2],
+      // 'svelte/indent': ['error', { indent: 2 }],
     },
   },
 ];

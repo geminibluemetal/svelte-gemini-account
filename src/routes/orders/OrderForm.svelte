@@ -5,7 +5,7 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
 
-  const { open, onClose, item, allItems, options } = $props();
+  const { open, onClose, item, options } = $props();
   let initialData = {
     party_name: '',
     address: '',
@@ -25,6 +25,8 @@
     delivery_sheet_verified: '',
   };
 
+  // Some Value are not updated when dependent on another value, so we use a local state to handle those values and update them when the dependent value changes. For example, phone number is updated when party name is changed.
+  // eslint-disable-next-line svelte/prefer-writable-derived
   let data = $state(initialData);
 
   const partyList = $derived(options.party.map((p) => p.name));
@@ -73,7 +75,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?.id} />
+      <input type="hidden" name="editId" value={item?._id} />
     {/if}
     <InputField
       name="party_name"

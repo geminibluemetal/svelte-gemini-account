@@ -15,6 +15,27 @@ export async function fetchSinglePartyByName(name) {
   return party;
 }
 
+export async function fetchSinglePartyById(id) {
+  const db = await connectDB();
+  const party = await db.collection(collectionName).findOne({ _id: ObjectId(id) });
+  return party;
+}
+
+export async function updatePhoneByPartyName(name, phone) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName)
+    .updateMany(
+      { name: name }, // Filter by party name
+      {
+        $set: {
+          phone: phone,
+          updated_at: new Date() // Track when it was updated
+        }
+      }
+    );
+  return result
+}
+
 export async function insertParty(data) {
   const db = await connectDB();
 

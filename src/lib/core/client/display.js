@@ -18,7 +18,10 @@ const formatters = {
     return formatFixed(value);
   },
   boolean: function (value) {
-    return value ? '✓' : '✕';
+    return value ? '✓ Yes' : '✕ No';
+  },
+  sign: function (value) {
+    return value ? '✓' : '';
   },
 };
 

@@ -1,151 +1,123 @@
-import db from '$lib/core/server/db';
+import { connectDB } from '$lib/core/server/mongodb';
+import { ObjectId } from 'mongodb';
 
-const tableName = 'orders';
+const collectionName = 'orders';
 
-export function fetchAllOrders() {
-  const query = `SELECT * FROM ${tableName}`;
-  const stat = db.prepare(query);
-  db.pragma('wal_checkpoint(TRUNCATE)');
-  return stat.all();
+export async function fetchAllOrders() {
+  const db = await connectDB();
+  const orders = await db.collection(collectionName).find({}).toArray();
+  return orders;
 }
 
-export function fetchSingleOrderByOrderNumber(order_number) {
-  const query = `SELECT * FROM ${tableName} WHERE order_number = '${order_number}'`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchSingleOrderByOrderNumber(order_number) {
+  const db = await connectDB();
+  const order = await db.collection(collectionName).findOne({ order_number: order_number });
+  return order;
 }
 
-export function fetchOrdersByStatus(statusArray) {
-  // Create placeholders for each status (?, ?, ?, etc.)
-  const placeholders = statusArray.map(() => '?').join(',');
-  const query = `SELECT * FROM ${tableName} WHERE status IN (${placeholders})`;
-  const stat = db.prepare(query);
-  return stat.all(...statusArray);
+
+export async function fetchOrdersByStatus(statusArray) {
+  const db = await connectDB();
+  const orders = await db.collection(collectionName)
+    .find({ status: { $in: statusArray } })
+    .toArray();
+  return orders;
 }
 
-export function fetchSingleOrderById(id) {
-  const query = `SELECT * FROM ${tableName} WHERE id = '${id}'`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchSingleOrderById(id) {
+  const db = await connectDB();
+  const order = await db.collection(collectionName).findOne({ _id: new ObjectId(id) });
+  return order;
 }
 
-export function updateSingleOrderColumn(id, columnName, newValue) {
-  // Use parameterized query to prevent SQL injection
-  const query = `UPDATE ${tableName} SET ${columnName} = ? WHERE id = ?`;
-  const stat = db.prepare(query);
-  return stat.run(newValue, id);
+export async function updateSingleOrderColumn(id, columnName, newValue) {
+  const db = await connectDB();
+  const updateData = {
+    $set: {
+      [columnName]: newValue
+    }
+  };
+  const result = await db.collection(collectionName)
+    .updateOne(
+      { _id: new ObjectId(id) },
+      updateData
+    );
+
+  return result;
 }
 
-export function insertOrder(data) {
-  const query = `
-    INSERT INTO orders (
-      date,
-      order_number,
-      party_name,
-      address,
-      phone,
-      item,
-      total_qty,
-      amount_time,
-      amount_type,
-      amount,
-      advance,
-      discount,
-      balance,
-      sign,
-      is_owner_order,
-      tracktor_only,
-      delivered_qty,
-      balance_qty,
-      notes,
-      status,
-      delivery_sheet_verified
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
+export async function insertOrder(data) {
+  const orderData = {
+    order_number: Number(data.order_number),
+    party_name: data.party_name || null,
+    address: data.address || null,
+    phone: data.phone || null,
+    item: data.item,
+    total_qty: Number(data.total_qty) || 0,
+    payment_at: data.amount_type === 'Cash' && Number(data.amount)
+      ? new Date()
+      : null,
+    amount_type: data.amount_type,
+    amount: Number(data.amount) || 0,
+    advance: Number(data.advance) || 0,
+    discount: Number(data.discount) || 0,
+    balance: Number(data.balance) || 0,
+    sign: Boolean(data.sign),
+    is_owner_order: Boolean(data.is_owner_order),
+    tracktor_only: Boolean(data.tracktor_only),
+    delivered_qty: Number(data.delivered_qty) || 0,
+    balance_qty: Number(data.balance_qty) || 0,
+    notes: data.notes || '',
+    status: data.status || 'New',
+    delivery_sheet_verified: data.delivery_sheet_verified ? 1 : 0,
+    created_at: data.date ? new Date(data.date) : new Date(),
+    updated_at: new Date()
+  };
 
-  const stat = db.prepare(query);
-
-  // Convert boolean values to integers (0 or 1) for SQLite
-  return stat.run(
-    data.date || new Date().toISOString().split('T')[0], // Format as YYYY-MM-DD
-    data.order_number,
-    data.party_name,
-    data.address || null,
-    data.phone || null,
-    data.item,
-    data.total_qty || 0,
-    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
-    data.amount_type,
-    data.amount || 0,
-    data.advance || 0,
-    data.discount || 0,
-    data.balance || 0,
-    data.sign ? 1 : 0, // Convert boolean to integer
-    data.is_owner_order ? 1 : 0, // Convert boolean to integer
-    data.tracktor_only ? 1 : 0, // Convert boolean to integer
-    data.delivered_qty || 0,
-    data.balance_qty || 0,
-    data.notes || '',
-    data.status || 'New',
-    data.delivery_sheet_verified || 0,
-  );
+  const db = await connectDB();
+  const result = await db.collection(collectionName).insertOne(orderData);
+  return result
 }
 
-export function updateOrderById(id, data) {
-  const query = `
-    UPDATE orders
-    SET
-      party_name = ?,
-      address = ?,
-      phone = ?,
-      item = ?,
-      total_qty = ?,
-      amount_time = ?,
-      amount_type = ?,
-      amount = ?,
-      advance = ?,
-      discount = ?,
-      balance = ?,
-      balance_qty = ?,
-      is_owner_order = ?,
-      tracktor_only = ?,
-      status = ?,
-      notes = ?
-    WHERE id = ?
-  `;
-
-  const stat = db.prepare(query);
-
-  return stat.run(
-    data.party_name,
-    data.address || null,
-    data.phone || null,
-    data.item,
-    data.total_qty || 0,
-    data.amount_type == 'Cash' && Number(data.amount) ? new Date().toISOString() : '',
-    data.amount_type,
-    data.amount || 0,
-    data.advance || 0,
-    data.discount || 0,
-    data.balance || 0,
-    data.balance_qty || 0,
-    data.is_owner_order ? 1 : 0,
-    data.tracktor_only ? 1 : 0,
-    data.status || 'New',
-    data.notes || '',
-    id,
-  );
+export async function updateOrderById(id, data) {
+  const updateData = {
+    $set: {
+      party_name: data.party_name,
+      address: data.address || null,
+      phone: data.phone || null,
+      item: data.item,
+      total_qty: parseFloat(data.total_qty) || 0,
+      payment_at: data.amount_type === 'Cash' && parseFloat(data.amount)
+        ? new Date()
+        : null,
+      amount_type: data.amount_type,
+      amount: parseFloat(data.amount) || 0,
+      advance: parseFloat(data.advance) || 0,
+      discount: parseFloat(data.discount) || 0,
+      balance: parseFloat(data.balance) || 0,
+      balance_qty: parseFloat(data.balance_qty) || 0,
+      is_owner_order: Boolean(data.is_owner_order),
+      tracktor_only: Boolean(data.tracktor_only),
+      status: data.status || 'New',
+      notes: data.notes || '',
+      updated_at: new Date()
+    }
+  };
+  const db = await connectDB();
+  const result = await db.collection(collectionName).updateOne({ _id: new ObjectId(id) }, updateData);
+  return result
 }
 
-export function deleteOrderById(id) {
-  const query = `DELETE FROM orders WHERE id = ?`;
-  const stmt = db.prepare(query);
-  return stmt.run(id);
+export async function deleteOrderById(id) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName).deleteOne({ _id: new ObjectId(id) });
+  return result
 }
 
-export function deleteOrdersByStatus(statusArray) {
-  const placeholders = statusArray.map(() => '?').join(', ');
-  const query = `DELETE FROM ${tableName} WHERE status IN (${placeholders});`;
-  const stat = db.prepare(query);
-  return stat.run(...statusArray);
+export async function deleteOrdersByStatus(statusArray) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName).deleteMany({
+    status: { $in: statusArray }
+  });
+  return result
 }

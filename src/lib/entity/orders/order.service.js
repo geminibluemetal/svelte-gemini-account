@@ -1,4 +1,4 @@
-import { formatDateTime, getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
+import { getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
 import { fetchSinglePartyByName, updatePhoneByPartyName } from '../party/party.dal';
 import { fetchSettings, setSettings } from '../settings/settings.dal';
 import {
@@ -22,15 +22,15 @@ import { fetchCashByOrderId } from '../cash/cash.dal';
 const num = (val) => Number(val) || 0;
 
 export async function getAllOrders() {
-  return fetchAllOrders();
+  return await fetchAllOrders();
 }
 
 export async function getOrderByNumber(order_number) {
-  return fetchSingleOrderByOrderNumber(order_number);
+  return await fetchSingleOrderByOrderNumber(order_number);
 }
 
 export async function getAllAvailableOrders() {
-  return fetchOrdersByStatus(['New', 'Loading', 'Partial']);
+  return await fetchOrdersByStatus(['New', 'Loading', 'Partial']);
 }
 
 export async function createOrder(data) {
@@ -54,7 +54,7 @@ export async function createOrder(data) {
 
   // Check party phone number if not exist save it.
   if (data.party_name) {
-    const result = fetchSinglePartyByName(data.party_name);
+    const result = await fetchSinglePartyByName(data.party_name);
     if (!result.phone && data.phone) {
       updatePhoneByPartyName(result.name, data.phone);
     } else if (result.phone != data.phone) {
@@ -63,7 +63,7 @@ export async function createOrder(data) {
   }
 
   // Auto Increment Order Numbers and Reset to 1 after reach 999
-  const settings = fetchSettings();
+  const settings = await fetchSettings();
   let currentOrderNumber = settings.last_order_number + 1;
   currentOrderNumber = currentOrderNumber < 1000 ? currentOrderNumber : 1;
 
@@ -71,16 +71,15 @@ export async function createOrder(data) {
   let order = await getOrderByNumber(currentOrderNumber);
   if (order) return { ok: false, message: `Order Number ${currentOrderNumber} already exists` };
 
-  data.date = formatDateTime('YY-MM-DD');
   data.order_number = currentOrderNumber;
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
   data.balance_qty = Number(data.total_qty);
 
-  let result = insertOrder(data);
+  let result = await insertOrder(data);
 
-  if (result.changes) {
-    result = setSettings({ last_order_number: currentOrderNumber });
-    if (!result.changes) {
+  if (result.acknowledged) {
+    result = await setSettings({ last_order_number: currentOrderNumber });
+    if (!result.acknowledged) {
       return { message: 'Order Created. but Order Number increment faild', ok: false };
     }
   }
@@ -110,7 +109,7 @@ export async function updateOrder(data, editId) {
     return { message: 'Discount should be Number', ok: false };
 
   // Check advance amount changes when signed in
-  let order = fetchSingleOrderById(editId);
+  let order = await fetchSingleOrderById(editId);
   if (order.sign == 1) {
     if (order.advance != data.advance) {
       return { message: "Advance amount can't changed after Signed", ok: false };
@@ -122,7 +121,7 @@ export async function updateOrder(data, editId) {
 
   // Check party phone number if not exist save it.
   if (data.party_name) {
-    const result = fetchSinglePartyByName(data.party_name);
+    const result = await fetchSinglePartyByName(data.party_name);
     if (!result.phone && data.phone) {
       updatePhoneByPartyName(result.name, data.phone);
     } else if (result.phone != data.phone) {
@@ -132,23 +131,23 @@ export async function updateOrder(data, editId) {
 
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
   data.balance_qty = (Number(data.total_qty) || 0) - (Number(order.delivered_qty) || 0);
-  data.status = examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty);
+  data.status = await examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty);
 
-  let result = updateOrderById(editId, data);
+  let result = await updateOrderById(editId, data);
 
-  if (!result.changes) {
+  if (!result.acknowledged) {
     return { message: 'Error, Order Not Updated', ok: false };
   }
 
-  order = fetchSingleOrderById(editId);
+  order = await fetchSingleOrderById(editId);
   syncCashReport(order, true);
   return { message: 'Order Updated', ok: true };
 }
 
 export async function deleteOrder(id) {
-  const result = deleteOrderById(id);
+  const result = await deleteOrderById(id);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Order Deleted`, ok: true };
   } else {
     return { message: `Order Not Deleted`, ok: false };
@@ -156,7 +155,7 @@ export async function deleteOrder(id) {
 }
 
 export async function orderSinglePrint(data) {
-  const order = fetchSingleOrderById(data.id);
+  const order = await fetchSingleOrderById(data.id);
   await printOut((p) => {
     p.reset()
       .beepOn(1, 2)
@@ -186,7 +185,7 @@ export async function orderSinglePrint(data) {
 }
 
 export async function orderFullPrint(data) {
-  const order = fetchSingleOrderById(data.id);
+  const order = await fetchSingleOrderById(data.id);
   await printOut((p) => {
     p.reset()
       .beepOn(2, 2)
@@ -219,7 +218,7 @@ export async function orderFullPrint(data) {
 }
 
 export async function orderPhonePrint(data) {
-  const order = fetchSingleOrderById(data.id);
+  const order = await fetchSingleOrderById(data.id);
   await printOut((p) => {
     p.reset()
       .beepOn(1, 1)
@@ -247,9 +246,9 @@ export async function orderPhonePrint(data) {
 }
 
 export async function signOrderById(id, current) {
-  const result = updateSingleOrderColumn(id, 'sign', current == 1 ? 0 : 1);
-  if (result?.changes) {
-    const order = fetchSingleOrderById(id);
+  const result = await updateSingleOrderColumn(id, 'sign', current == 1 ? false : true);
+  if (result?.acknowledged) {
+    const order = await fetchSingleOrderById(id);
     syncCashReport(order, true);
   }
 }
@@ -264,8 +263,8 @@ export async function orderStatusToFinished(id) {
   updateSingleOrderColumn(id, 'status', 'Finished');
 }
 export async function orderStatusReset(id) {
-  const order = fetchSingleOrderById(id);
-  const status = examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty);
+  const order = await fetchSingleOrderById(id);
+  const status = await examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty);
   updateSingleOrderColumn(id, 'status', status);
 }
 
@@ -288,7 +287,7 @@ export async function createTokenFromOrder(id, data) {
   if (data.qty && isNaN(Number(data.qty)))
     return { message: 'Quantity must be a Number', ok: false };
 
-  const order = fetchSingleOrderById(id);
+  const order = await fetchSingleOrderById(id);
   const tokenData = {
     party_name: order.party_name,
     vehicle: data.vehicle,
@@ -297,7 +296,7 @@ export async function createTokenFromOrder(id, data) {
   };
   const result = await createToken(tokenData, false);
   if (result.lastInsertRowid) {
-    const token = fetchDeliveryById(result.lastInsertRowid);
+    const token = await fetchDeliveryById(result.lastInsertRowid);
     printToken({
       Token: token.serial,
       Party: token.party_name ? token.party_name : ' - ',
@@ -314,13 +313,13 @@ export async function createTokenFromOrder(id, data) {
 }
 
 export async function clearCompletedOrder() {
-  const result = deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished']);
-  if (result.changes) {
+  const result = await deleteOrdersByStatus(['Delivered', 'Cancelled', 'Finished']);
+  if (result.acknowledged) {
     return { message: 'Order Cleared', ok: true };
   }
 }
 
-function syncCashReport(order, isUpdate) {
+async function syncCashReport(order, isUpdate) {
   const advance = num(order.advance);
   const isCashType = order.amount_type == 'Cash';
   if (advance && isCashType) {
@@ -335,7 +334,7 @@ function syncCashReport(order, isUpdate) {
           ? `${order.address} Ad`
           : '',
     };
-    const cash = fetchCashByOrderId(data.order_id);
+    const cash = await fetchCashByOrderId(data.order_id);
     if (isUpdate && cash?.id) updateIncome(data, cash.id);
     else createIncome(data);
   } else {
