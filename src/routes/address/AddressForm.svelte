@@ -4,15 +4,9 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
 
-  const { open, onClose, item, allAddress } = $props();
-  let initialData = {
-    name: '',
-    delivery_025: '',
-    delivery_050_100: '',
-    delivery_max: '',
-  };
+  const { open, onClose, item } = $props();
 
-  let data = $state(initialData);
+  let data = $derived({ ...item });
 
   function handleClose() {
     onClose();
@@ -28,10 +22,6 @@
       }
     };
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -45,7 +35,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?.id} />
+      <input type="hidden" name="editId" value={item?._id} />
     {/if}
     <InputField name="name" value={data.name} placeholder="Address Name" autoComplete="off" />
     <InputField

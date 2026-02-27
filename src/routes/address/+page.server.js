@@ -6,12 +6,13 @@ import {
   updateAddress,
 } from '$lib/entity/address/address.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('ADDRESS.LIST');
   const address = await getAllAddress();
-  return { address };
+  return { address: serializeDoc(address) };
 }
 
 export const actions = {

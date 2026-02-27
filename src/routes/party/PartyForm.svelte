@@ -5,13 +5,7 @@
   import { showToast } from '$lib/stores/toast';
 
   const { open, onClose, item } = $props();
-  let initialData = {
-    name: '',
-    phone: '',
-    opening_balance: 0,
-  };
-
-  let data = $state(initialData);
+  let data = $derived({ ...item });
 
   function handleClose() {
     onClose();
@@ -27,10 +21,6 @@
       }
     };
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -44,7 +34,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?.id} />
+      <input type="hidden" name="editId" value={item?._id} />
     {/if}
     <InputField name="name" value={data.name} placeholder="Party Name" autoComplete="off" />
     <InputField name="phone" value={data.phone} type="number" placeholder="Phone" />

@@ -8,19 +8,14 @@ import {
 } from './address.dal';
 
 export async function getAllAddress() {
-  return fetchAllAddress();
+  return await fetchAllAddress();
 }
 
 export async function createAddress(data) {
-  if (!data.name) {
-    return { message: 'Name is Required', ok: false };
-  }
+  if (!data.name) return { message: 'Name is Required', ok: false };
+  if (data.name.includes('+') && !data.name.includes(' + ')) return { message: 'Add space between +', ok: false };
 
-  if (data.name.includes('+') && !data.name.includes(' + ')) {
-    return { message: 'Add space between +', ok: false };
-  }
-
-  const addressExist = fetchSingleAddressByName(data.name);
+  const addressExist = await fetchSingleAddressByName(data.name);
 
   if (addressExist) {
     return { message: `'${data.name}' is already exists`, ok: false };
@@ -30,9 +25,9 @@ export async function createAddress(data) {
   data.delivery_050_100 = parseFloat(data.delivery_050_100);
   data.delivery_max = parseFloat(data.delivery_max);
 
-  const result = insertAddress(data);
+  const result = await insertAddress(data);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Address created`, ok: true };
   }
 }
@@ -46,7 +41,7 @@ export async function updateAddress(data, editId) {
     return { message: 'Add space between +', ok: false };
   }
 
-  const addressExist = checkAddressNameExists(data.name, editId);
+  const addressExist = await checkAddressNameExists(data.name, editId);
 
   if (addressExist) {
     return { message: `'${data.name}' is already exists`, ok: false };
@@ -56,17 +51,17 @@ export async function updateAddress(data, editId) {
   data.delivery_050_100 = parseFloat(data.delivery_050_100);
   data.delivery_max = parseFloat(data.delivery_max);
 
-  const result = updateAddressById(data, editId);
+  const result = await updateAddressById(data, editId);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Address updated`, ok: true };
   }
 }
 
 export async function deleteAddress(id) {
-  const result = deleteAddressById(id);
+  const result = await deleteAddressById(id);
 
-  if (result?.changes) {
+  if (result?.acknowledged) {
     return { message: `Address Deleted`, ok: true };
   } else {
     return { message: `Address Not Deleted`, ok: false };

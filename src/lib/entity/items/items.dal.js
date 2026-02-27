@@ -20,11 +20,11 @@ export async function insertItem(data) {
 
   const itemDoc = {
     name: data.name ?? null,
-    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? parseFloat(data.price_025) : null,
-    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? parseFloat(data.price_050) : null,
-    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? parseFloat(data.price_100) : null,
-    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? parseFloat(data.price_150) : null,
-    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? parseFloat(data.price_200) : null,
+    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? Number(data.price_025) : null,
+    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? Number(data.price_050) : null,
+    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? Number(data.price_100) : null,
+    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? Number(data.price_150) : null,
+    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? Number(data.price_200) : null,
     created_at: new Date(),
   };
 
@@ -37,11 +37,11 @@ export async function updateItemById(data, id) {
 
   const itemDoc = {
     name: data.name ?? null,
-    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? parseFloat(data.price_025) : null,
-    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? parseFloat(data.price_050) : null,
-    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? parseFloat(data.price_100) : null,
-    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? parseFloat(data.price_150) : null,
-    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? parseFloat(data.price_200) : null,
+    price_025: data.price_025 !== undefined && !isNaN(Number(data.price_025)) ? Number(data.price_025) : null,
+    price_050: data.price_050 !== undefined && !isNaN(Number(data.price_050)) ? Number(data.price_050) : null,
+    price_100: data.price_100 !== undefined && !isNaN(Number(data.price_100)) ? Number(data.price_100) : null,
+    price_150: data.price_150 !== undefined && !isNaN(Number(data.price_150)) ? Number(data.price_150) : null,
+    price_200: data.price_200 !== undefined && !isNaN(Number(data.price_200)) ? Number(data.price_200) : null,
     created_at: new Date(),
   };
 

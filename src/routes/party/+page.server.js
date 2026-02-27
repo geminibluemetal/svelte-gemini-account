@@ -6,12 +6,13 @@ import {
   updateParty,
 } from '$lib/entity/party/party.service.js';
 import { formDataToObject } from '$lib/utils/form.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('PARTY.LIST');
   const party = await getAllParty();
-  return { party };
+  return { party: serializeDoc(party) };
 }
 
 export const actions = {
