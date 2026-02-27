@@ -4,18 +4,10 @@
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
-  import { formDataToObject } from '$lib/utils/form';
 
   const { open, onClose, item, options } = $props();
-  let initialData = {
-    party_name: '',
-    token_item: '',
-    token_quantity: '',
-    vehicle: '',
-    is_cancelled: 0,
-  };
 
-  let data = $state(initialData);
+  let data = $derived({ ...item });
 
   const partyList = $derived(options.party.map((p) => p.name));
   const vehicleList = $derived(options.vehicle.map((v) => v.short_number));
@@ -39,10 +31,6 @@
       }
     };
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -56,7 +44,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?.id} />
+      <input type="hidden" name="editId" value={item?._id} />
     {/if}
     <InputField
       name="party_name"

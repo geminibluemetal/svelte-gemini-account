@@ -10,8 +10,8 @@ import {
   updateTokenById,
 } from '../delivery/delivery.dal';
 
-export async function getAllToken(date = formatDateTime('YY-MM-DD')) {
-  return fetchAllDeliveryByDate(date);
+export async function getAllToken(date = new Date()) {
+  return await fetchAllDeliveryByDate(date);
 }
 
 export async function createToken(data, takePrint = true) {
@@ -21,13 +21,15 @@ export async function createToken(data, takePrint = true) {
   if (data.token_quantity && isNaN(Number(data.token_quantity)))
     return { message: 'Quantity should be a number', ok: false };
 
-  let serial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
+  let serial = await fetchLastSerialByDate();
   serial = Number(serial) + 1;
 
   data.serial = serial;
-  data.token_time = getFormattedTime();
-  const result = insertToken(data);
-  if (result?.changes) {
+  data.token_quantity = Number(data.token_quantity);
+  console.log(data);
+  const result = await insertToken(data);
+
+  if (result?.acknowledged) {
     if (takePrint) {
       printToken({
         Token: serial,
@@ -76,10 +78,10 @@ export async function updateToken(data, editId, takePrint = true) {
   if (data.token_quantity && isNaN(Number(data.token_quantity)))
     return { message: 'Quantity should be a number', ok: false };
 
-  const result = updateTokenById(data, editId);
-  if (result?.changes) {
+  const result = await updateTokenById(data, editId);
+  if (result?.acknowledged) {
     if (takePrint) {
-      const token = fetchDeliveryById(editId);
+      const token = await fetchDeliveryById(editId);
       if (!token.is_cancelled)
         printToken({
           Token: token.serial,
@@ -108,7 +110,7 @@ export async function deleteToken(id) {
     return { message: "Can't delete old token", ok: false };
 
   const result = deleteTokenById(id);
-  if (result.changes) {
+  if (result.acknowledged) {
     return { message: 'Last Token Deleted', ok: true };
   }
 }

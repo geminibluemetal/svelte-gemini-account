@@ -11,6 +11,7 @@ import {
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
 import { formatDateTime } from '$lib/utils/dateTime';
 import { formDataToObject } from '$lib/utils/form.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends, url }) {
@@ -27,7 +28,12 @@ export async function load({ depends, url }) {
   const party = await getAllParty();
   const vehicle = await getAllVehicle();
   const item = await getAllItems();
-  return { token, party, vehicle, item };
+  return {
+    token: serializeDoc(token),
+    party: serializeDoc(party),
+    vehicle: serializeDoc(vehicle),
+    item: serializeDoc(item),
+  };
 }
 
 export const actions = {

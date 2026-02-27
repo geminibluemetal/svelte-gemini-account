@@ -1,384 +1,407 @@
 import { calculateAmount } from '$lib/core/helper';
-import db from '$lib/core/server/db';
-import { parseTime } from '$lib/utils/dateTimeParser';
+import { connectDB } from '$lib/core/server/mongodb';
+import { ObjectId } from 'mongodb';
 import { fetchSingleAddressByName } from '../address/address.dal';
 import { fetchSingleItemByName } from '../items/items.dal';
-import { fetchSingleOrderByOrderNumber } from '../orders/order.dal';
 import { examineStatusByQuantity } from '../orders/order.service';
-import { fetchSinglePartyByName } from '../party/party.dal';
 
-const tableName = 'delivery'; // Token also uses delivery table
+const collectionName = 'delivery'; // Token also uses delivery table
 
-export function fetchAllDeliveryByDate(date) {
-  const query = `SELECT * FROM ${tableName} WHERE DATE(created_at) = '${date}';`;
-  const stat = db.prepare(query);
-  db.pragma('wal_checkpoint(TRUNCATE)');
-  return stat.all();
+export async function fetchAllDeliveryByDate(date) {
+  const selectedDate = new Date(date);
+  // Start of day (00:00:00.000)
+  const startingDay = new Date(selectedDate);
+  startingDay.setHours(0, 0, 0, 0);
+  // End of day (23:59:59.999)
+  const endingDay = new Date(selectedDate);
+  endingDay.setHours(23, 59, 59, 999);
+
+  const db = await connectDB();
+  const result = await db
+    .collection(collectionName)
+    .find({ created_at: { $gte: startingDay, $lte: endingDay } })
+    .toArray();
+  return result;
 }
 
-export function fetchDeliveryById(id) {
-  const query = `SELECT * FROM ${tableName} WHERE id = '${id}';`;
-  const stat = db.prepare(query);
-  return stat.get();
+export async function fetchDeliveryById(id) {
+  const db = await connectDB();
+  const result = await db.collection(collectionName).findOne({ _id: new ObjectId(id) });
+  return result;
 }
 
-export function fetchLastSerialByDate(date) {
-  const query = `
-    SELECT MAX(serial) as last_serial
-    FROM delivery
-    WHERE DATE(created_at) = ?;
-  `;
-  const stat = db.prepare(query);
-  const result = stat.get(date); // Use get() for single result
-  return result ? result.last_serial : 0;
+export async function fetchLastSerialByDate(date = new Date()) {
+  const selectedDate = new Date(date);
+  // Start of day
+  const startingDay = new Date(selectedDate);
+  startingDay.setHours(0, 0, 0, 0);
+  // End of day
+  const endingDay = new Date(selectedDate);
+  endingDay.setHours(23, 59, 59, 999);
+
+  const db = await connectDB();
+  const result = await db
+    .collection(collectionName)
+    .find({ created_at: { $gte: startingDay, $lte: endingDay } })
+    .sort({ serial: -1 }) // highest serial first
+    .limit(1)
+    .toArray();
+  return result.length > 0 ? result[0].serial : 0;
 }
 
-export function insertToken(data) {
-  // Assuming your table has DEFAULT values for some columns
-  const query = `
-    INSERT INTO delivery (
-      party_name,
-      vehicle,
-      token_item,
-      token_quantity,
-      is_cancelled,
-      serial,
-      token_time
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  const params = [
-    data.party_name || null,
-    data.vehicle || '',
-    data.token_item || '',
-    data.token_quantity || 0,
-    data.is_cancelled ? 1 : 0,
-    data.serial || 0,
-    data.token_time || '',
-  ];
-
-  const stmt = db.prepare(query);
-  return stmt.run(params);
+export async function insertToken(data) {
+  const db = await connectDB();
+  const document = {
+    party_name: data.party_name ?? null,
+    vehicle: data.vehicle ?? '',
+    token_item: data.token_item ?? '',
+    token_quantity: data.token_quantity ? Number(data.token_quantity) : 0,
+    is_cancelled: data.is_cancelled ?? false,
+    serial: data.serial ?? 0,
+    token_time: data.token_time ?? null,
+    created_at: new Date(), // recommended
+  };
+  const result = await db.collection(collectionName).insertOne(document);
+  return result;
 }
 
-export function updateTokenById(data, id) {
-  // Define all possible fields based on table schema
-  const query = `
-    UPDATE delivery SET
-      party_name = COALESCE(?, party_name),
-      token_item = COALESCE(?, token_item),
-      token_quantity = COALESCE(?, token_quantity),
-      vehicle = COALESCE(?, vehicle),
-      is_cancelled = COALESCE(?, is_cancelled)
-    WHERE id = ?
-  `;
-
-  const params = [
-    data.party_name !== undefined ? data.party_name : null,
-    data.token_item !== undefined ? data.token_item : null,
-    data.token_quantity !== undefined ? data.token_quantity : null,
-    data.vehicle !== undefined ? data.vehicle : null,
-    data.is_cancelled ? 1 : 0,
-    id,
-  ];
-
-  const stmt = db.prepare(query);
-  return stmt.run(params);
+export async function updateTokenById(data, id) {
+  const db = await connectDB();
+  const document = {
+    party_name: data.party_name ?? null,
+    vehicle: data.vehicle ?? '',
+    token_item: data.token_item ?? '',
+    token_quantity: data.token_quantity ? Number(data.token_quantity) : 0,
+    is_cancelled: data.is_cancelled ? Boolean(data.is_cancelled) : false,
+    token_time: data.token_time ?? null,
+  };
+  const result = await db
+    .collection(collectionName)
+    .updateOne({ _id: new ObjectId(id) }, { $set: document });
+  return result;
 }
 
-const syncOrderFromDelivery = (oldDelivery, newDelivery) => {
+export async function syncOrderFromDelivery(oldDelivery, newDelivery) {
+  const db = await connectDB();
+  const ordersCollection = db.collection('orders');
+
   const num = (val) => Number(val) || 0;
-  const query = `
-    UPDATE orders
-    SET
-      delivered_qty = ?,
-      balance_qty = ?,
-      status = ?,
-      delivery_sheet_verified = ?
-    WHERE order_number = ?
-  `;
-  const orderUpdates = db.prepare(query);
-  const updates = {};
 
-  // Updates Old Order
-  const oldOrder = fetchSingleOrderByOrderNumber(oldDelivery.order_number);
-  if (oldOrder) {
-    updates.delivered_qty = num(oldOrder.delivered_qty) - num(oldDelivery.delivery_quantity);
-    updates.balance_qty = num(oldOrder.total_qty) - num(updates.delivered_qty);
-    updates.status = examineStatusByQuantity(
-      num(oldOrder.total_qty),
-      num(updates.delivered_qty),
-      num(updates.balance_qty),
-    );
-    updates.delivery_sheet_verified = oldDelivery.sign
-      ? num(oldOrder.delivery_sheet_verified) - 1
-      : oldOrder.delivery_sheet_verified;
-    updates.order_number = oldOrder.order_number;
+  // 🔹 UPDATE OLD ORDER (subtract)
+  if (oldDelivery?.order_number) {
+    const oldOrder = await ordersCollection.findOne({
+      order_number: oldDelivery.order_number,
+    });
 
-    orderUpdates.run(
-      updates.delivered_qty || 0,
-      updates.balance_qty || 0,
-      updates.status || 'New',
-      updates.delivery_sheet_verified || 0,
-      updates.order_number,
-    );
+    if (oldOrder) {
+      const delivered_qty = num(oldOrder.delivered_qty) - num(oldDelivery.delivery_quantity);
+      const balance_qty = num(oldOrder.total_qty) - delivered_qty;
+      const status = examineStatusByQuantity(num(oldOrder.total_qty), delivered_qty, balance_qty);
+
+      const delivery_sheet_verified = oldDelivery.sign
+        ? num(oldOrder.delivery_sheet_verified) - 1
+        : num(oldOrder.delivery_sheet_verified);
+
+      await ordersCollection.updateOne(
+        { order_number: oldOrder.order_number },
+        {
+          $set: {
+            delivered_qty,
+            balance_qty,
+            status,
+            delivery_sheet_verified,
+          },
+        },
+      );
+    }
   }
 
-  // Updates New Order
-  const newOrder = fetchSingleOrderByOrderNumber(newDelivery.order_number);
-  if (newOrder) {
-    updates.delivered_qty = num(newOrder.delivered_qty) + num(newDelivery.delivery_quantity);
-    updates.balance_qty = num(newOrder.total_qty) - num(updates.delivered_qty);
-    updates.status = examineStatusByQuantity(
-      num(newOrder.total_qty),
-      num(updates.delivered_qty),
-      num(updates.balance_qty),
-    );
-    updates.delivery_sheet_verified = newDelivery.sign
-      ? num(newOrder.delivery_sheet_verified) + 1
-      : newOrder.delivery_sheet_verified;
-    updates.order_number = newOrder.order_number;
+  // 🔹 UPDATE NEW ORDER (add)
+  if (newDelivery?.order_number) {
+    const newOrder = await ordersCollection.findOne({
+      order_number: newDelivery.order_number,
+    });
 
-    orderUpdates.run(
-      updates.delivered_qty || 0,
-      updates.balance_qty || 0,
-      updates.status || 'New',
-      updates.delivery_sheet_verified || 0,
-      updates.order_number,
-    );
+    if (newOrder) {
+      const delivered_qty = num(newOrder.delivered_qty) + num(newDelivery.delivery_quantity);
+
+      const balance_qty = num(newOrder.total_qty) - delivered_qty;
+
+      const status = examineStatusByQuantity(num(newOrder.total_qty), delivered_qty, balance_qty);
+
+      const delivery_sheet_verified = newDelivery.sign
+        ? num(newOrder.delivery_sheet_verified) + 1
+        : num(newOrder.delivery_sheet_verified);
+
+      await ordersCollection.updateOne(
+        { order_number: newOrder.order_number },
+        {
+          $set: {
+            delivered_qty,
+            balance_qty,
+            status,
+            delivery_sheet_verified,
+          },
+        },
+      );
+    }
   }
-};
+}
 
-const syncLedgerFromDelivery = (delivery) => {
+export async function syncLedgerFromDelivery(delivery) {
+  const db = await connectDB();
+  const statements = db.collection('party_statements');
+  const parties = db.collection('parties');
+
   const num = (val) => Number(val) || 0;
-  const isAc = delivery.amount_type_1 == 'AC' || delivery.amount_type_2 == 'AC';
+
+  const isAc = delivery.amount_type_1 === 'AC' || delivery.amount_type_2 === 'AC';
   const party_name = delivery.party_name;
   const isCancelled = delivery.is_cancelled;
+
   let amount =
     (delivery.amount_type_1 === 'AC' ? num(delivery.amount_1) : 0) +
     (delivery.amount_type_2 === 'AC' ? num(delivery.amount_2) : 0);
 
-  const address = fetchSingleAddressByName(delivery.address);
-  const item = fetchSingleItemByName(delivery.delivery_item);
-
+  // 🔹 Calculate fallback amount
   if (!amount) {
+    const address = await fetchSingleAddressByName(delivery.address);
+    const item = await fetchSingleItemByName(delivery.delivery_item);
     const amountResult = calculateAmount(address, item, delivery.delivery_quantity);
-    if (amountResult.success) {
-      amount = amountResult.data;
-    } else {
+    if (!amountResult.success) {
       return amountResult;
     }
+    amount = amountResult.data;
   }
 
-  const statementDeleteQuery = `DELETE FROM party_statements WHERE delivery_id = ?`;
-  const statementDelete = db.prepare(statementDeleteQuery);
+  // 🔹 DELETE existing statement for this delivery
+  await statements.deleteMany({
+    delivery_id: new ObjectId(delivery._id),
+  });
 
-  // Delete Existing Statement
-  statementDelete.run(delivery.id);
-
+  // 🔹 Stop if cancelled / not AC / no party
   if (isCancelled || !isAc || !party_name) {
     return { success: true };
   }
 
-  // Create New Statement
-  const party = fetchSinglePartyByName(party_name);
-  const statementCreateQuery = `
-  INSERT INTO party_statements
-    (
-      party_id,
-      delivery_id,
-      amount_type,
-      entry_type,
-      amount,
-      item,
-      qty,
-      vehicle,
-      address,
-      time,
-      sign,
-      created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-  const statementCreate = db.prepare(statementCreateQuery);
-  const data = [
-    party.id,
-    delivery.id,
-    null,
-    'DEBIT',
-    amount,
-    delivery.delivery_item,
-    delivery.delivery_quantity,
-    delivery.vehicle,
-    delivery.address,
-    delivery.delivery_time,
-    delivery.sign,
-    parseTime(delivery.delivery_time).toISOString().replace('T', ' ').slice(0, 19),
-  ];
-  const result = statementCreate.run(data);
-  if (result?.changes) {
+  // 🔹 Get Party
+  const party = await parties.findOne({ name: party_name });
+
+  if (!party) {
+    return { success: false, message: 'Party not found' };
+  }
+
+  // 🔹 CREATE new statement
+  const document = {
+    party_id: party._id,
+    delivery_id: new ObjectId(delivery._id),
+    amount_type: null,
+    entry_type: 'DEBIT',
+    amount: amount,
+    item: delivery.delivery_item ?? null,
+    qty: num(delivery.delivery_quantity),
+    vehicle: delivery.vehicle ?? null,
+    address: delivery.address ?? null,
+    created_at: new Date(delivery.delivered_aT),
+    sign: delivery.sign ? 1 : 0,
+  };
+
+  const result = await statements.insertOne(document);
+  if (result.insertedId) {
     return { success: true };
   }
-};
+  return { success: false };
+}
 
-export function updateDeliveryById(data, id) {
-  const oldDelivery = fetchDeliveryById(id);
+export async function updateDeliveryById(data, id) {
+  const db = await connectDB();
+  const delivery = db.collection('delivery');
 
-  const query = `
-    UPDATE delivery SET
-      order_number = COALESCE(?, order_number),
-      party_name = COALESCE(?, party_name),
-      address = COALESCE(?, address),
-      delivery_time = CASE
-        WHEN delivery_time IS NULL OR delivery_time = ''
-        THEN ?
-        ELSE delivery_time
-      END,
-      delivery_item = COALESCE(?, delivery_item),
-      delivery_quantity = COALESCE(?, delivery_quantity),
-      amount_type_1 = COALESCE(?, amount_type_1),
-      amount_1 = COALESCE(?, amount_1),
-      is_cancelled = COALESCE(?, is_cancelled)
-    WHERE id = ?
-  `;
+  // 🔹 Get old delivery
+  const oldDelivery = await delivery.findOne({
+    _id: new ObjectId(id),
+  });
 
-  const params = [
-    data.order_number !== undefined ? data.order_number : null,
-    data.party_name !== undefined ? data.party_name : null,
-    data.address !== undefined ? data.address : null,
-    data.delivery_time !== undefined ? data.delivery_time : null,
-    data.delivery_item !== undefined ? data.delivery_item : null,
-    data.delivery_quantity !== undefined ? data.delivery_quantity : null,
-    data.amount_type_1 ? data.amount_type_1 : oldDelivery.amount_type_1 == 'AC' ? '' : null, // TODO
-    data.amount_type_1 == 'AC' ? 0 : null, // TODO
-    data.is_cancelled ? 1 : 0,
-    id,
-  ];
-  const stmt = db.prepare(query);
-  const result = stmt.run(params);
+  if (!oldDelivery) {
+    return { message: 'Delivery Not Found', ok: false };
+  }
 
-  if (!result.changes) {
+  const updateFields = {
+    order_number: data.order_number ?? null,
+    party_name: data.party_name ?? null,
+    address: data.address ?? null,
+    delivered_aT: data.delivered_aT
+      ? new Date(data.delivered_aT)
+      : (oldDelivery.delivered_aT ?? null),
+    delivery_item: data.delivery_item ?? null,
+    delivery_quantity:
+      data.delivery_quantity !== undefined ? Number(data.delivery_quantity) || 0 : 0,
+    amount_type_1: data.amount_type_1 ?? null,
+    amount_1: data.amount_1 !== undefined ? Number(data.amount_1) || 0 : 0,
+    is_cancelled: data.is_cancelled !== undefined ? Boolean(data.is_cancelled) : false,
+  };
+
+  // 🔹 Update Delivery (overwrite all fields)
+  const result = await delivery.updateOne({ _id: new ObjectId(id) }, { $set: updateFields });
+
+  if (!result.modifiedCount) {
     return { message: 'Delivery Not Updated', ok: false };
   }
 
-  const newDelivery = fetchDeliveryById(id);
+  // 🔹 Get updated delivery
+  const newDelivery = await delivery.findOne({
+    _id: new ObjectId(id),
+  });
 
-  // Additional Things
-  // 1) Update Orders
-  syncOrderFromDelivery(oldDelivery, newDelivery);
-  // 2) Update Ledger
-  const syncResult = syncLedgerFromDelivery(newDelivery);
+  // 🔹 Sync Related Systems
+  await syncOrderFromDelivery(oldDelivery, newDelivery);
+  const syncResult = await syncLedgerFromDelivery(newDelivery);
+
   return syncResult;
 }
 
-export function updateDeliveryAmountById(data, id) {
-  const query = `
-    UPDATE delivery SET
-      amount_time = COALESCE(?, amount_time),
-      amount_type_1 = COALESCE(?, amount_type_1),
-      amount_1 = COALESCE(?, amount_1),
-      amount_type_2 = COALESCE(?, amount_type_2),
-      amount_2 = COALESCE(?, amount_2)
-    WHERE id = ?
-  `;
-  const amount_time =
-    data.amount_1 || data.amount_type_1 || data.amount_2 || data.amount_type_2
-      ? new Date().toISOString()
-      : '';
-  const params = [
-    amount_time,
-    data.amount_type_1 !== undefined ? data.amount_type_1 : null,
-    data.amount_1 !== undefined ? data.amount_1 : null,
-    data.amount_type_2 !== undefined ? data.amount_type_2 : null,
-    data.amount_2 !== undefined ? data.amount_2 : null,
-    id,
-  ];
+export async function updateDeliveryAmountById(data, id) {
+  const db = await connectDB();
+  const delivery = db.collection('delivery');
 
-  const stmt = db.prepare(query);
-  const result = stmt.run(params);
-  if (!result?.changes) {
+  const hasAmount = data.amount_1 || data.amount_type_1 || data.amount_2 || data.amount_type_2;
+
+  const updateFields = {
+    amount_time: hasAmount ? new Date() : null,
+    amount_type_1: data.amount_type_1 ?? null,
+    amount_1: data.amount_1 !== undefined ? Number(data.amount_1) || 0 : 0,
+    amount_type_2: data.amount_type_2 ?? null,
+    amount_2: data.amount_2 !== undefined ? Number(data.amount_2) || 0 : 0,
+  };
+
+  const result = await delivery.updateOne({ _id: new ObjectId(id) }, { $set: updateFields });
+
+  if (!result.modifiedCount) {
     return { message: 'Delivery Amount not Updated', ok: false };
   }
 
-  const delivery = fetchDeliveryById(id);
-  const syncResult = syncLedgerFromDelivery(delivery);
-  return syncResult;
-}
-
-export function signDelivery(id, newValue) {
-  // Define the transaction logic
-  const performUpdate = db.transaction((targetId, value) => {
-    // 1. Get the order number from the delivery table
-    const row = db.prepare('SELECT order_number FROM delivery WHERE id = ?').get(targetId);
-
-    if (!row) {
-      throw new Error(`Delivery record with ID ${targetId} not found.`);
-    }
-
-    // 2. Update the counter in the orders table
-    // adjustment is 1 if newValue is truthy, -1 if falsy
-    const adjustment = value ? 1 : -1;
-    db.prepare(
-      `
-      UPDATE orders
-      SET delivery_sheet_verified = delivery_sheet_verified + ?
-      WHERE order_number = ?
-    `,
-    ).run(adjustment, row.order_number);
-
-    db.prepare(
-      `
-      UPDATE party_statements
-      SET sign = ?
-      WHERE delivery_id = ?
-    `,
-    ).run(value, targetId);
-
-    // 3. Update the sign column in the delivery table
-    // (Assuming tableName is 'delivery' based on your context)
-    return db.prepare(`UPDATE delivery SET sign = ? WHERE id = ?`).run(value, targetId);
+  const newDelivery = await delivery.findOne({
+    _id: new ObjectId(id),
   });
 
-  // Execute the transaction
-  return performUpdate(id, newValue);
+  return await syncLedgerFromDelivery(newDelivery);
 }
 
-export function markDeliveryById(id, value) {
-  db.prepare(`UPDATE delivery SET has_mark = ? WHERE id = ?`).run(value, id);
-}
+export async function signDelivery(id, newValue) {
+  const db = await connectDB();
+  const session = db.client.startSession();
 
-export function deleteTokenById(id) {
-  const query = `DELETE FROM delivery WHERE id = ?`;
-  const stmt = db.prepare(query);
-  return stmt.run(id);
-}
+  try {
+    await session.withTransaction(async () => {
+      const delivery = db.collection('delivery');
+      const orders = db.collection('orders');
+      const statements = db.collection('party_statements');
 
-export function getAllDeliveryCash(date) {
-  const query = `
-  SELECT
-      id,
-      'DS-' || serial AS serial,
-      amount_time AS time,
-      TRIM(
-          COALESCE(NULLIF(party_name, ''), '') ||
-          CASE WHEN NULLIF(party_name, '') IS NOT NULL AND NULLIF(address, '') IS NOT NULL THEN ', ' ELSE '' END ||
-          COALESCE(NULLIF(address, ''), '')
-      ) AS description,
-      (
-        CASE WHEN amount_type_1 = 'CP' THEN amount_1 ELSE 0 END +
-        CASE WHEN amount_type_2 = 'CP' THEN amount_2 ELSE 0 END
-      ) AS amount,
-      sign,
-      created_at,
-      'DELIVERY' AS source
-  FROM delivery
-  WHERE
-      DATE(amount_time) = ?
-      AND (
-          (amount_type_1 = 'CP' AND amount_1 != 0)
-          OR
-          (amount_type_2 = 'CP' AND amount_2 != 0)
+      const currnetDelivery = await delivery.findOne({ _id: new ObjectId(id) }, { session });
+
+      if (!currnetDelivery) {
+        throw new Error('Delivery not found');
+      }
+
+      const adjustment = newValue ? 1 : -1;
+
+      // Update order counter
+      await orders.updateOne(
+        { order_number: currnetDelivery.order_number },
+        { $inc: { delivery_sheet_verified: adjustment } },
+        { session },
       );
-  `;
-  const stmt = db.prepare(query);
-  return stmt.all(date);
+
+      // Update statement sign
+      await statements.updateMany(
+        { delivery_id: currnetDelivery._id },
+        { $set: { sign: newValue ? 1 : 0 } },
+        { session },
+      );
+
+      // Update currnetDelivery sign
+      await currnetDelivery.updateOne(
+        { _id: currnetDelivery._id },
+        { $set: { sign: newValue ? 1 : 0 } },
+        { session },
+      );
+    });
+
+    return { ok: true };
+  } finally {
+    await session.endSession();
+  }
+}
+
+export async function markDeliveryById(id, value) {
+  const db = await connectDB();
+  return await db
+    .collection('delivery')
+    .updateOne({ _id: new ObjectId(id) }, { $set: { has_mark: Boolean(value) } });
+}
+
+export async function deleteTokenById(id) {
+  const db = await connectDB();
+  const delivery = db.collection('delivery');
+  const deliveryId = new ObjectId(id);
+  return await delivery.deleteOne({ _id: deliveryId });
+}
+
+export async function getAllDeliveryCash(date) {
+  const db = await connectDB();
+  const delivery = db.collection('delivery');
+  const selectedDate = new Date(date);
+  const start = new Date(selectedDate);
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(selectedDate);
+  end.setHours(23, 59, 59, 999);
+
+  return await delivery
+    .aggregate([
+      {
+        $match: {
+          amount_time: { $gte: start, $lte: end },
+          $or: [
+            { amount_type_1: 'CP', amount_1: { $ne: 0 } },
+            { amount_type_2: 'CP', amount_2: { $ne: 0 } },
+          ],
+        },
+      },
+      {
+        $addFields: {
+          serial: { $concat: ['DS-', { $toString: '$serial' }] },
+          description: {
+            $trim: {
+              input: {
+                $concat: [{ $ifNull: ['$party_name', ''] }, ', ', { $ifNull: ['$address', ''] }],
+              },
+            },
+          },
+          amount: {
+            $add: [
+              {
+                $cond: [{ $eq: ['$amount_type_1', 'CP'] }, '$amount_1', 0],
+              },
+              {
+                $cond: [{ $eq: ['$amount_type_2', 'CP'] }, '$amount_2', 0],
+              },
+            ],
+          },
+          source: 'DELIVERY',
+        },
+      },
+      {
+        $project: {
+          id: '$_id',
+          serial: 1,
+          time: '$amount_time',
+          description: 1,
+          amount: 1,
+          sign: 1,
+          created_at: 1,
+          source: 1,
+        },
+      },
+    ])
+    .toArray();
 }

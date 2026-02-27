@@ -1,63 +1,6 @@
 // seed/items.js
 export const collectionName = 'items';
 
-// Define indexes for better query performance
-export const indexes = [
-  { spec: { name: 1 }, options: { unique: true } }, // Unique index on item name
-  { spec: { price_025: 1 } }, // Index for filtering by 0-25 price
-  { spec: { price_050: 1 } }, // Index for filtering by 25-50 price
-  { spec: { price_100: 1 } }, // Index for filtering by 50-100 price
-  { spec: { price_150: 1 } }, // Index for filtering by 100-150 price
-  { spec: { price_200: 1 } }, // Index for filtering by 150-200 price
-];
-
-// Optional: Define MongoDB schema validation
-export const validationRules = {
-  validator: {
-    $jsonSchema: {
-      bsonType: 'object',
-      required: ['name'],
-      properties: {
-        name: {
-          bsonType: 'string',
-          description: 'must be a string and is required',
-        },
-        price_025: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          description: 'must be a positive number or null',
-        },
-        price_050: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          description: 'must be a positive number or null',
-        },
-        price_100: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          description: 'must be a positive number or null',
-        },
-        price_150: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          description: 'must be a positive number or null',
-        },
-        price_200: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          description: 'must be a positive number or null',
-        },
-        created_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-      },
-    },
-  },
-  level: 'strict',
-  action: 'error',
-};
-
 // Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   {

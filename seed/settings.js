@@ -1,39 +1,6 @@
 // seed/settings.js
 export const collectionName = 'settings';
 
-// Define indexes for better query performance
-export const indexes = [
-  // Since this is a single-document collection, we don't need many indexes
-  // But we'll add an index on _id which is automatic
-];
-
-// Optional: Define MongoDB schema validation
-export const validationRules = {
-  validator: {
-    $jsonSchema: {
-      bsonType: 'object',
-      required: ['last_order_number'],
-      properties: {
-        last_order_number: {
-          bsonType: 'int',
-          minimum: 0,
-          description: 'must be a non-negative integer and is required',
-        },
-        created_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-        updated_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-      },
-    },
-  },
-  level: 'strict',
-  action: 'error',
-};
-
 // Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   {

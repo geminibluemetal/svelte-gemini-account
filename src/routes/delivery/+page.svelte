@@ -16,13 +16,12 @@
   import { page } from '$app/stores';
   import { CheckCheck, SearchXIcon, Trash } from 'lucide-svelte';
   import OldBalanceForm from './OldBalanceForm.svelte';
-  import InputField from '$lib/components/InputField.svelte';
 
   const { data } = $props();
   let view = $state('All');
   const headers = [
     { name: 'SN', key: 'serial', align: 'center', width: '38', color: serialColor },
-    { name: 'T Time', key: 'token_time', align: 'center', width: '80' },
+    { name: 'T Time', key: 'created_at', display: 'time', align: 'center', width: '80' },
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
     { name: 'D Time', key: 'delivery_time', align: 'center', width: '80' },
     { name: 'ON', key: 'order_number', align: 'center', width: '38', color: orderColor },

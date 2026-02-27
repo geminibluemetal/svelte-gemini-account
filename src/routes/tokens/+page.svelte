@@ -6,7 +6,6 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
-  import Badge from '$lib/components/Badge.svelte';
   import Button from '$lib/components/Button.svelte';
   import DateNavigator from '$lib/components/DateNavigator.svelte';
   import { commonDate } from '$lib/stores/common';
@@ -17,7 +16,7 @@
   const { data } = $props();
   const headers = [
     { name: 'Serial', align: 'center', key: 'serial' },
-    { name: 'Time', align: 'center', key: 'token_time', width: '85' },
+    { name: 'Time', align: 'center', key: 'created_at', display: 'time', width: '85' },
     { name: 'Party', align: 'left', key: 'party_name', width: '300' },
     { name: 'Item', align: 'left', key: 'token_item', width: '125' },
     { name: 'Quantity', align: 'center', key: 'token_quantity', display: 'decimal' },
@@ -51,7 +50,7 @@
   async function handleTokenDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item.id });
+      const result = await transportAction('?/delete', { id: item._id });
       if (result.type === 'failure') {
         const parsedData = JSON.parse(result.data);
         let message = parsedData[parsedData[0].message];
@@ -61,7 +60,7 @@
     }
   }
 
-  const handleTokenPrint = (item) => transportAction('?/print', { id: item.id });
+  const handleTokenPrint = (item) => transportAction('?/print', { id: item._id });
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -99,6 +98,7 @@
 
       // 3. Use { keepFocus: true, replaceState: true } to prevent
       // unnecessary scroll jumps or history bloating
+      // eslint-disable-next-line svelte/no-navigation-without-resolve
       goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
     }
   }
@@ -163,7 +163,7 @@
 
 <Model open={helperOpened} onClose={toggleHelper}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 p-0.5 text-center">{o.key}</span>
         <span>=</span>

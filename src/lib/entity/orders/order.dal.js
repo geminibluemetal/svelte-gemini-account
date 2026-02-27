@@ -15,10 +15,10 @@ export async function fetchSingleOrderByOrderNumber(order_number) {
   return order;
 }
 
-
 export async function fetchOrdersByStatus(statusArray) {
   const db = await connectDB();
-  const orders = await db.collection(collectionName)
+  const orders = await db
+    .collection(collectionName)
     .find({ status: { $in: statusArray } })
     .toArray();
   return orders;
@@ -34,14 +34,12 @@ export async function updateSingleOrderColumn(id, columnName, newValue) {
   const db = await connectDB();
   const updateData = {
     $set: {
-      [columnName]: newValue
-    }
+      [columnName]: newValue,
+    },
   };
-  const result = await db.collection(collectionName)
-    .updateOne(
-      { _id: new ObjectId(id) },
-      updateData
-    );
+  const result = await db
+    .collection(collectionName)
+    .updateOne({ _id: new ObjectId(id) }, updateData);
 
   return result;
 }
@@ -54,9 +52,7 @@ export async function insertOrder(data) {
     phone: data.phone || null,
     item: data.item,
     total_qty: Number(data.total_qty) || 0,
-    payment_at: data.amount_type === 'Cash' && Number(data.amount)
-      ? new Date()
-      : null,
+    payment_at: data.amount_type === 'Cash' && Number(data.amount) ? new Date() : null,
     amount_type: data.amount_type,
     amount: Number(data.amount) || 0,
     advance: Number(data.advance) || 0,
@@ -71,12 +67,12 @@ export async function insertOrder(data) {
     status: data.status || 'New',
     delivery_sheet_verified: data.delivery_sheet_verified ? 1 : 0,
     created_at: data.date ? new Date(data.date) : new Date(),
-    updated_at: new Date()
   };
 
+  console.log(orderData);
   const db = await connectDB();
   const result = await db.collection(collectionName).insertOne(orderData);
-  return result
+  return result;
 }
 
 export async function updateOrderById(id, data) {
@@ -87,9 +83,7 @@ export async function updateOrderById(id, data) {
       phone: data.phone || null,
       item: data.item,
       total_qty: parseFloat(data.total_qty) || 0,
-      payment_at: data.amount_type === 'Cash' && parseFloat(data.amount)
-        ? new Date()
-        : null,
+      payment_at: data.amount_type === 'Cash' && parseFloat(data.amount) ? new Date() : null,
       amount_type: data.amount_type,
       amount: parseFloat(data.amount) || 0,
       advance: parseFloat(data.advance) || 0,
@@ -100,24 +94,25 @@ export async function updateOrderById(id, data) {
       tracktor_only: Boolean(data.tracktor_only),
       status: data.status || 'New',
       notes: data.notes || '',
-      updated_at: new Date()
-    }
+    },
   };
   const db = await connectDB();
-  const result = await db.collection(collectionName).updateOne({ _id: new ObjectId(id) }, updateData);
-  return result
+  const result = await db
+    .collection(collectionName)
+    .updateOne({ _id: new ObjectId(id) }, updateData);
+  return result;
 }
 
 export async function deleteOrderById(id) {
   const db = await connectDB();
   const result = await db.collection(collectionName).deleteOne({ _id: new ObjectId(id) });
-  return result
+  return result;
 }
 
 export async function deleteOrdersByStatus(statusArray) {
   const db = await connectDB();
   const result = await db.collection(collectionName).deleteMany({
-    status: { $in: statusArray }
+    status: { $in: statusArray },
   });
-  return result
+  return result;
 }

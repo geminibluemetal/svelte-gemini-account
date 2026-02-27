@@ -1,45 +1,6 @@
 // seed/party.js
 export const collectionName = 'party';
 
-// Define indexes for better query performance
-export const indexes = [
-  { spec: { name: 1 }, options: { unique: false } }, // Index on party name (not unique since names might repeat)
-  { spec: { phone: 1 } }, // Index for searching by phone number
-  { spec: { created_at: -1 } }, // Index for sorting by creation date
-  { spec: { name: 1, phone: 1 } }, // Compound index for name + phone searches
-];
-
-// Optional: Define MongoDB schema validation
-export const validationRules = {
-  validator: {
-    $jsonSchema: {
-      bsonType: 'object',
-      required: ['name'],
-      properties: {
-        name: {
-          bsonType: 'string',
-          description: 'must be a string and is required',
-        },
-        phone: {
-          bsonType: ['string', 'null'],
-          description: 'must be a string or null',
-        },
-        opening_balance: {
-          bsonType: 'number',
-          minimum: 0,
-          description: 'must be a positive number',
-        },
-        created_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-      },
-    },
-  },
-  level: 'strict',
-  action: 'error',
-};
-
 // Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   { name: 'ADS', phone: '9790029726', opening_balance: 0.0, created_at: new Date() },
@@ -262,7 +223,6 @@ export const seedData = [
   { name: 'Vanitech', phone: '9443368704', opening_balance: 0.0, created_at: new Date() },
   { name: 'Varathan', phone: '9003763662', opening_balance: 0.0, created_at: new Date() },
   { name: 'VBS', phone: '', opening_balance: 0.0, created_at: new Date() },
-  { name: 'Velmani Driver', phone: '9486254337', opening_balance: 0.0, created_at: new Date() },
   {
     name: 'Velmurugan Mesthiri',
     phone: '9786565666',

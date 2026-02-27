@@ -1,34 +1,6 @@
 // seed/cash_description.js
 export const collectionName = 'cash_description';
 
-// Define indexes for better query performance
-export const indexes = [
-  { spec: { description: 1 }, options: { unique: true } }, // Unique index on description field
-  { spec: { created_at: -1 } }, // Index for sorting by creation date
-];
-
-// Optional: Define MongoDB schema validation
-export const validationRules = {
-  validator: {
-    $jsonSchema: {
-      bsonType: 'object',
-      required: ['description'],
-      properties: {
-        description: {
-          bsonType: 'string',
-          description: 'must be a string and is required',
-        },
-        created_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-      },
-    },
-  },
-  level: 'strict',
-  action: 'error',
-};
-
 // Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   { description: '1/2 Bold', created_at: new Date() },
@@ -165,7 +137,6 @@ export const seedData = [
   { description: 'Tea', created_at: new Date() },
   { description: 'Tirupathy Opp', created_at: new Date() },
   { description: 'Vellore Mechanic', created_at: new Date() },
-  { description: 'Velmani Driver', created_at: new Date() },
   { description: 'Vengatajalam (Acc) Mgr', created_at: new Date() },
   { description: 'Vengatajalam (Food) Mgr', created_at: new Date() },
   { description: 'Viji Electrician', created_at: new Date() },

@@ -1,55 +1,6 @@
 // seed/vehicle.js
 export const collectionName = 'vehicle';
 
-export const indexes = [
-  // Composite unique index on short_number + full_number
-  { spec: { short_number: 1, full_number: 1 }, options: { unique: true } },
-
-  // Other indexes for performance
-  { spec: { full_number: 1 } },
-  { spec: { is_company_vehicle: 1 } },
-  { spec: { short_number: 1, is_company_vehicle: 1 } },
-];
-
-// Specify which fields together form a unique combination
-export const uniqueFields = ['short_number', 'full_number'];
-
-// Optional: Define MongoDB schema validation
-export const validationRules = {
-  validator: {
-    $jsonSchema: {
-      bsonType: 'object',
-      required: ['short_number', 'is_company_vehicle'],
-      properties: {
-        full_number: {
-          bsonType: ['string', 'null'],
-          description: 'must be a string or null',
-        },
-        short_number: {
-          bsonType: 'string',
-          description: 'must be a string and is required',
-        },
-        is_company_vehicle: {
-          bsonType: 'bool',
-          description: 'must be a boolean and is required',
-        },
-        body_capacity: {
-          bsonType: ['number', 'null'],
-          minimum: 0,
-          maximum: 100,
-          description: 'must be a number between 0-100 or null',
-        },
-        created_at: {
-          bsonType: ['date', 'null'],
-          description: 'must be a date or null',
-        },
-      },
-    },
-  },
-  level: 'strict',
-  action: 'error',
-};
-
 // Seed data - converted from SQL format to MongoDB document format
 export const seedData = [
   {

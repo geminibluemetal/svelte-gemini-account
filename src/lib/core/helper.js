@@ -1,10 +1,12 @@
 import { fetchSingleAddressByName } from '$lib/entity/address/address.dal';
 import { fetchSingleItemByName } from '$lib/entity/items/items.dal';
 
-export function calculateAmount(address, item, qty) {
+export async function calculateAmount(address, item, qty) {
   address =
-    typeof address === 'object' && address !== null ? address : fetchSingleAddressByName(address);
-  item = typeof item === 'object' && item !== null ? item : fetchSingleItemByName(item);
+    typeof address === 'object' && address !== null
+      ? address
+      : await fetchSingleAddressByName(address);
+  item = typeof item === 'object' && item !== null ? item : await fetchSingleItemByName(item);
 
   let creditAmount = 0;
   // Get base item amount based on quantity
