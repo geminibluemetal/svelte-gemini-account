@@ -5,19 +5,28 @@ import { ObjectId } from 'mongodb';
 
 const indianVehicleRegex = /^(?:[A-Z]{2}\d{2}[A-Z]{1,3}\d{4}|[A-Z]{2}\d{2}\s\d{4})$/;
 
-async function validateUniqueShortNumber(val, fullData = {}) {
+/**
+ * Checks database for existing shortNumber, excluding the current ID if updating.
+ */
+async function validateUniqueShortNumber(shortNumber, id = null) {
   const db = await connectDB();
   const repo = new VehicleRepository(db);
-  const query = { shortNumber: val };
-  if (fullData.id) {
-    query._id = { $ne: new ObjectId(fullData.id) };
+
+  const query = { shortNumber };
+  if (id) {
+    // Exclude the current document from the uniqueness check
+    query._id = { $ne: new ObjectId(id) };
   }
+
   const existing = await repo.findOne(query);
-  return !existing;
+  return !existing; // Returns true if unique (not found)
 }
 
 export function vehicleSchema(isUpdate = false) {
-  return z.object({
+  const baseSchema = z.object({
+    // We add ID to the schema so it is available during refinement
+    id: z.string().optional(),
+
     fullNumber: z
       .string()
       .toUpperCase()
@@ -30,18 +39,28 @@ export function vehicleSchema(isUpdate = false) {
     shortNumber: z
       .string({ required_error: 'Vehicle Number is required' })
       .trim()
-      .min(4, { message: 'Vehicle Number should be at least 4 characters' })
-      .refine(
-        async (val, fullData) => {
-          return validateUniqueShortNumber(val, isUpdate ? fullData : {});
-        },
-        { message: 'This Vehicle Number already exists' },
-      ),
+      .min(4, { message: 'Vehicle Number should be at least 4 characters' }),
 
     isCompanyVehicle: z.coerce.boolean().default(false),
     bodyCapacity: z.array(z.number()).default([]),
     createdAt: z.date().optional().nullable(),
     updatedAt: z.date().optional().nullable(),
+  });
+
+  // Use superRefine to access the whole object (data)
+  return baseSchema.superRefine(async (data, ctx) => {
+    const isUnique = await validateUniqueShortNumber(
+      data.shortNumber,
+      isUpdate ? data.id : null
+    );
+
+    if (!isUnique) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'This Vehicle Number already exists',
+        path: ['shortNumber'], // Points the error to the specific field
+      });
+    }
   });
 }
 

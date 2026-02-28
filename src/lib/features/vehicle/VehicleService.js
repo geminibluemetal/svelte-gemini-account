@@ -29,7 +29,7 @@ export default class VehicleService extends BaseService {
   async updateVehicle(id, data) {
     try {
       const repo = await this.getRepository();
-      const parsed = await vehicleUpdateSchema.safeParseAsync(data);
+      const parsed = await vehicleUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) {
         schemaError(parsed);
       }
