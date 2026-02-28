@@ -2,9 +2,9 @@ import { ObjectId } from 'mongodb';
 import AppError, { handleSuccess } from '$lib/core/server/error';
 
 export default class BaseRepository {
-  constructor(db, collectionName, ModelClass) {
+  constructor(db, collectionName, Model) {
     this.collection = db.collection(collectionName);
-    this.Model = ModelClass;
+    this.Model = Model;
   }
 
   // Convert to ObjectId safely
@@ -16,13 +16,36 @@ export default class BaseRepository {
   }
 
   // Convert DB doc → Model instance
-  toModel(doc) {
+  toModel(doc, projection = {}) {
     if (!doc) return null;
 
-    return new this.Model({
-      id: doc._id.toString(),
-      ...doc,
-    });
+    const obj = { id: doc._id.toString() };
+
+    // Only include projected fields (like MongoDB)
+    if (projection && Object.keys(projection).length > 0) {
+      const includeMode = Object.values(projection).some((v) => v === 1);
+
+      if (includeMode) {
+        // Include only fields with 1
+        for (const key in projection) {
+          if (projection[key] && key in doc) {
+            obj[key] = doc[key];
+          }
+        }
+      } else {
+        // Exclude fields with 0
+        for (const key in doc) {
+          if (!(key in projection && projection[key] === 0)) {
+            obj[key] = doc[key];
+          }
+        }
+      }
+    } else {
+      // No projection, include all fields
+      Object.assign(obj, doc);
+    }
+
+    return obj;
   }
 
   // Create
@@ -54,10 +77,10 @@ export default class BaseRepository {
     return this.toModel(doc);
   }
 
-  // Find All
-  async findAll(filter = {}) {
-    const docs = await this.collection.find(filter).toArray();
-    return docs.map((doc) => this.toModel(doc));
+  // Find All with proper projection
+  async findAll(filter = {}, projection = {}) {
+    const docs = await this.collection.find(filter, { projection }).toArray();
+    return docs.map((doc) => this.toModel(doc, projection));
   }
 
   // Update

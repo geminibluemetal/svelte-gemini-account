@@ -1,5 +1,7 @@
-export default class VehicleModel {
-  constructor({
+import { applyProjection } from '../base/BaseMode';
+
+export default function Vehicle(
+  {
     id = null,
     fullNumber = null,
     shortNumber = null,
@@ -7,13 +9,17 @@ export default class VehicleModel {
     bodyCapacity = [],
     createdAt = null,
     updatedAt = null,
-  } = {}) {
-    this.id = id;
-    this.fullNumber = fullNumber;
-    this.shortNumber = shortNumber;
-    this.isCompanyVehicle = isCompanyVehicle;
-    this.bodyCapacity = bodyCapacity;
-    this.createdAt = createdAt;
-    this.updatedAt = updatedAt;
-  }
+  } = {},
+  projection = {},
+) {
+  const allFields = {
+    id,
+    fullNumber,
+    shortNumber,
+    isCompanyVehicle,
+    bodyCapacity,
+    createdAt,
+    updatedAt,
+  };
+  return applyProjection(allFields, projection);
 }

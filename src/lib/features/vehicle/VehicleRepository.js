@@ -1,8 +1,8 @@
 import BaseRepository from '../base/BaseRepository';
-import VehicleModel from './VehicleModel';
+import Vehicle from './VehicleModel';
 
 export default class VehicleRepository extends BaseRepository {
   constructor(db) {
-    super(db, 'vehicle', VehicleModel);
+    super(db, 'vehicle', Vehicle);
   }
 }

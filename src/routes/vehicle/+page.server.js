@@ -1,10 +1,4 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import {
-  createVehicle,
-  deleteVehicle,
-  getAllVehicle,
-  updateVehicle,
-} from '$lib/entity/vehicle/vehicle.service.js';
 import VehicleService from '$lib/features/vehicle/VehicleService.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
@@ -25,7 +19,7 @@ export const actions = {
     let result = null;
     const vehicleService = new VehicleService();
     if (editId) {
-      result = await updateVehicle(data, editId);
+      result = await vehicleService.updateVehicle(editId, data);
     } else {
       result = await vehicleService.createVehicle(data);
     }
@@ -42,7 +36,8 @@ export const actions = {
   delete: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    const result = await deleteVehicle(data?.id);
+    const vehicleService = new VehicleService();
+    const result = await vehicleService.deleteVehicle(data.id);
 
     if (!result?.ok) {
       return fail(400, { message: result.message });
