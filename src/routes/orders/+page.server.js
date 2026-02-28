@@ -19,13 +19,16 @@ import {
 } from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
+import OrderService from '$lib/features/orders/OrderService.js';
 import { formDataToObject } from '$lib/utils/form';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('ORDERS.LIST');
-  const orders = await getAllOrders();
+  const orderService = new OrderService();
+  const orders = await orderService.orderList();
+  console.log(orders);
   const party = await getAllParty();
   const address = await getAllAddress();
   const items = await getAllItems();
@@ -35,8 +38,8 @@ export async function load({ depends }) {
     party: serializeDoc(party),
     address: serializeDoc(address),
     items: serializeDoc(items),
-    vehicle: serializeDoc(vehicle)
-  }
+    vehicle: serializeDoc(vehicle),
+  };
 }
 
 export const actions = {
@@ -45,11 +48,12 @@ export const actions = {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
     let result = null;
+    const orderService = new OrderService();
 
     if (editId) {
       result = await updateOrder(data, editId);
     } else {
-      result = await createOrder(data);
+      result = await orderService.createOrder(data);
     }
 
     if (!result?.ok) {

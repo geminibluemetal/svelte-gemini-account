@@ -39,23 +39,23 @@
   });
 
   const headers = [
-    { name: 'Date', align: 'center', key: 'created_at', display: 'date', width: '96' },
-    { name: 'ON', align: 'center', key: 'order_number', color: OrderNumberColor, width: '38' },
-    { name: 'Party', align: 'left', key: 'party_name', width: '220' },
+    { name: 'Date', align: 'center', key: 'createdAt', display: 'date', width: '96' },
+    { name: 'ON', align: 'center', key: 'orderNumber', color: OrderNumberColor, width: '38' },
+    { name: 'Party', align: 'left', key: 'partyName', width: '220' },
     { name: 'Address', align: 'left', key: 'address', width: '220' },
     { name: 'Phone', align: 'left', key: 'phone', width: '100' },
     { name: 'Item', align: 'left', key: 'item' },
-    { name: 'T Qty', align: 'center', key: 'total_qty', display: 'decimal', width: '53' },
-    { name: 'AT', align: 'center', key: 'amount_type', color: AmountTypeColor, width: '60' },
+    { name: 'T Qty', align: 'center', key: 'totalQty', display: 'decimal', width: '53' },
+    { name: 'AT', align: 'center', key: 'amountType', color: AmountTypeColor, width: '60' },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
     { name: 'Advan', align: 'right', key: 'advance', display: 'currency' },
     { name: 'Dis', align: 'right', key: 'discount', display: 'currency' },
     { name: 'Bal', align: 'right', key: 'balance', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', display: 'sign', color: SignColor },
-    { name: 'D Qty', align: 'center', key: 'delivered_qty', display: 'decimal', width: '53' },
-    { name: 'B Qty', align: 'center', key: 'balance_qty', display: 'decimal', width: '53' },
+    { name: 'D Qty', align: 'center', key: 'deliveredQty', display: 'decimal', width: '53' },
+    { name: 'B Qty', align: 'center', key: 'balanceQty', display: 'decimal', width: '53' },
     { name: 'Notes', align: 'left', key: 'notes', display: notesDisplay },
-    { name: 'DSV', align: 'center', key: 'delivery_sheet_verified', color: DSVColor },
+    { name: 'DSV', align: 'center', key: 'deliverySheetVerified', color: DSVColor },
   ];
 
   const availableOptions = [
@@ -138,7 +138,7 @@
   //   }
   //   const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
   //   if (confirmed) {
-  //     const result = await transportAction('?/delete', { id: item._id });
+  //     const result = await transportAction('?/delete', { id: item.id });
   //     if (result.type === 'failure') showToast('Not Deleted', 'danger');
   //     else showToast('Deleted Success');
   //   }
@@ -150,22 +150,22 @@
     const amount = prompt('Enter Amount');
     if (!amount) return;
     const tip = prompt('Enter Tip Amount');
-    transportAction('?/singlePrint', { id: item._id, qty, amount, tip });
+    transportAction('?/singlePrint', { id: item.id, qty, amount, tip });
   };
   const handleFullPrint = (item) => {
     const tip = prompt('Enter Tip Amount');
     if (!tip) return;
-    transportAction('?/fullPrint', { id: item._id, tip });
+    transportAction('?/fullPrint', { id: item.id, tip });
   };
-  const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item._id });
-  const handleOrderLoading = (item) => transportAction('?/changeToLoading', { id: item._id });
-  const handleOrderCancel = (item) => transportAction('?/changeToCancelled', { id: item._id });
-  const handleOrderFinish = (item) => transportAction('?/changeToFinished', { id: item._id });
-  const handleOrderStatusReset = (item) => transportAction('?/resetStatus', { id: item._id });
-  const handleSignOrder = (item) => transportAction('?/sign', { id: item._id, current: item.sign });
+  const handlePhonePrint = (item) => transportAction('?/phonePrint', { id: item.id });
+  const handleOrderLoading = (item) => transportAction('?/changeToLoading', { id: item.id });
+  const handleOrderCancel = (item) => transportAction('?/changeToCancelled', { id: item.id });
+  const handleOrderFinish = (item) => transportAction('?/changeToFinished', { id: item.id });
+  const handleOrderStatusReset = (item) => transportAction('?/resetStatus', { id: item.id });
+  const handleSignOrder = (item) => transportAction('?/sign', { id: item.id, current: item.sign });
   const handleTokenCreation = async (item) => {
     tokenOpened = true;
-    quickToken._id = item._id;
+    quickToken.id = item.id;
   };
 
   const handleQuickTokenSubmit = () => {
@@ -384,7 +384,7 @@
     enhance={handleQuickTokenSubmit}
     submitButtonText={['Generate']}
   >
-    <input type="hidden" name="id" bind:value={quickToken._id} />
+    <input type="hidden" name="id" bind:value={quickToken.id} />
     <InputField
       name="vehicle"
       bind:value={quickToken.vehicle}

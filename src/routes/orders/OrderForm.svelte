@@ -7,12 +7,12 @@
 
   const { open, onClose, item, options } = $props();
   let initialData = {
-    party_name: '',
+    partyName: '',
     address: '',
     phone: '',
     item: '',
-    total_qty: '',
-    amount_type: '', // COD, AC, Cash, Paytm, Gpay,
+    totalQty: '',
+    amountType: '', // COD, AC, Cash, Paytm, Gpay,
     amount: '',
     advance: '',
     discount: '',
@@ -75,11 +75,11 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?._id} />
+      <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="party_name"
-      value={data.party_name}
+      name="partyName"
+      value={data.partyName}
       placeholder="Select Party"
       autoComplete="off"
       options={partyList}
@@ -106,21 +106,21 @@
       allowedChars={['+']}
     />
     <InputField
-      name="total_qty"
+      name="totalQty"
       inputmode="decimal"
       caseMode="none"
-      value={data.total_qty}
+      value={data.totalQty}
       placeholder="Total Quantity"
       autoComplete="off"
     />
     <InputField
-      name="amount_type"
-      bind:value={data.amount_type}
+      name="amountType"
+      bind:value={data.amountType}
       placeholder="Amount Type"
       autoComplete="off"
       options={amountType}
     />
-    {#if amountType?.includes(data.amount_type) && data.amount_type !== 'AC'}
+    {#if amountType?.includes(data.amountType) && data.amountType !== 'AC'}
       <InputField
         caseMode="none"
         name="amount"
@@ -150,11 +150,7 @@
       autoComplete="off"
       caseMode="para"
     />
-    <CheckBoxField
-      name="is_owner_order"
-      value={data.is_owner_order}
-      placeholder="Is Owner Order?"
-    />
-    <CheckBoxField name="tracktor_only" value={data.tracktor_only} placeholder="Tractor Only" />
+    <CheckBoxField name="isOwnerOrder" value={data.isOwnerOrder} placeholder="Is Owner Order?" />
+    <CheckBoxField name="tracktorOnly" value={data.tracktorOnly} placeholder="Tractor Only" />
   </Form>
 </Model>
