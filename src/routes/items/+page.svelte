@@ -11,11 +11,11 @@
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
-    { name: '0.25', align: 'right', key: 'price_025' },
-    { name: '0.50', align: 'right', key: 'price_050' },
-    { name: '1.00', align: 'right', key: 'price_100' },
-    { name: '1.50', align: 'right', key: 'price_150' },
-    { name: '2.00', align: 'right', key: 'price_200' },
+    { name: '0.25', align: 'right', key: 'price.unit025' },
+    { name: '0.50', align: 'right', key: 'price.unit050' },
+    { name: '1.00', align: 'right', key: 'price.unit100' },
+    { name: '1.50', align: 'right', key: 'price.unit150' },
+    { name: '2.00', align: 'right', key: 'price.unit200' },
   ];
 
   const availableOptions = [
@@ -37,7 +37,7 @@
   async function handleItemDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item._id });
+      const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') showToast('Not Deleted', 'danger');
       else showToast('Deleted Success');
     }

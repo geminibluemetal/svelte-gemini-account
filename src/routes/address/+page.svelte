@@ -11,9 +11,9 @@
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
-    { name: '0.25 Delivery', align: 'right', key: 'delivery_025' },
-    { name: '1.00 Delivery', align: 'right', key: 'delivery_050_100' },
-    { name: '2.00 Delivery', align: 'right', key: 'delivery_max' },
+    { name: '0.25 Delivery', align: 'right', key: 'deliveryCharges.chargeHalf' },
+    { name: '1.00 Delivery', align: 'right', key: 'deliveryCharges.chargeSingle' },
+    { name: '2.00 Delivery', align: 'right', key: 'deliveryCharges.chargeMax' },
   ];
 
   const availableOptions = [
@@ -35,7 +35,7 @@
   async function handleAddressDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item._id });
+      const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') showToast('Not Deleted', 'danger');
       else showToast('Deleted Success');
     }

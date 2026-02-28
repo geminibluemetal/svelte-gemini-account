@@ -51,6 +51,12 @@
   const jump20Bottom = () =>
     doAction ? (overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow) : null;
 
+  const getValue = (obj, path) => {
+    if (!path) return undefined;
+    // This handles both "name" and "price.unit025"
+    return path.split('.').reduce((acc, part) => acc && acc[part], obj);
+  };
+
   $effect(() => {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
     if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
@@ -165,7 +171,8 @@
           {/if}
 
           {#each headers as header, col (col)}
-            {@const color = header?.color ? header.color(item[header.key], item) : null}
+            {@const value = getValue(item, header.key)}
+            {@const color = header?.color ? header.color(value, item) : null}
             <div
               class="px-1
                 {rowColor?.border ? rowColor.border : 'border-b border-gray-500'}
@@ -187,12 +194,12 @@
               data-over-row={row}
             >
               {#if header?.display && header.display instanceof Function}
-                {header.display(item[header.key], item)}
-              {:else if item[header.key] != null && item[header.key] !== '' && item[header.key] !== 0 && item[header.key] !== '0'}
+                {header.display(value, item)}
+              {:else if value != null && value !== '' && value !== 0 && value !== '0'}
                 {#if header?.display}
-                  {display(header.display, item[header.key])}
+                  {display(header.display, value)}
                 {:else}
-                  {item[header.key]}
+                  {value}
                 {/if}
               {/if}
             </div>

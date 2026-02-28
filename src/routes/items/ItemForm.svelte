@@ -7,7 +7,20 @@
   const { open, onClose, item, allItems } = $props();
 
   let nameOptions = $state([]);
-  let data = $derived({ ...item });
+  let data = $derived(
+    item
+      ? { ...item }
+      : {
+          name: '',
+          price: {
+            unit025: '',
+            unit050: '',
+            unit100: '',
+            unit150: '',
+            unit200: '',
+          },
+        },
+  );
 
   function handleClose() {
     nameOptions = [];
@@ -47,7 +60,7 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?._id} />
+      <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
       name="name"
@@ -60,32 +73,32 @@
       onValueChange={handleNameChange}
     />
     <InputField
-      name="price_025"
-      value={data.price_025}
+      name="price[unit025]"
+      value={data.price?.unit025}
       type="number"
       placeholder="0.25 Unit Price"
     />
     <InputField
-      name="price_050"
-      value={data.price_050}
+      name="price[unit050]"
+      value={data.price?.unit050}
       type="number"
       placeholder="0.50 Unit Price"
     />
     <InputField
-      name="price_100"
-      value={data.price_100}
+      name="price[unit100]"
+      value={data.price?.unit100}
       type="number"
       placeholder="1.00 Unit Price"
     />
     <InputField
-      name="price_150"
-      value={data.price_150}
+      name="price[unit150]"
+      value={data.price?.unit150}
       type="number"
       placeholder="1.50 Unit Price"
     />
     <InputField
-      name="price_200"
-      value={data.price_200}
+      name="price[unit200]"
+      value={data.price?.unit200}
       type="number"
       placeholder="2.00 Unit Price"
     />

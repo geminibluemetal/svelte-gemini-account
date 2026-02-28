@@ -6,7 +6,18 @@
 
   const { open, onClose, item } = $props();
 
-  let data = $derived({ ...item });
+  let data = $derived(
+    item
+      ? { ...item }
+      : {
+          name: '',
+          deliveryCharges: {
+            chargeHalf: '',
+            chargeSingle: '',
+            chargeMax: '',
+          },
+        },
+  );
 
   function handleClose() {
     onClose();
@@ -35,24 +46,24 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?._id} />
+      <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField name="name" value={data.name} placeholder="Address Name" autoComplete="off" />
     <InputField
-      name="delivery_025"
-      value={data.delivery_025}
+      name="deliveryCharges[chargeHalf]"
+      value={data.deliveryCharges?.chargeHalf}
       type="number"
       placeholder="0.25 Unit Delivery"
     />
     <InputField
-      name="delivery_050_100"
-      value={data.delivery_050_100}
+      name="deliveryCharges[chargeSingle]"
+      value={data.deliveryCharges?.chargeSingle}
       type="number"
       placeholder="1.00 Unit Delivery"
     />
     <InputField
-      name="delivery_max"
-      value={data.delivery_max}
+      name="deliveryCharges[chargeMax]"
+      value={data.deliveryCharges?.chargeMax}
       type="number"
       placeholder="2.00 Unit Delivery"
     />

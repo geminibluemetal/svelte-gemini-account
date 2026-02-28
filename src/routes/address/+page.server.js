@@ -1,17 +1,13 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import {
-  createAddress,
-  deleteAddress,
-  getAllAddress,
-  updateAddress,
-} from '$lib/entity/address/address.service.js';
+import AddressService from '$lib/features/address/AddressService.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
 export async function load({ depends }) {
   depends('ADDRESS.LIST');
-  const address = await getAllAddress();
+  const addressService = new AddressService();
+  const address = await addressService.addressList();
   return { address: serializeDoc(address) };
 }
 
@@ -21,11 +17,12 @@ export const actions = {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
     let result = null;
+    const addressService = new AddressService();
 
     if (editId) {
-      result = await updateAddress(data, editId);
+      result = await addressService.updateAddress(editId, data);
     } else {
-      result = await createAddress(data);
+      result = await addressService.createAddress(data);
     }
 
     if (!result?.ok) {
@@ -40,7 +37,8 @@ export const actions = {
   delete: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    const result = await deleteAddress(data?.id);
+    const addressService = new AddressService();
+    const result = await addressService.deleteAddress(data?.id);
 
     if (!result?.ok) {
       return fail(400, { message: result.message });
