@@ -28,7 +28,6 @@ export async function load({ depends }) {
   depends('ORDERS.LIST');
   const orderService = new OrderService();
   const orders = await orderService.orderList();
-  console.log(orders);
   const party = await getAllParty();
   const address = await getAllAddress();
   const items = await getAllItems();
@@ -51,7 +50,7 @@ export const actions = {
     const orderService = new OrderService();
 
     if (editId) {
-      result = await updateOrder(data, editId);
+      result = await orderService.updateOrder(editId, data);
     } else {
       result = await orderService.createOrder(data);
     }
@@ -69,7 +68,8 @@ export const actions = {
   delete: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    const result = await deleteOrder(data?.id);
+    const orderService = new OrderService();
+    const result = await orderService.deleteOrder(data?.id);
 
     if (!result?.ok) {
       return fail(400, { message: result.message });

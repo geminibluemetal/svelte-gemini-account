@@ -1,6 +1,6 @@
 import { applyProjection } from '../base/BaseMode';
 
-export default function Address(
+export default function Order(
   {
     id = null,
     orderNumber = null,
@@ -23,8 +23,6 @@ export default function Address(
     deliverySheetVerified = 0,
     createdAt = null,
     updatedAt = null,
-    balance = amount - advance - discount,
-    balanceQty = totalQty - deliveredQty,
   } = {},
   projection = {},
 ) {
@@ -50,8 +48,8 @@ export default function Address(
     deliverySheetVerified,
     createdAt,
     updatedAt,
-    balance,
-    balanceQty,
+    balance: amount - advance - discount,
+    balanceQty: totalQty - deliveredQty,
   };
   return applyProjection(allFields, projection);
 }

@@ -16,36 +16,9 @@ export default class BaseRepository {
   }
 
   // Convert DB doc → Model instance
-  toModel(doc, projection = {}) {
+  toModel(doc, projection) {
     if (!doc) return null;
-
-    const obj = { id: doc._id.toString() };
-
-    // Only include projected fields (like MongoDB)
-    if (projection && Object.keys(projection).length > 0) {
-      const includeMode = Object.values(projection).some((v) => v === 1);
-
-      if (includeMode) {
-        // Include only fields with 1
-        for (const key in projection) {
-          if (projection[key] && key in doc) {
-            obj[key] = doc[key];
-          }
-        }
-      } else {
-        // Exclude fields with 0
-        for (const key in doc) {
-          if (!(key in projection && projection[key] === 0)) {
-            obj[key] = doc[key];
-          }
-        }
-      }
-    } else {
-      // No projection, include all fields
-      Object.assign(obj, doc);
-    }
-
-    return obj;
+    return this.Model({ id: doc._id.toString(), ...doc }, projection);
   }
 
   // Create

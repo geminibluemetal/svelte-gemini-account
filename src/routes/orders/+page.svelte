@@ -24,7 +24,7 @@
     vehicle: null,
     qty: null,
   });
-  const vehicleList = $derived(data.vehicle.map((v) => v.short_number));
+  const vehicleList = $derived(data.vehicle.map((v) => v.shortNumber));
   const viewList = $derived({
     all: data.orders,
     new: data.orders.filter((o) => o.status == 'New'),
@@ -83,13 +83,13 @@
 
   function notesDisplay(value, item) {
     let prefix = '';
-    prefix += item.tracktor_only ? '(🚜)' : '';
+    prefix += item.tracktorOnly ? '(🚜)' : '';
     prefix += item.status == 'Loading' ? '(⬆️)' : '';
     return `${prefix} ${value}`;
   }
 
   function OrderNumberColor(value, item) {
-    return item.is_owner_order == 1 ? HighlightCell.red : null;
+    return item.isOwnerOrder == 1 ? HighlightCell.red : null;
   }
 
   function SignColor(value) {
