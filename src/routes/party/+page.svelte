@@ -12,7 +12,7 @@
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
     { name: 'Phone', align: 'center', key: 'phone' },
-    { name: 'Opening Balance', align: 'right', key: 'opening_balance', display: 'currency' },
+    { name: 'Opening Balance', align: 'right', key: 'openingBalance', display: 'currency' },
   ];
 
   const availableOptions = [
@@ -34,7 +34,7 @@
   async function handlePartyDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete '${item.name}'?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item._id });
+      const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') showToast('Not Deleted', 'danger');
       else showToast('Deleted Success');
     }
