@@ -9,9 +9,7 @@ export default class BaseRepository {
 
   // Convert to ObjectId safely
   toObjectId(id) {
-    if (!ObjectId.isValid(id)) {
-      throw new AppError('Invalid ID format');
-    }
+    if (!ObjectId.isValid(id)) throw new AppError('Invalid ID format');
     return new ObjectId(id);
   }
 
@@ -29,16 +27,14 @@ export default class BaseRepository {
       updatedAt: null,
     });
 
-    if (!result.acknowledged) {
-      throw new AppError('Database insert failed');
-    }
-
+    if (!result.acknowledged) throw new AppError('Database insert failed');
     return handleSuccess('Created Success');
   }
 
   // Find one
-  async findOne(query) {
-    return await this.collection.findOne(query);
+  async findOne(query = {}) {
+    const doc = await this.collection.findOne(query);
+    return this.toModel(doc);
   }
 
   // Find by ID
@@ -46,7 +42,6 @@ export default class BaseRepository {
     const doc = await this.collection.findOne({
       _id: this.toObjectId(id),
     });
-
     return this.toModel(doc);
   }
 
@@ -62,12 +57,22 @@ export default class BaseRepository {
       { _id: this.toObjectId(id) },
       { $set: { ...data, updatedAt: new Date() } },
     );
-
-    if (!result.acknowledged) {
-      throw new AppError('Database update failed');
-    }
-
+    if (!result.acknowledged) throw new AppError('Database update failed');
     return handleSuccess('Updated Success');
+  }
+
+  // Update Fields
+  async updateFieldsById(id, updates) {
+    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, { $set: updates });
+    if (!result.acknowledged) throw new AppError('Database update failed');
+    return handleSuccess('Fields updated successfully');
+  }
+
+  // Update Fields
+  async updateFields(updates) {
+    const result = await this.collection.updateOne({}, { $set: updates });
+    if (!result.acknowledged) throw new AppError('Database update failed');
+    return handleSuccess('Fields updated successfully');
   }
 
   // Delete
@@ -75,11 +80,7 @@ export default class BaseRepository {
     const result = await this.collection.deleteOne({
       _id: this.toObjectId(id),
     });
-
-    if (!result.acknowledged) {
-      throw new AppError('Database delete failed');
-    }
-
+    if (!result.acknowledged) throw new AppError('Database delete failed');
     return handleSuccess('Deleted Success');
   }
 }

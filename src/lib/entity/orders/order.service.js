@@ -131,7 +131,11 @@ export async function updateOrder(data, editId) {
 
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
   data.balance_qty = (Number(data.total_qty) || 0) - (Number(order.delivered_qty) || 0);
-  data.status = await examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty);
+  data.status = await examineStatusByQuantity(
+    data.total_qty,
+    order.delivered_qty,
+    data.balance_qty,
+  );
 
   let result = await updateOrderById(editId, data);
 
@@ -264,7 +268,11 @@ export async function orderStatusToFinished(id) {
 }
 export async function orderStatusReset(id) {
   const order = await fetchSingleOrderById(id);
-  const status = await examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty);
+  const status = await examineStatusByQuantity(
+    order.total_qty,
+    order.delivered_qty,
+    order.balance_qty,
+  );
   updateSingleOrderColumn(id, 'status', status);
 }
 

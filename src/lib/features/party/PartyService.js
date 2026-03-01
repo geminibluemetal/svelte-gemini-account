@@ -47,4 +47,22 @@ export default class PartyService extends BaseService {
       return handleServiceError(error);
     }
   }
+
+  async findAndUpdatePhone(partyName, phone) {
+    try {
+      if (phone) {
+        const repo = await this.getRepository();
+        const party = await repo.findOne({
+          name: partyName,
+          $or: [{ phone: null }, { phone: '' }, { phone: { $exists: false } }],
+        });
+        if (party) {
+          // console.log(`Found party "${party.name}" without phone, updating to ${phone}`);
+          return await repo.updateFieldsById(party.id, { phone });
+        }
+      }
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
 }

@@ -86,6 +86,14 @@ export function orderSchema() {
           });
         }
       }
+
+      if (data.amountType !== 'AC' && (!data.amount || data.amount === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Amount is required for non-AC orders',
+          path: ['amount'],
+        });
+      }
     });
 }
 
