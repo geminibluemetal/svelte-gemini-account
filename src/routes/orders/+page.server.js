@@ -2,20 +2,7 @@ import { sseEmit } from '$lib/core/server/sseBus.js';
 import { getAllAddress } from '$lib/entity/address/address.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
 import {
-  clearCompletedOrder,
-  createOrder,
   createTokenFromOrder,
-  deleteOrder,
-  getAllOrders,
-  orderFullPrint,
-  orderPhonePrint,
-  orderSinglePrint,
-  orderStatusReset,
-  orderStatusToCancelled,
-  orderStatusToFinished,
-  orderStatusToLoading,
-  signOrderById,
-  updateOrder,
 } from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
@@ -83,28 +70,32 @@ export const actions = {
   singlePrint: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderSinglePrint(data);
+    const orderService = new OrderService();
+    orderService.singlePrint(data);
   },
 
   // Full Print
   fullPrint: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderFullPrint(data);
+    const orderService = new OrderService();
+    orderService.fullPrint(data);
   },
 
   // Phone Print
   phonePrint: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderPhonePrint(data);
+    const orderService = new OrderService();
+    orderService.phonePrint(data);
   },
 
   // Sign Order
   sign: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    signOrderById(data.id, data.current);
+    const orderService = new OrderService();
+    orderService.signOrder(data.id);
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'CASH.LIST' });
   },
@@ -113,28 +104,32 @@ export const actions = {
   changeToLoading: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderStatusToLoading(data.id);
+    const orderService = new OrderService();
+    orderService.changeStatus(data.id, 'Loading');
     sseEmit({ type: 'ORDERS.LIST' });
   },
   // change Order status To Cancelled
   changeToCancelled: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderStatusToCancelled(data.id);
+    const orderService = new OrderService();
+    orderService.changeStatus(data.id, 'Cancelled');
     sseEmit({ type: 'ORDERS.LIST' });
   },
   // change Order status To Finished
   changeToFinished: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderStatusToFinished(data.id);
+    const orderService = new OrderService();
+    orderService.changeStatus(data.id, 'Finished');
     sseEmit({ type: 'ORDERS.LIST' });
   },
   // Reset order status
   resetStatus: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    orderStatusReset(data.id);
+    const orderService = new OrderService();
+    orderService.resetStatus(data.id);
     sseEmit({ type: 'ORDERS.LIST' });
   },
 
@@ -154,7 +149,8 @@ export const actions = {
 
   // Clear Orders
   clearOrder: async () => {
-    const result = await clearCompletedOrder();
+    const orderService = new OrderService();
+    const result = await orderService.clearCompletedOrder();
     if (!result?.ok) {
       return fail(400, { message: result.message });
     }

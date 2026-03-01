@@ -83,4 +83,18 @@ export default class BaseRepository {
     if (!result.acknowledged) throw new AppError('Database delete failed');
     return handleSuccess('Deleted Success');
   }
+
+  // Delete with filter
+  async deleteByFilter(filter) {
+    const result = await this.collection.deleteMany(filter);
+    if (!result.acknowledged) throw new AppError('Database delete failed');
+    return handleSuccess('Deleted Success');
+  }
+
+  // Update aggregation fields
+  async updateAggregationById(id, aggregationUpdatesArray) {
+    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, aggregationUpdatesArray);
+    if (!result.acknowledged) throw new AppError('Database update failed');
+    return handleSuccess('Fields updated successfully');
+  }
 }

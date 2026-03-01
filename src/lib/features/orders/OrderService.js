@@ -1,6 +1,9 @@
 import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
+import { printOut } from '$lib/core/server/print';
 import { serverBus } from '$lib/core/server/serverBus';
 import { EVENTS } from '$lib/core/server/serverBusEvents';
+import { getFormattedDate } from '$lib/utils/dateTime';
+import { formatFixed } from '$lib/utils/number';
 import BaseService from '../base/BaseService';
 import SettingsService from '../settings/SettingsService';
 import OrderRepository from './OrderRepository';
@@ -83,5 +86,153 @@ export default class OrderService extends BaseService {
     } catch (error) {
       return handleServiceError(error);
     }
+  }
+
+  async getAllAvailableOrders() {
+    try {
+      const repo = await this.getRepository();
+      const filter = { status: { $in: ['New', 'Loading', 'Partial'] } }
+      return await repo.findAll(filter);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async signOrder(id) {
+    try {
+      const repo = await this.getRepository();
+      const piplineArray = [{ $set: { sign: { $not: "$sign" } } }]
+      return await repo.updateAggregationById(id, piplineArray);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async changeStatus(id, status) {
+    try {
+      const repo = await this.getRepository();
+      return await repo.updateById(id, { status });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async resetStatus(id) {
+    try {
+      const repo = await this.getRepository();
+      const order = await repo.findById(id);
+      const status = OrderService.examineStatusByQuantity(order.totalQty, order.deliveredQty, order.balanceQty);
+      return await repo.updateById(id, { status });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async clearCompletedOrder() {
+    try {
+      const repo = await this.getRepository();
+      return await repo.deleteByFilter({ status: { $in: ['Delivered', 'Cancelled', 'Finished'] } });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async singlePrint(data) {
+    const repo = await this.getRepository();
+    const order = await repo.findById(data.id);
+    await printOut((p) => {
+      p.reset()
+        .beepOn(1, 2)
+        .align('center')
+        .setTextSize(1, 0)
+        .bold(true)
+        .line('Single Cash Bill')
+        .bold(false)
+        .dashedLine(17)
+        .align('left')
+
+        .pairs('Date', getFormattedDate())
+        .pairs('Order', order.orderNumber)
+        .pairs('Party', order.partyName)
+        .pairs('Address', order.address)
+        .pairs('Phone', order.phone)
+        .pairs('Item', order.item)
+        .pairs('Qty', formatFixed(data.qty))
+        .pairs('Amount', data.amount)
+        .pairs('Tip', data.tip)
+        .pairs('Total', Number(data.amount) + Number(data.tip))
+        .flushPairs()
+
+        .feed(1)
+        .cut();
+    });
+  }
+
+  async fullPrint(data) {
+    const repo = await this.getRepository();
+    const order = await repo.findById(data.id);
+    await printOut((p) => {
+      p.reset()
+        .beepOn(2, 2)
+        .align('center')
+        .setTextSize(1, 0)
+        .bold(true)
+        .line('Full Cash Bill')
+        .bold(false)
+        .dashedLine(17)
+        .align('left')
+
+        .pairs('Date', getFormattedDate())
+        .pairs('Order', order.orderNumber)
+        .pairs('Party', order.partyName)
+        .pairs('Address', order.address)
+        .pairs('Phone', order.phone)
+        .pairs('Item', order.item)
+        .pairs('Qty', formatFixed(order.totalQty))
+        .pairs('Amount', order.amount)
+        .pairs('Advance', order.advance)
+        .pairs('Discount', order.discount)
+        .pairs('Balance', order.balance)
+        .pairs('Tip', data.tip)
+        .pairs('Total', Number(order.balance) + Number(data.tip))
+        .flushPairs()
+
+        .feed(1)
+        .cut();
+    });
+  }
+
+  async phonePrint(data) {
+    const repo = await this.getRepository();
+    const order = await repo.findById(data.id);
+    await printOut((p) => {
+      p.reset()
+        .beepOn(1, 1)
+        .setTextSize(1, 0)
+        .align('left')
+
+        .pairs('Order', order.orderNumber)
+        .pairs('Address', order.address)
+        .pairs('Phone', order.phone)
+        .pairs('Item', order.item)
+        .pairs('Qty', formatFixed(order.totalQty))
+        .flushPairs()
+
+        .feed(1)
+        .cut();
+    });
+  }
+
+  static examineStatusByQuantity(totalQty, deliveredQty, balanceQty) {
+    totalQty = Number(totalQty) || 0;
+    deliveredQty = Number(deliveredQty) || 0;
+    balanceQty = Number(balanceQty) || 0;
+    return deliveredQty >= totalQty
+      ? 'Delivered'
+      : totalQty === balanceQty && deliveredQty === 0
+        ? 'New'
+        : balanceQty !== 0
+          ? 'Partial'
+          : 'New';
   }
 }
