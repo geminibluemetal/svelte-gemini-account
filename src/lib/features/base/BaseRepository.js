@@ -92,9 +92,9 @@ export default class BaseRepository {
   }
 
   // Update aggregation fields
-  async updateAggregationById(id, aggregationUpdatesArray) {
-    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, aggregationUpdatesArray);
+  async toggleSignById(id) {
+    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, [{ $set: { sign: { $not: "$sign" } } }]);
     if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Fields updated successfully');
+    return handleSuccess('Signed successfully');
   }
 }

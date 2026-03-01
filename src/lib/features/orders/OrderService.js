@@ -96,8 +96,7 @@ export default class OrderService {
 
   async signOrder(id) {
     try {
-      const piplineArray = [{ $set: { sign: { $not: "$sign" } } }]
-      return await this.repository.updateAggregationById(id, piplineArray);
+      return await this.repository.toggleSignById(id);
     } catch (error) {
       return handleServiceError(error);
     }
