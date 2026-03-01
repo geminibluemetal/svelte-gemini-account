@@ -1,34 +1,33 @@
 import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
+import { connectDB } from '$lib/core/server/mongodb';
 import { printOut } from '$lib/core/server/print';
 import { serverBus } from '$lib/core/server/serverBus';
 import { EVENTS } from '$lib/core/server/serverBusEvents';
 import { getFormattedDate } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
-import BaseService from '../base/BaseService';
 import SettingsService from '../settings/SettingsService';
 import OrderRepository from './OrderRepository';
 import { orderCreateSchema, orderUpdateSchema } from './OrderSchema';
 
-export default class OrderService extends BaseService {
+const db = await connectDB()
+export default class OrderService {
   constructor() {
-    super(OrderRepository);
     this.settingsService = new SettingsService();
+    this.repository = new OrderRepository(db);
   }
 
   async orderList() {
-    const repo = await this.getRepository();
-    return await repo.findAll();
+    return await this.repository.findAll();
   }
 
   async createOrder(data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await orderCreateSchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
       const settings = await this.settingsService.getSettings();
 
       parsed.data.orderNumber = settings.nextOrderNumber;
-      const order = await repo.create(parsed.data);
+      const order = await this.repository.create(parsed.data);
 
       if (order?.ok) {
         const result = await this.settingsService.updateSetting({
@@ -51,11 +50,10 @@ export default class OrderService extends BaseService {
 
   async updateOrder(id, data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await orderUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) schemaError(parsed);
 
-      const order = await repo.updateById(id, parsed.data);
+      const order = await this.repository.updateById(id, parsed.data);
 
       // Emit Events
       // 1. Handle Phone Updates for Party
@@ -72,8 +70,8 @@ export default class OrderService extends BaseService {
   // IMPORTANT: In Later if we implement these we should also do cash report sync
   // async deleteOrder(id) {
   //   try {
-  //     const repo = await this.getRepository();
-  //     return await repo.deleteById(id);
+
+  //     return await this.repository.deleteById(id);
   //   } catch (error) {
   //     return handleServiceError(error);
   //   }
@@ -81,8 +79,7 @@ export default class OrderService extends BaseService {
 
   async getOrderByNumber(orderNumber) {
     try {
-      const repo = await this.getRepository();
-      return await repo.findOne({ orderNumber });
+      return await this.repository.findOne({ orderNumber });
     } catch (error) {
       return handleServiceError(error);
     }
@@ -90,9 +87,8 @@ export default class OrderService extends BaseService {
 
   async getAllAvailableOrders() {
     try {
-      const repo = await this.getRepository();
       const filter = { status: { $in: ['New', 'Loading', 'Partial'] } }
-      return await repo.findAll(filter);
+      return await this.repository.findAll(filter);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -100,9 +96,8 @@ export default class OrderService extends BaseService {
 
   async signOrder(id) {
     try {
-      const repo = await this.getRepository();
       const piplineArray = [{ $set: { sign: { $not: "$sign" } } }]
-      return await repo.updateAggregationById(id, piplineArray);
+      return await this.repository.updateAggregationById(id, piplineArray);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -110,8 +105,7 @@ export default class OrderService extends BaseService {
 
   async changeStatus(id, status) {
     try {
-      const repo = await this.getRepository();
-      return await repo.updateById(id, { status });
+      return await this.repository.updateById(id, { status });
     } catch (error) {
       return handleServiceError(error);
     }
@@ -119,10 +113,9 @@ export default class OrderService extends BaseService {
 
   async resetStatus(id) {
     try {
-      const repo = await this.getRepository();
-      const order = await repo.findById(id);
+      const order = await this.repository.findById(id);
       const status = OrderService.examineStatusByQuantity(order.totalQty, order.deliveredQty, order.balanceQty);
-      return await repo.updateById(id, { status });
+      return await this.repository.updateById(id, { status });
     } catch (error) {
       return handleServiceError(error);
     }
@@ -130,16 +123,14 @@ export default class OrderService extends BaseService {
 
   async clearCompletedOrder() {
     try {
-      const repo = await this.getRepository();
-      return await repo.deleteByFilter({ status: { $in: ['Delivered', 'Cancelled', 'Finished'] } });
+      return await this.repository.deleteByFilter({ status: { $in: ['Delivered', 'Cancelled', 'Finished'] } });
     } catch (error) {
       return handleServiceError(error);
     }
   }
 
   async singlePrint(data) {
-    const repo = await this.getRepository();
-    const order = await repo.findById(data.id);
+    const order = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 2)
@@ -169,8 +160,7 @@ export default class OrderService extends BaseService {
   }
 
   async fullPrint(data) {
-    const repo = await this.getRepository();
-    const order = await repo.findById(data.id);
+    const order = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(2, 2)
@@ -203,8 +193,7 @@ export default class OrderService extends BaseService {
   }
 
   async phonePrint(data) {
-    const repo = await this.getRepository();
-    const order = await repo.findById(data.id);
+    const order = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 1)

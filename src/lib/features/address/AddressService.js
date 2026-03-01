@@ -1,26 +1,25 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
-import BaseService from '../base/BaseService';
+import { connect } from 'node:tls';
 import AddressRepository from './AddressRepository';
 import { addressCreateSchema, addressUpdateSchema } from './AddressSchema';
 
-export default class AddressService extends BaseService {
+const db = await connect()
+export default class AddressService {
   constructor() {
-    super(AddressRepository);
+    this.repository = new AddressRepository(db);
   }
 
   async addressList() {
-    const repo = await this.getRepository();
-    return await repo.findAll({}, { name: 1, deliveryCharges: 1, _id: 1 });
+    return await this.repository.findAll({}, { name: 1, deliveryCharges: 1, _id: 1 });
   }
 
   async createAddress(data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await addressCreateSchema.safeParseAsync(data);
       if (!parsed.success) {
         schemaError(parsed);
       }
-      return await repo.create(parsed.data);
+      return await this.repository.create(parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -28,12 +27,11 @@ export default class AddressService extends BaseService {
 
   async updateAddress(id, data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await addressUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) {
         schemaError(parsed);
       }
-      return await repo.updateById(id, parsed.data);
+      return await this.repository.updateById(id, parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -41,8 +39,7 @@ export default class AddressService extends BaseService {
 
   async deleteAddress(id) {
     try {
-      const repo = await this.getRepository();
-      return await repo.deleteById(id);
+      return await this.repository.deleteById(id);
     } catch (error) {
       return handleServiceError(error);
     }

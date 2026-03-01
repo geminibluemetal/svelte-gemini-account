@@ -1,24 +1,23 @@
 import { schemaError } from '$lib/core/server/error';
-import BaseService from '../base/BaseService';
+import { connectDB } from '$lib/core/server/mongodb';
 import SettingsRepository from './SettingsRepository';
 import { settingsSchema } from './SettingsSchema';
 
-export default class SettingsService extends BaseService {
+const db = await connectDB()
+export default class SettingsService {
   constructor() {
-    super(SettingsRepository);
+    this.repository = new SettingsRepository(db)
   }
 
   async getSettings() {
-    const repo = await this.getRepository();
-    return await repo.findOne();
+    return await this.repository.findOne();
   }
 
   async updateSetting(data = {}) {
-    const repo = await this.getRepository();
     const parsed = await settingsSchema.safeParseAsync(data);
     if (!parsed.success) {
       schemaError(parsed);
     }
-    return await repo.updateFields(parsed.data);
+    return await this.repository.updateFields(parsed.data);
   }
 }

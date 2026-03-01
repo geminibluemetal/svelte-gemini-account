@@ -1,26 +1,25 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
-import BaseService from '../base/BaseService';
+import { connectDB } from '$lib/core/server/mongodb';
 import VehicleRepository from './VehicleRepository';
 import { vehicleCreateSchema, vehicleUpdateSchema } from './VehicleSchema';
 
-export default class VehicleService extends BaseService {
+const db = await connectDB()
+export default class VehicleService {
   constructor() {
-    super(VehicleRepository);
+    this.repository = new VehicleRepository(db);
   }
 
   async vehicleList() {
-    const repo = await this.getRepository();
-    return await repo.findAll({}, { shortNumber: 1, isCompanyVehicle: 1, _id: 1 });
+    return await this.repository.findAll({}, { shortNumber: 1, isCompanyVehicle: 1, _id: 1 });
   }
 
   async createVehicle(data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await vehicleCreateSchema.safeParseAsync(data);
       if (!parsed.success) {
         schemaError(parsed);
       }
-      return await repo.create(parsed.data);
+      return await this.repository.create(parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -28,12 +27,11 @@ export default class VehicleService extends BaseService {
 
   async updateVehicle(id, data) {
     try {
-      const repo = await this.getRepository();
       const parsed = await vehicleUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) {
         schemaError(parsed);
       }
-      return await repo.updateById(id, parsed.data);
+      return await this.repository.updateById(id, parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -41,8 +39,7 @@ export default class VehicleService extends BaseService {
 
   async deleteVehicle(id) {
     try {
-      const repo = await this.getRepository();
-      return await repo.deleteById(id);
+      return await this.repository.deleteById(id);
     } catch (error) {
       return handleServiceError(error);
     }
