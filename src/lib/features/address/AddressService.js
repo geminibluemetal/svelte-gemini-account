@@ -1,9 +1,9 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
-import { connect } from 'node:tls';
+import { connectDB } from '$lib/core/server/mongodb';
 import AddressRepository from './AddressRepository';
 import { addressCreateSchema, addressUpdateSchema } from './AddressSchema';
 
-const db = await connect()
+const db = await connectDB()
 export default class AddressService {
   constructor() {
     this.repository = new AddressRepository(db);
