@@ -7,7 +7,7 @@
 export function applyProjection(data = {}, projection = {}) {
   if (!projection || Object.keys(projection).length === 0) return { ...data };
 
-  const result = {};
+  const result = { id: data.id };
   const includeMode = Object.values(projection).some((v) => v === 1);
 
   if (includeMode) {
