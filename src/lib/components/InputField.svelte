@@ -73,8 +73,6 @@
         } else {
           selectedOptionIndex = 0; // Loop back to first option
         }
-      } else {
-        showOptions = true;
       }
     } else if (e.key === 'ArrowUp') {
       // Navigate up with loop from top to bottom
@@ -107,6 +105,9 @@
       // Close dropdown without selecting
       showOptions = false;
     } else if (e.key === 'Tab') {
+      if (filtered.length > 0 && value && showOptions) {
+        value = filtered[selectedOptionIndex];
+      }
       // Close dropdown when tabbing away
       showOptions = false;
     }
@@ -212,7 +213,7 @@
   {/if}
 
   {#if options.length}
-    {#if showOptions && filtered.length}
+    {#if showOptions && filtered.length && value}
       <div
         class="absolute top-full left-0 z-10 max-h-50 w-full overflow-auto rounded-b-md border-2 border-amber-500 bg-white dark:bg-gray-950"
       >
@@ -226,7 +227,9 @@
             onmousedown={(e) => handleOptionClick(e, index)}
             tabindex="0"
           >
-            {option}
+            <div class="flex justify-between">
+              <span>{option}</span> <span class="text-black/50">{option} with extra text</span>
+            </div>
           </div>
         {/each}
       </div>
