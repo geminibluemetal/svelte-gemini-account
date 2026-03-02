@@ -26,14 +26,14 @@ export default class BaseRepository {
       createdAt: new Date(),
       updatedAt: null,
     });
-
     if (!result.acknowledged) throw new AppError('Database insert failed');
-    return handleSuccess('Created Success');
+    return handleSuccess('Created Success', result);
   }
 
   // Find one
-  async findOne(query = {}) {
-    const doc = await this.collection.findOne(query);
+  async findOne(query = {}, projection = {}, options = {}) {
+    const finalOptions = { ...options, projection };
+    const doc = await this.collection.findOne(query, finalOptions);
     return this.toModel(doc);
   }
 
@@ -58,21 +58,21 @@ export default class BaseRepository {
       { $set: { ...data, updatedAt: new Date() } },
     );
     if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Updated Success');
+    return handleSuccess('Updated Success', result);
   }
 
   // Update Fields
   async updateFieldsById(id, updates) {
     const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, { $set: updates });
     if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Fields updated successfully');
+    return handleSuccess('Fields updated successfully', result);
   }
 
   // Update Fields
   async updateFields(updates) {
     const result = await this.collection.updateOne({}, { $set: updates });
     if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Fields updated successfully');
+    return handleSuccess('Fields updated successfully', result);
   }
 
   // Delete
@@ -81,20 +81,36 @@ export default class BaseRepository {
       _id: this.toObjectId(id),
     });
     if (!result.acknowledged) throw new AppError('Database delete failed');
-    return handleSuccess('Deleted Success');
+    return handleSuccess('Deleted Success', result);
   }
 
   // Delete with filter
   async deleteByFilter(filter) {
     const result = await this.collection.deleteMany(filter);
     if (!result.acknowledged) throw new AppError('Database delete failed');
-    return handleSuccess('Deleted Success');
+    return handleSuccess('Deleted Success', result);
   }
 
   // Update aggregation fields
   async toggleSignById(id) {
-    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, [{ $set: { sign: { $not: "$sign" } } }]);
+    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, [
+      { $set: { sign: { $not: '$sign' } } },
+    ]);
     if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Signed successfully');
+    return handleSuccess('Signed successfully', result);
+  }
+
+  getDateFilter(dateInput, fieldName) {
+    const date = new Date(dateInput);
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    return {
+      [fieldName]: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    };
   }
 }

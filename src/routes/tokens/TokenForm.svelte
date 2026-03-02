@@ -1,5 +1,5 @@
 <script>
-  import CheckBoxField from '$lib/components/CheckBoxField.svelte';
+  // import CheckBoxField from '$lib/components/CheckBoxField.svelte';
   import Form from '$lib/components/Form.svelte';
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
@@ -10,7 +10,7 @@
   let data = $derived({ ...item });
 
   const partyList = $derived(options.party.map((p) => p.name));
-  const vehicleList = $derived(options.vehicle.map((v) => v.short_number));
+  const vehicleList = $derived(options.vehicle.map((v) => v.shortNumber));
   const itemsList = $derived(options.item.map((i) => i.name));
 
   function handleClose() {
@@ -19,8 +19,8 @@
 
   function handleFormSubmit({ formData }) {
     if (item) {
-      formData.set('delivery_item', item.delivery_item ? item.delivery_item : '');
-      formData.set('delivery_quantity', item.delivery_quantity ? item.delivery_quantity : '');
+      formData.set('deliveryItem', item.deliveryItem ? item.deliveryItem : '');
+      formData.set('deliveryQuantity', item.deliveryQuantity ? item.deliveryQuantity : '');
     }
     return async ({ result }) => {
       if (result.type == 'failure') {
@@ -44,11 +44,11 @@
     enhance={handleFormSubmit}
   >
     {#if !!item}
-      <input type="hidden" name="editId" value={item?._id} />
+      <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="party_name"
-      value={data.party_name}
+      name="partyName"
+      value={data.partyName}
       placeholder="Party"
       autoComplete="off"
       options={partyList}
@@ -63,8 +63,8 @@
       silent={true}
     />
     <InputField
-      name="token_item"
-      value={data.token_item}
+      name="tokenItem"
+      value={data.tokenItem}
       placeholder="Item"
       autoComplete="off"
       caseMode="smartTitleChars"
@@ -73,14 +73,14 @@
       silent={true}
     />
     <InputField
-      name="token_quantity"
-      value={data.token_quantity}
+      name="tokenQuantity"
+      value={data.tokenQuantity}
       placeholder="Quantity"
       autoComplete="off"
       caseMode="none"
     />
     {#if !!item}
-      <CheckBoxField name="is_cancelled" value={data.is_cancelled} placeholder="Is Cancelled" />
+      <!-- <CheckBoxField name="isCancelled" value={data.isCancelled} placeholder="Is Cancelled" /> -->
     {/if}
   </Form>
 </Model>

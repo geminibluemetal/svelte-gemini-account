@@ -6,35 +6,35 @@ import { EVENTS } from '$lib/core/server/serverBusEvents';
 import { getFormattedDate } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import SettingsService from '../settings/SettingsService';
-import OrderRepository from './OrderRepository';
-import { orderCreateSchema, orderUpdateSchema } from './OrderSchema';
+import DeliveryRepository from './DeliveryRepository';
+import { deliveryCreateSchema, deliveryUpdateSchema } from './DeliverySchema';
 
 const db = await connectDB();
-export default class OrderService {
+export default class DeliveryService {
   constructor() {
     this.settingsService = new SettingsService();
-    this.repository = new OrderRepository(db);
+    this.repository = new DeliveryRepository(db);
   }
 
-  async orderList() {
+  async deliveryList() {
     return await this.repository.findAll();
   }
 
-  async createOrder(data) {
+  async createDelivery(data) {
     try {
-      const parsed = await orderCreateSchema.safeParseAsync(data);
+      const parsed = await deliveryCreateSchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
       const settings = await this.settingsService.getSettings();
 
-      parsed.data.orderNumber = settings.nextOrderNumber;
-      const order = await this.repository.create(parsed.data);
+      parsed.data.deliveryNumber = settings.nextDeliveryNumber;
+      const delivery = await this.repository.create(parsed.data);
 
-      // Store order number in settings
-      if (order?.ok) {
+      if (delivery?.ok) {
         const result = await this.settingsService.updateSetting({
-          lastOrderNumber: settings.nextOrderNumber,
+          lastDeliveryNumber: settings.nextDeliveryNumber,
         });
-        if (!result.ok) throw new AppError('Order created but auto order number increment breaked');
+        if (!result.ok)
+          throw new AppError('Delivery created but auto delivery number increment breaked');
       }
 
       // Emit Events
@@ -43,18 +43,18 @@ export default class OrderService {
       // 2. Todo: Handle Cash Report Sync
       // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
 
-      return order;
+      return delivery;
     } catch (error) {
       return handleServiceError(error);
     }
   }
 
-  async updateOrder(id, data) {
+  async updateDelivery(id, data) {
     try {
-      const parsed = await orderUpdateSchema.safeParseAsync({ ...data, id });
+      const parsed = await deliveryUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) schemaError(parsed);
 
-      const order = await this.repository.updateById(id, parsed.data);
+      const delivery = await this.repository.updateById(id, parsed.data);
 
       // Emit Events
       // 1. Handle Phone Updates for Party
@@ -62,14 +62,14 @@ export default class OrderService {
       // 2. Todo: Handle Cash Report Sync
       // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
 
-      return order;
+      return delivery;
     } catch (error) {
       return handleServiceError(error);
     }
   }
 
   // IMPORTANT: In Later if we implement these we should also do cash report sync
-  // async deleteOrder(id) {
+  // async deleteDelivery(id) {
   //   try {
 
   //     return await this.repository.deleteById(id);
@@ -78,15 +78,15 @@ export default class OrderService {
   //   }
   // }
 
-  async getOrderByNumber(orderNumber) {
+  async getDeliveryByNumber(deliveryNumber) {
     try {
-      return await this.repository.findOne({ orderNumber });
+      return await this.repository.findOne({ deliveryNumber });
     } catch (error) {
       return handleServiceError(error);
     }
   }
 
-  async getAllAvailableOrders() {
+  async getAllAvailableDeliverys() {
     try {
       const filter = { status: { $in: ['New', 'Loading', 'Partial'] } };
       return await this.repository.findAll(filter);
@@ -95,7 +95,7 @@ export default class OrderService {
     }
   }
 
-  async signOrder(id) {
+  async signDelivery(id) {
     try {
       return await this.repository.toggleSignById(id);
     } catch (error) {
@@ -113,11 +113,11 @@ export default class OrderService {
 
   async resetStatus(id) {
     try {
-      const order = await this.repository.findById(id);
-      const status = OrderService.examineStatusByQuantity(
-        order.totalQty,
-        order.deliveredQty,
-        order.balanceQty,
+      const delivery = await this.repository.findById(id);
+      const status = DeliveryService.examineStatusByQuantity(
+        delivery.totalQty,
+        delivery.deliveredQty,
+        delivery.balanceQty,
       );
       return await this.repository.updateById(id, { status });
     } catch (error) {
@@ -125,7 +125,7 @@ export default class OrderService {
     }
   }
 
-  async clearCompletedOrder() {
+  async clearCompletedDelivery() {
     try {
       return await this.repository.deleteByFilter({
         status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
@@ -136,7 +136,7 @@ export default class OrderService {
   }
 
   async singlePrint(data) {
-    const order = await this.repository.findById(data.id);
+    const delivery = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 2)
@@ -149,11 +149,11 @@ export default class OrderService {
         .align('left')
 
         .pairs('Date', getFormattedDate())
-        .pairs('Order', order.orderNumber)
-        .pairs('Party', order.partyName)
-        .pairs('Address', order.address)
-        .pairs('Phone', order.phone)
-        .pairs('Item', order.item)
+        .pairs('Delivery', delivery.deliveryNumber)
+        .pairs('Party', delivery.partyName)
+        .pairs('Address', delivery.address)
+        .pairs('Phone', delivery.phone)
+        .pairs('Item', delivery.item)
         .pairs('Qty', formatFixed(data.qty))
         .pairs('Amount', data.amount)
         .pairs('Tip', data.tip)
@@ -166,7 +166,7 @@ export default class OrderService {
   }
 
   async fullPrint(data) {
-    const order = await this.repository.findById(data.id);
+    const delivery = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(2, 2)
@@ -179,18 +179,18 @@ export default class OrderService {
         .align('left')
 
         .pairs('Date', getFormattedDate())
-        .pairs('Order', order.orderNumber)
-        .pairs('Party', order.partyName)
-        .pairs('Address', order.address)
-        .pairs('Phone', order.phone)
-        .pairs('Item', order.item)
-        .pairs('Qty', formatFixed(order.totalQty))
-        .pairs('Amount', order.amount)
-        .pairs('Advance', order.advance)
-        .pairs('Discount', order.discount)
-        .pairs('Balance', order.balance)
+        .pairs('Delivery', delivery.deliveryNumber)
+        .pairs('Party', delivery.partyName)
+        .pairs('Address', delivery.address)
+        .pairs('Phone', delivery.phone)
+        .pairs('Item', delivery.item)
+        .pairs('Qty', formatFixed(delivery.totalQty))
+        .pairs('Amount', delivery.amount)
+        .pairs('Advance', delivery.advance)
+        .pairs('Discount', delivery.discount)
+        .pairs('Balance', delivery.balance)
         .pairs('Tip', data.tip)
-        .pairs('Total', Number(order.balance) + Number(data.tip))
+        .pairs('Total', Number(delivery.balance) + Number(data.tip))
         .flushPairs()
 
         .feed(1)
@@ -199,18 +199,18 @@ export default class OrderService {
   }
 
   async phonePrint(data) {
-    const order = await this.repository.findById(data.id);
+    const delivery = await this.repository.findById(data.id);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 1)
         .setTextSize(1, 0)
         .align('left')
 
-        .pairs('Order', order.orderNumber)
-        .pairs('Address', order.address)
-        .pairs('Phone', order.phone)
-        .pairs('Item', order.item)
-        .pairs('Qty', formatFixed(order.totalQty))
+        .pairs('Delivery', delivery.deliveryNumber)
+        .pairs('Address', delivery.address)
+        .pairs('Phone', delivery.phone)
+        .pairs('Item', delivery.item)
+        .pairs('Qty', formatFixed(delivery.totalQty))
         .flushPairs()
 
         .feed(1)

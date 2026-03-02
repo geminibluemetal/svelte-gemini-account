@@ -1,3 +1,5 @@
+import { serializeDoc } from '$lib/utils/serializer';
+
 export default class AppError extends Error {
   constructor(message) {
     super(message);
@@ -24,6 +26,6 @@ export function handleServiceError(error) {
   }
 }
 
-export function handleSuccess(message) {
-  return { ok: true, message: message ? message : 'Operation Success' };
+export function handleSuccess(message, data) {
+  return { ok: true, message: message ? message : 'Operation Success', data: serializeDoc(data) };
 }

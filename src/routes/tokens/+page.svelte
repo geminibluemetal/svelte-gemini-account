@@ -16,10 +16,10 @@
   const { data } = $props();
   const headers = [
     { name: 'Serial', align: 'center', key: 'serial' },
-    { name: 'Time', align: 'center', key: 'created_at', display: 'time', width: '85' },
-    { name: 'Party', align: 'left', key: 'party_name', width: '300' },
-    { name: 'Item', align: 'left', key: 'token_item', width: '125' },
-    { name: 'Quantity', align: 'center', key: 'token_quantity', display: 'decimal' },
+    { name: 'Time', align: 'center', key: 'createdAt', display: 'time', width: '85' },
+    { name: 'Party', align: 'left', key: 'partyName', width: '300' },
+    { name: 'Item', align: 'left', key: 'tokenItem', width: '125' },
+    { name: 'Quantity', align: 'center', key: 'tokenQuantity', display: 'decimal' },
     { name: 'Vehicle', align: 'left', key: 'vehicle', width: '70' },
   ];
 
@@ -38,8 +38,8 @@
 
   const viewList = $derived({
     all: data.token,
-    closed: data.token.filter((t) => t.delivery_item && t.delivery_quantity),
-    opened: data.token.filter((t) => !t.delivery_item || !t.delivery_quantity),
+    closed: data.token.filter((t) => t.deliveryItem && t.deliveryQuantity),
+    opened: data.token.filter((t) => !t.deliveryItem || !t.deliveryQuantity),
   });
 
   function handleTokenEdit(item) {
@@ -50,7 +50,7 @@
   async function handleTokenDelete(item) {
     const confirmed = await confirm(`Are you Sure to Delete?`);
     if (confirmed) {
-      const result = await transportAction('?/delete', { id: item._id });
+      const result = await transportAction('?/delete', { id: item.id });
       if (result.type === 'failure') {
         const parsedData = JSON.parse(result.data);
         let message = parsedData[parsedData[0].message];
@@ -60,7 +60,7 @@
     }
   }
 
-  const handleTokenPrint = (item) => transportAction('?/print', { id: item._id });
+  const handleTokenPrint = (item) => transportAction('?/print', { id: item.id });
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -112,7 +112,7 @@
   const toggleOpenForm = () => (formOpened = !formOpened);
 
   function rowHighlight(item) {
-    return item.is_cancelled ? HighlightRow.red : null;
+    return item.isCancelled ? HighlightRow.red : null;
   }
 
   onMount(() => {
