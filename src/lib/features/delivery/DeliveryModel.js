@@ -23,6 +23,7 @@ export default function Delivery(
     isCancelled = false, // Used in token
     createdAt = null, // Used in token
     updatedAt = null, // Used in token
+    ...extraFields
   } = {},
   projection = {},
 ) {
@@ -48,6 +49,7 @@ export default function Delivery(
     isCancelled,
     createdAt,
     updatedAt,
+    ...extraFields,
   };
   return applyProjection(allFields, projection);
 }

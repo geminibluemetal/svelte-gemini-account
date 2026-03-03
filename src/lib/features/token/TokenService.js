@@ -4,13 +4,11 @@ import { printOut } from '$lib/core/server/print';
 import { getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import DeliveryRepository from '../delivery/DeliveryRepository';
-import SettingsService from '../settings/SettingsService';
 import { tokenSchema } from './TokenSchema';
 
 const db = await connectDB();
 export default class TokenService {
   constructor() {
-    this.settingsService = new SettingsService();
     this.repository = new DeliveryRepository(db, true); // Passing true as 2nd para should use Token model instead of delivery
   }
 

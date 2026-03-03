@@ -6,11 +6,11 @@ export default class PartyStatementRepository extends BaseRepository {
     super(db, 'partyStatement', PartyStatement);
   }
 
-  async findAllOldBalance(date) {
+  async findAllOldBalance(date, extraFilter = {}) {
     const dateFilter = this.getDateFilter(date, 'createdAt');
     const pipeline = [
       {
-        $match: dateFilter,
+        $match: { ...dateFilter, ...extraFilter },
       },
       {
         $addFields: {

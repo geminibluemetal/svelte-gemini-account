@@ -1,13 +1,11 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
-import SettingsService from '../settings/SettingsService';
 import PartyStatementRepository from './PartyStatementRepository';
 import { partyStatementSchema } from './PartyStatementSchema';
 
 const db = await connectDB();
 export default class PartyStatementService {
   constructor() {
-    this.settingsService = new SettingsService();
     this.repository = new PartyStatementRepository(db);
   }
 
@@ -55,5 +53,9 @@ export default class PartyStatementService {
     } catch (error) {
       return handleServiceError(error);
     }
+  }
+
+  async getAllOldBalanceCashList(date) {
+    return await this.repository.findAllOldBalance(date, { amountType: 'Cash' });
   }
 }

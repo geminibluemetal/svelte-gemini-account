@@ -4,16 +4,15 @@ import {
   createNewCashReport,
   deleteCash,
   deleteCashReport,
-  getAllCash,
-  getAllReports,
   signCash,
   updateCash,
 } from '$lib/entity/cash/cash.service.js';
-import { fetchAllCashDescription } from '$lib/entity/cash/cash_description.dal.js';
-import { getAllDeliveryCash } from '$lib/entity/delivery/delivery.dal.js';
-import { getAllParty } from '$lib/entity/party/party.service.js';
-import { getAllOldBalanceCash } from '$lib/entity/party/party.statements.dal.js';
-import { formatDateTime } from '$lib/utils/dateTime';
+import CashService from '$lib/features/cash/CashService';
+import CashDescriptionService from '$lib/features/cashDescription/CashDescriptionService';
+import CashReportService from '$lib/features/cashReport/CashReportService';
+import DeliveryService from '$lib/features/delivery/DeliveryService';
+import PartyService from '$lib/features/party/PartyService';
+import PartyStatementService from '$lib/features/partyStatement/PartyStatementService';
 import { formDataToObject } from '$lib/utils/form';
 import { fail } from '@sveltejs/kit';
 
@@ -25,19 +24,23 @@ export async function load({ depends, url }) {
   const reportIndex = parseInt(url.searchParams.get('report') || '0', 10);
 
   // Use passed date if valid, otherwise default to today
-  const formattedDate = Date.parse(dateParam)
-    ? formatDateTime('YY-MM-DD', dateParam)
-    : formatDateTime('YY-MM-DD');
+  const formattedDate = Date.parse(dateParam) ? new Date(dateParam) : new Date();
 
   // 2. Fetch all data in parallel (Avoiding Waterfalls)
+  const cashReportService = new CashReportService();
+  const cashService = new CashService();
+  const deliveryService = new DeliveryService();
+  const partyStatementService = new PartyStatementService();
+  const cashDescriptionService = new CashDescriptionService();
+  const partyService = new PartyService();
   const [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] =
     await Promise.all([
-      getAllReports(formattedDate),
-      getAllCash(formattedDate),
-      getAllDeliveryCash(formattedDate),
-      getAllOldBalanceCash(formattedDate),
-      fetchAllCashDescription(),
-      getAllParty(),
+      cashReportService.cashReportList(formattedDate),
+      cashService.cashList(formattedDate),
+      deliveryService.cashList(formattedDate),
+      partyStatementService.getAllOldBalanceCashList(formattedDate),
+      cashDescriptionService.cashDescriptionList(),
+      partyService.partyList(),
     ]);
 
   // 3. Determine Report Time Boundaries
@@ -58,13 +61,15 @@ export async function load({ depends, url }) {
   let expense = directCash.filter((c) => c.entryType === 'EXPENSE' && isWithinReport(c));
   expense.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-  return {
+  const data = {
     income,
     expense,
     reports,
     party,
     cashDescription,
   };
+  console.log(oldBalanceCash);
+  return data;
 }
 
 /**
