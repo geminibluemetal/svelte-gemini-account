@@ -7,6 +7,8 @@ export default function Token(
     partyName = null,
     tokenItem = null,
     tokenQuantity = 0,
+    deliveryItem = null,
+    deliveryQuantity = 0,
     vehicle = null,
     createdAt = null,
     updatedAt = null,
@@ -20,6 +22,7 @@ export default function Token(
     tokenItem,
     tokenQuantity,
     vehicle,
+    isClosed: Boolean(deliveryItem && deliveryQuantity),
     createdAt,
     updatedAt,
   };

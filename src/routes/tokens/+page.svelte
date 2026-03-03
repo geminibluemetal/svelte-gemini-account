@@ -38,8 +38,8 @@
 
   const viewList = $derived({
     all: data.token,
-    closed: data.token.filter((t) => t.deliveryItem && t.deliveryQuantity),
-    opened: data.token.filter((t) => !t.deliveryItem || !t.deliveryQuantity),
+    closed: data.token.filter((t) => t.isCloased),
+    opened: data.token.filter((t) => !t.isCloased),
   });
 
   function handleTokenEdit(item) {

@@ -23,6 +23,7 @@
     createOption = dummyFunction,
     placeholder = '',
     allowedChars = [],
+    optionHelperText = () => {},
     onEnter = dummyFunction,
     onValueChange = dummyFunction,
     onValueSelected = dummyFunction,
@@ -228,7 +229,7 @@
             tabindex="0"
           >
             <div class="flex justify-between">
-              <span>{option}</span> <span class="text-black/50">{option} with extra text</span>
+              <span>{option}</span> <span class="text-black/50">{optionHelperText(option)}</span>
             </div>
           </div>
         {/each}
