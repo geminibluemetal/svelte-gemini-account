@@ -19,14 +19,14 @@ export default class TokenService {
     return await this.repository.findAll(dateFilter);
   }
 
-  async createToken(data) {
+  async createToken(data, additionalDataToPrint = {}) {
     try {
       const parsed = await tokenSchema.safeParse(data);
       if (!parsed.success) schemaError(parsed);
       parsed.data.serial = await this.getLastSerial();
       const tokenResult = await this.repository.create(parsed.data);
       const token = await this.repository.findById(tokenResult.data.insertedId);
-      this.sendPrint(token);
+      this.sendPrint(token, additionalDataToPrint);
       return tokenResult;
     } catch (error) {
       return handleServiceError(error);
@@ -49,7 +49,8 @@ export default class TokenService {
   async deleteToken(id) {
     try {
       // Get last token and match id for delete last token only
-      const lastToken = await this.repository.findOne({}, { _id: 1 }, { sort: { createdAt: -1 } });
+      const lastToken = await this.repository.findOne({}, {}, { sort: { createdAt: -1 } });
+      if (lastToken.isClosed) throw new AppError('Cannot delete closed token.');
       if (lastToken.id === id) return await this.repository.deleteById(id);
       throw new AppError('Can only delete last token');
     } catch (error) {
@@ -59,7 +60,7 @@ export default class TokenService {
 
   async printToken(id) {
     try {
-      const token = this.repository.findById(id);
+      const token = await this.repository.findById(id);
       this.sendPrint(token);
     } catch (error) {
       return handleServiceError(error);
@@ -81,7 +82,8 @@ export default class TokenService {
     }
   }
 
-  sendPrint(token, additionalData) {
+  sendPrint(token, additionalData = {}) {
+    console.log('Printing Token with data:', token, additionalData);
     printOut((p) => {
       p.reset()
         .beepOn(3, 1)
@@ -94,10 +96,10 @@ export default class TokenService {
         .align('left');
 
       p.pairs('Token', token.serial);
-      p.pairs('Party', token.party_name);
+      p.pairs('Party', token.partyName);
       p.pairs('Vcle', token.vehicle);
-      p.pairs('Item', token.token_item);
-      p.pairs('Qty', formatFixed(token.token_quantity));
+      p.pairs('Item', token.tokenItem);
+      p.pairs('Qty', formatFixed(token.tokenQuantity));
       p.pairs('Date', getFormattedDate());
       p.pairs('Time', getFormattedTime());
 

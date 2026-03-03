@@ -66,7 +66,7 @@ export class ESCPOSPrinter {
   pairs(label, value, totalWidth = 32) {
     // Store pairs in cache to calculate max width later
     if (!this._pairsCache) this._pairsCache = [];
-    this._pairsCache.push({ label, value, totalWidth });
+    this._pairsCache.push({ label, value: value ? value : '-', totalWidth });
     return this;
   }
   flushPairs() {

@@ -1,9 +1,6 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import { getAllAddress } from '$lib/entity/address/address.service.js';
 import { getAllItems } from '$lib/entity/items/items.service.js';
-import {
-  createTokenFromOrder,
-} from '$lib/entity/orders/order.service.js';
 import { getAllParty } from '$lib/entity/party/party.service.js';
 import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
 import OrderService from '$lib/features/orders/OrderService.js';
@@ -137,7 +134,8 @@ export const actions = {
   orderToToken: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    const result = await createTokenFromOrder(data.id, data);
+    const orderService = new OrderService();
+    const result = await orderService.generateToken(data.id, data);
     if (!result?.ok) {
       return fail(400, { message: result.message });
     }

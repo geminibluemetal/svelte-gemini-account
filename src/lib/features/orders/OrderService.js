@@ -6,6 +6,7 @@ import { EVENTS } from '$lib/core/server/serverBusEvents';
 import { getFormattedDate } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import SettingsService from '../settings/SettingsService';
+import TokenService from '../token/TokenService';
 import OrderRepository from './OrderRepository';
 import { orderCreateSchema, orderUpdateSchema } from './OrderSchema';
 
@@ -133,6 +134,21 @@ export default class OrderService {
     } catch (error) {
       return handleServiceError(error);
     }
+  }
+
+  async generateToken(id, data) {
+    const order = await this.repository.findById(data.id);
+    const tokenService = new TokenService();
+    tokenService.createToken({
+      partyName: order.partyName,
+      tokenItem: order.item,
+      tokenQuantity: data.qty || order.totalQty,
+      deliveryItem: null,
+      deliveryQuantity: 0,
+      vehicle: data.vehicle,
+    }, {
+      phone: order.phone,
+    });
   }
 
   async singlePrint(data) {
