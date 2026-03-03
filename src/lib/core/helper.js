@@ -50,15 +50,15 @@ function getAmountByItemQuantity(item, qty) {
   } else if (quantity <= 0.5) {
     return parseFloat(item.price_050) || 0;
   } else if (quantity <= 1.0) {
-    return parseFloat(item.price_100) || 0;
+    return parseFloat(item.price100) || 0;
   } else if (quantity <= 1.5) {
-    return parseFloat(item.price_150) || 0;
+    return parseFloat(item.price150) || 0;
   } else if (quantity <= 2.0) {
-    return parseFloat(item.price_200) || 0;
+    return parseFloat(item.price200) || 0;
   } else {
     // Handle quantities above 2.0 - you might want to add logic for this
     // For now, return the maximum price or calculate proportionally
-    return parseFloat(item.price_200) * (quantity / 2) || 0;
+    return parseFloat(item.price200) * (quantity / 2) || 0;
   }
 }
 
@@ -70,8 +70,8 @@ function getDeliveryCharge(qty, address) {
   if (quantity <= 0.25) {
     return parseFloat(address.delivery_025) || 0;
   } else if (quantity <= 1.0) {
-    // Note: In your address data, you have delivery_050_100 which likely covers 0.5 to 1.0
-    return parseFloat(address.delivery_050_100) || 0;
+    // Note: In your address data, you have delivery_050100 which likely covers 0.5 to 1.0
+    return parseFloat(address.delivery_050100) || 0;
   } else {
     // For quantities above 1.0, use delivery_max
     return parseFloat(address.delivery_max) || 0;

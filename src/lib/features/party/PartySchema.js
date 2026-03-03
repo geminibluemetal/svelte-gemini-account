@@ -25,17 +25,21 @@ export function partySchema(isUpdate = false) {
     name: z
       .string({
         required_error: 'Party name is required',
-        invalid_type_error: 'Party name must be text'
+        invalidType_error: 'Party name must be text',
       })
       .trim()
       .min(1, 'Party name cannot be empty'),
     phone: z.preprocess(
       (val) => (val === '' ? null : val),
-      z.string()
+      z
+        .string()
         .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
-        .nullable()
+        .nullable(),
     ),
-    openingBalance: z.coerce.number({ invalid_type_error: 'Delivery Charge must be a number' }).min(0, 'Delivery Charge cannot be negative').nullable(),
+    openingBalance: z.coerce
+      .number({ invalidType_error: 'Delivery Charge must be a number' })
+      .min(0, 'Delivery Charge cannot be negative')
+      .nullable(),
     createdAt: z.date().optional().nullable(),
     updatedAt: z.date().optional().nullable(),
   });
@@ -43,10 +47,7 @@ export function partySchema(isUpdate = false) {
   return baseSchema.superRefine(async (data, ctx) => {
     // Only run DB check if name exists to avoid redundant errors
     if (data.name) {
-      const isUnique = await validateUniqueName(
-        data.name,
-        isUpdate ? data.id : null
-      );
+      const isUnique = await validateUniqueName(data.name, isUpdate ? data.id : null);
 
       if (!isUnique) {
         ctx.addIssue({

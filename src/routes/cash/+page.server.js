@@ -51,11 +51,11 @@ export async function load({ depends, url }) {
   };
 
   let income = [...directCash, ...deliveryCash, ...oldBalanceCash].filter(
-    (c) => c.entry_type !== 'EXPENSE' && isWithinReport(c),
+    (c) => c.entryType !== 'EXPENSE' && isWithinReport(c),
   );
   income.sort((a, b) => new Date(a.time) - new Date(b.time));
 
-  let expense = directCash.filter((c) => c.entry_type === 'EXPENSE' && isWithinReport(c));
+  let expense = directCash.filter((c) => c.entryType === 'EXPENSE' && isWithinReport(c));
   expense.sort((a, b) => new Date(a.time) - new Date(b.time));
 
   return {

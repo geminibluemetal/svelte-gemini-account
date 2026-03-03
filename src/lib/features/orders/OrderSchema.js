@@ -36,7 +36,7 @@ export function orderSchema() {
       totalQty: z.coerce
         .number({
           required_error: 'Total Quantity is required',
-          invalid_type_error: 'Total Quantity must be a number',
+          invalidType_error: 'Total Quantity must be a number',
         })
         .positive('Total Quantity must be greater than 0'),
       amountType: z.string(),

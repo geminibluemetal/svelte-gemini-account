@@ -81,9 +81,9 @@ export async function deleteParty(id) {
 
 export async function createOldBalance(data) {
   if (!data.party_id) return { message: 'Party is required', ok: false };
-  if (!data.amount_type) return { message: 'Amount Type is required', ok: false };
+  if (!data.amountType) return { message: 'Amount Type is required', ok: false };
   if (!data.amount) return { message: 'Amount is required', ok: false };
-  if (!data.entry_type) return { message: 'Entry Type Missing', ok: false };
+  if (!data.entryType) return { message: 'Entry Type Missing', ok: false };
   if (data.amount && isNaN(Number(data.amount)))
     return { message: 'Amount should be number', ok: false };
 
@@ -98,9 +98,9 @@ export async function createOldBalance(data) {
 export async function updateOldBalance(data, id) {
   if (Number(data.sign)) return { message: 'Can not edit Signed Old Balance', ok: false };
   if (!data.party_id) return { message: 'Party is required', ok: false };
-  if (!data.amount_type) return { message: 'Amount Type is required', ok: false };
+  if (!data.amountType) return { message: 'Amount Type is required', ok: false };
   if (!data.amount) return { message: 'Amount is required', ok: false };
-  if (!data.entry_type) return { message: 'Entry Type Missing', ok: false };
+  if (!data.entryType) return { message: 'Entry Type Missing', ok: false };
   if (data.amount && isNaN(Number(data.amount)))
     return { message: 'Amount should be number', ok: false };
 

@@ -19,7 +19,7 @@ export const tokenSchema = z.object({
   tokenQuantity: z.coerce
     .number({
       required_error: 'Quantity is required',
-      invalid_type_error: 'Quantity must be a number',
+      invalidType_error: 'Quantity must be a number',
     })
     .positive('Quantity must be greater than 0'),
 });

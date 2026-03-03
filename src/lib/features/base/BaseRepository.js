@@ -91,13 +91,20 @@ export default class BaseRepository {
     return handleSuccess('Deleted Success', result);
   }
 
-  // Update aggregation fields
+  // Toggle sign by aggregation
   async toggleSignById(id) {
-    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, [
-      { $set: { sign: { $not: '$sign' } } },
-    ]);
+    const result = await this.toggleFieldById(id, 'sign');
     if (!result.acknowledged) throw new AppError('Database update failed');
     return handleSuccess('Signed successfully', result);
+  }
+
+  // Toggle aggregation fields
+  async toggleFieldById(id, field) {
+    const result = await this.collection.updateOne({ _id: this.toObjectId(id) }, [
+      { $set: { [field]: { $not: `$${field}` } } },
+    ]);
+    if (!result.acknowledged) throw new AppError('Database update failed');
+    return handleSuccess('Toggled successfully', result);
   }
 
   getDateFilter(dateInput, fieldName) {

@@ -17,15 +17,15 @@ export async function getAllToken(date = new Date()) {
 export async function createToken(data, takePrint = true) {
   if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
   if (!data.token_item) return { message: 'Item is Required', ok: false };
-  if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
-  if (data.token_quantity && isNaN(Number(data.token_quantity)))
+  if (!data.tokenQuantity) return { message: 'Quantity is Required', ok: false };
+  if (data.tokenQuantity && isNaN(Number(data.tokenQuantity)))
     return { message: 'Quantity should be a number', ok: false };
 
   let serial = await fetchLastSerialByDate();
   serial = Number(serial) + 1;
 
   data.serial = serial;
-  data.token_quantity = Number(data.token_quantity);
+  data.tokenQuantity = Number(data.tokenQuantity);
   console.log(data);
   const result = await insertToken(data);
 
@@ -36,7 +36,7 @@ export async function createToken(data, takePrint = true) {
         Party: data.party_name,
         Vcle: data.vehicle,
         Item: data.token_item,
-        Qty: formatFixed(data.token_quantity),
+        Qty: formatFixed(data.tokenQuantity),
         Date: getFormattedDate(),
         Time: getFormattedTime(),
       });
@@ -70,12 +70,12 @@ export async function printToken(data) {
 }
 
 export async function updateToken(data, editId, takePrint = true) {
-  if (data.delivery_item && data.delivery_quantity)
+  if (data.delivery_item && data.deliveryQuantity)
     return { message: 'Can not modify delivered token', ok: false };
   if (!data.vehicle) return { message: 'Vehicle is Required', ok: false };
   if (!data.token_item) return { message: 'Item is Required', ok: false };
-  if (!data.token_quantity) return { message: 'Quantity is Required', ok: false };
-  if (data.token_quantity && isNaN(Number(data.token_quantity)))
+  if (!data.tokenQuantity) return { message: 'Quantity is Required', ok: false };
+  if (data.tokenQuantity && isNaN(Number(data.tokenQuantity)))
     return { message: 'Quantity should be a number', ok: false };
 
   const result = await updateTokenById(data, editId);
@@ -88,7 +88,7 @@ export async function updateToken(data, editId, takePrint = true) {
           Party: token.party_name,
           Vcle: token.vehicle,
           Item: token.token_item,
-          Qty: formatFixed(token.token_quantity),
+          Qty: formatFixed(token.tokenQuantity),
           Date: getFormattedDate(),
           Time: getFormattedTime(),
         });
@@ -101,7 +101,7 @@ export async function deleteToken(id) {
   const token = fetchDeliveryById(id);
   let lastSerial = fetchLastSerialByDate(formatDateTime('YY-MM-DD'));
   if (token.serial != lastSerial) return { message: 'Can only delete last token', ok: false };
-  if (token.delivery_item && token.delivery_quantity)
+  if (token.delivery_item && token.deliveryQuantity)
     return { message: "Can't Delete Delivered Token", ok: false };
   if (token.sign) return { message: "Can't Delete Signed Token", ok: false };
 
@@ -123,7 +123,7 @@ export async function printTokenById(id) {
       Party: token.party_name,
       Vcle: token.vehicle,
       Item: token.token_item,
-      Qty: formatFixed(token.token_quantity),
+      Qty: formatFixed(token.tokenQuantity),
       Date: getFormattedDate(),
       Time: getFormattedTime(),
     });

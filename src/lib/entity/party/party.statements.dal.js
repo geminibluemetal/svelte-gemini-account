@@ -4,15 +4,15 @@ export const tableName = 'party_statements';
 
 export function insertPartyOldBalance(data) {
   const query = `
-    INSERT INTO ${tableName} (party_id, amount_type, amount, entry_type, time)
+    INSERT INTO ${tableName} (party_id, amountType, amount, entryType, time)
     VALUES (?, ?, ?, ?, ?)
   `;
   const stat = db.prepare(query);
   return stat.run(
     data.party_id,
-    data.amount_type,
+    data.amountType,
     data.amount,
-    data.entry_type,
+    data.entryType,
     new Date().toISOString(),
   );
 }
@@ -21,13 +21,13 @@ export function updatePartyOldBalance(data, id) {
   const query = `
     UPDATE ${tableName}
     SET party_id = ?,
-        amount_type = ?,
+        amountType = ?,
         amount = ?,
-        entry_type = ?
+        entryType = ?
     WHERE id = ?
   `;
   const stat = db.prepare(query);
-  return stat.run(data.party_id, data.amount_type, data.amount, data.entry_type, id);
+  return stat.run(data.party_id, data.amountType, data.amount, data.entryType, id);
 }
 
 export function fetchAllOldBalanceByDate(date) {
@@ -36,14 +36,14 @@ export function fetchAllOldBalanceByDate(date) {
       ob.id,
       ob.party_id,
       p.name as party_name,
-      ob.amount_type,
+      ob.amountType,
       ob.amount,
       ob.sign,
-      ob.entry_type
+      ob.entryType
     FROM ${tableName} ob
     INNER JOIN party p ON ob.party_id = p.id
     WHERE DATE(ob.created_at) = '${date}'
-    AND ob.entry_type = 'CREDIT';
+    AND ob.entryType = 'CREDIT';
   `;
   const stat = db.prepare(query);
   db.pragma('wal_checkpoint(TRUNCATE)');
@@ -58,18 +58,18 @@ export function getAllOldBalanceCash(date) {
       'OB' AS serial,
       strftime('%Y-%m-%dT%H:%M:%Sz', ob.time) AS time,
       p.name || ' O/B' AS description,
-      ob.amount_type,
+      ob.amountType,
       ob.amount,
       ob.sign,
-      ob.entry_type,
+      ob.entryType,
       ob.created_at,
       'OB' AS source
     FROM ${tableName} ob
     INNER JOIN party p ON ob.party_id = p.id
     WHERE ob.created_at >= ?
       AND ob.created_at < date(?, '+1 day')
-      AND ob.entry_type = 'CREDIT'
-      AND ob.amount_type = 'Cash'
+      AND ob.entryType = 'CREDIT'
+      AND ob.amountType = 'Cash'
   `;
 
   const stat = db.prepare(query);
@@ -108,11 +108,11 @@ export function fetchAllBalanceForParty(type) {
         p.name,
         p.phone,
         p.opening_balance,
-        COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) as total_debit,
-        COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
+        COALESCE(SUM(CASE WHEN ps.entryType = 'DEBIT' THEN ps.amount ELSE 0 END), 0) as total_debit,
+        COALESCE(SUM(CASE WHEN ps.entryType = 'CREDIT' THEN ps.amount ELSE 0 END), 0) as total_credit,
         (p.opening_balance +
-         COALESCE(SUM(CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE 0 END), 0) -
-         COALESCE(SUM(CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE 0 END), 0)
+         COALESCE(SUM(CASE WHEN ps.entryType = 'DEBIT' THEN ps.amount ELSE 0 END), 0) -
+         COALESCE(SUM(CASE WHEN ps.entryType = 'CREDIT' THEN ps.amount ELSE 0 END), 0)
         ) AS current_balance
     FROM party p
     LEFT JOIN party_statements ps ON p.id = ps.party_id
@@ -142,18 +142,18 @@ export function fetchPartyStatementByPartyId(id) {
       ps.qty,
       ps.amount,
       ps.sign,
-      ps.entry_type,
-      ps.amount_type,
+      ps.entryType,
+      ps.amountType,
       -- FIX 1: Map the display columns correctly
-      CASE WHEN ps.entry_type = 'DEBIT' THEN ps.amount ELSE NULL END as debit,
-      CASE WHEN ps.entry_type = 'CREDIT' THEN ps.amount ELSE NULL END as credit,
+      CASE WHEN ps.entryType = 'DEBIT' THEN ps.amount ELSE NULL END as debit,
+      CASE WHEN ps.entryType = 'CREDIT' THEN ps.amount ELSE NULL END as credit,
       -- FIX 2: Running Balance must use the SAME order as the final query
       (
         p.opening_balance +
         SUM(
           CASE
-            WHEN ps.entry_type = 'DEBIT' THEN ps.amount
-            WHEN ps.entry_type = 'CREDIT' THEN -ps.amount
+            WHEN ps.entryType = 'DEBIT' THEN ps.amount
+            WHEN ps.entryType = 'CREDIT' THEN -ps.amount
             ELSE 0
           END
         ) OVER (

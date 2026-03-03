@@ -13,8 +13,8 @@ export async function getAllItems() {
 
 export async function createItem(data) {
   if (!data.name) return { message: 'Name is Required', ok: false };
-  if (data.name.includes('+') && !data.name.includes(' + ')) return { message: 'Add space between +', ok: false };
-
+  if (data.name.includes('+') && !data.name.includes(' + '))
+    return { message: 'Add space between +', ok: false };
 
   const itemExist = await fetchSingleItemByName(data.name);
 
@@ -24,9 +24,9 @@ export async function createItem(data) {
 
   data.price_025 = parseFloat(data.price_025);
   data.price_050 = parseFloat(data.price_050);
-  data.price_100 = parseFloat(data.price_100);
-  data.price_150 = parseFloat(data.price_150);
-  data.price_200 = parseFloat(data.price_200);
+  data.price100 = parseFloat(data.price100);
+  data.price150 = parseFloat(data.price150);
+  data.price200 = parseFloat(data.price200);
 
   const result = await insertItem(data);
 
@@ -52,9 +52,9 @@ export async function updateItem(data, editId) {
 
   data.price_025 = parseFloat(data.price_025);
   data.price_050 = parseFloat(data.price_050);
-  data.price_100 = parseFloat(data.price_100);
-  data.price_150 = parseFloat(data.price_150);
-  data.price_200 = parseFloat(data.price_200);
+  data.price100 = parseFloat(data.price100);
+  data.price150 = parseFloat(data.price150);
+  data.price200 = parseFloat(data.price200);
 
   const result = await updateItemById(data, editId);
 

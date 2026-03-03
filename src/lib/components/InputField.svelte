@@ -41,8 +41,8 @@
   let selectedOptionIndex = $state(0);
   let filtered = $derived(
     fullSearch
-      ? options.filter((o) => o.toLowerCase().includes(value?.toLowerCase()))
-      : options.filter((o) => o.toLowerCase().startsWith(value?.toLowerCase())),
+      ? options.filter((o) => o?.toLowerCase()?.includes(value?.toLowerCase()))
+      : options.filter((o) => o?.toLowerCase()?.startsWith(value?.toLowerCase())),
   );
 
   // Auto-scroll when selectedOptionIndex changes

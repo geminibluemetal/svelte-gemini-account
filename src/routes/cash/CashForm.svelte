@@ -9,7 +9,7 @@
     order_id: null,
     amount: 0,
     description: '',
-    entry_type: 'EXPENSE',
+    entryType: 'EXPENSE',
   };
 
   let data = $state(initialData);
@@ -53,8 +53,8 @@
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="entry_type"
-      value={data.entry_type}
+      name="entryType"
+      value={data.entryType}
       options={['EXPENSE', 'INCOME']}
       placeholder="Entry Type"
       autoComplete="off"

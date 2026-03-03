@@ -18,9 +18,9 @@ export function fetchAllCash(date) {
   return stmt.all(date);
 }
 
-export function insertCash(data, entry_type) {
+export function insertCash(data, entryType) {
   const query = `
-    INSERT INTO cash (order_id, amount, description, sign, entry_type)
+    INSERT INTO cash (order_id, amount, description, sign, entryType)
     VALUES (?, ?, ?, ?, ?)
   `;
   const stat = db.prepare(query);
@@ -29,11 +29,11 @@ export function insertCash(data, entry_type) {
     data.amount || 0,
     data.description || null,
     data.sign ? 1 : 0,
-    entry_type || 'INCOME',
+    entryType || 'INCOME',
   );
 }
 
-export function updateCash(data, entry_type, id) {
+export function updateCash(data, entryType, id) {
   const query = `
     UPDATE cash
     SET
@@ -41,7 +41,7 @@ export function updateCash(data, entry_type, id) {
       amount = ?,
       description = ?,
       sign = ?,
-      entry_type = ?
+      entryType = ?
     WHERE id = ?
   `;
 
@@ -52,7 +52,7 @@ export function updateCash(data, entry_type, id) {
     data.amount || 0,
     data.description || null,
     data.sign ? 1 : 0,
-    entry_type || 'INCOME',
+    entryType || 'INCOME',
     id,
   );
 }

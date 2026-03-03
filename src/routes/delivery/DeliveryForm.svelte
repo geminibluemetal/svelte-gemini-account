@@ -22,7 +22,7 @@
   let data = $state(initialData);
   let isAc = $state(false);
 
-  const orderList = $derived(['NO', ...options.orders.map((o) => o.orderNumber.toString())]);
+  const orderList = $derived(['NO', ...options.orders.map((o) => o.orderNumber?.toString())]);
   const partyList = $derived(options.party.map((p) => p.name));
   const addressList = $derived(options.address.map((a) => a.name));
   const itemsList = $derived(options.item.map((i) => i.name));
@@ -56,6 +56,7 @@
       formData.set('vehicle', item.vehicle);
       formData.set('sign', item.sign);
       formData.set('amountType2', item.amountType2);
+      formData.set('deliveredAt', item.deliveredAt ? item.deliveredAt : '');
     }
     return async ({ result }) => {
       if (result.type == 'failure') {

@@ -59,8 +59,8 @@ export function createCash(data) {
   }
 
   let result;
-  if (data.entry_type == 'INCOME') result = createIncome(data);
-  if (data.entry_type == 'EXPENSE') result = createExpense(data);
+  if (data.entryType == 'INCOME') result = createIncome(data);
+  if (data.entryType == 'EXPENSE') result = createExpense(data);
 
   if (result?.changes) return { message: 'Created', ok: true };
 }
@@ -84,8 +84,8 @@ export function updateCash(data, id) {
   }
 
   let result;
-  if (data.entry_type == 'INCOME') result = updateIncome(data, id);
-  if (data.entry_type == 'EXPENSE') result = updateExpense(data, id);
+  if (data.entryType == 'INCOME') result = updateIncome(data, id);
+  if (data.entryType == 'EXPENSE') result = updateExpense(data, id);
 
   if (result?.changes) return { message: 'Created', ok: true };
 }

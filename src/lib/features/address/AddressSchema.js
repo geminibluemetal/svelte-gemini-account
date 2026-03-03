@@ -27,17 +27,29 @@ export function addressSchema(isUpdate = false) {
     name: z
       .string({
         required_error: 'Address name is required',
-        invalid_type_error: 'Address name must be text'
+        invalidType_error: 'Address name must be text',
       })
       .trim()
       .min(1, 'Address name cannot be empty'),
 
     // Price object validation
-    deliveryCharges: z.object({
-      chargeHalf: z.coerce.number({ invalid_type_error: 'Delivery Charge must be a number' }).min(0, 'Delivery Charge cannot be negative').nullable(),
-      chargeSingle: z.coerce.number({ invalid_type_error: 'Delivery Charge must be a number' }).min(0, 'Delivery Charge cannot be negative').nullable(),
-      chargeMax: z.coerce.number({ invalid_type_error: 'Delivery Charge must be a number' }).min(0, 'Delivery Charge cannot be negative').nullable(),
-    }, { required_error: 'Delivery Charges breakdown is required' }),
+    deliveryCharges: z.object(
+      {
+        chargeHalf: z.coerce
+          .number({ invalidType_error: 'Delivery Charge must be a number' })
+          .min(0, 'Delivery Charge cannot be negative')
+          .nullable(),
+        chargeSingle: z.coerce
+          .number({ invalidType_error: 'Delivery Charge must be a number' })
+          .min(0, 'Delivery Charge cannot be negative')
+          .nullable(),
+        chargeMax: z.coerce
+          .number({ invalidType_error: 'Delivery Charge must be a number' })
+          .min(0, 'Delivery Charge cannot be negative')
+          .nullable(),
+      },
+      { required_error: 'Delivery Charges breakdown is required' },
+    ),
 
     createdAt: z.date().optional().nullable(),
     updatedAt: z.date().optional().nullable(),
@@ -46,10 +58,7 @@ export function addressSchema(isUpdate = false) {
   return baseSchema.superRefine(async (data, ctx) => {
     // Only run DB check if name exists to avoid redundant errors
     if (data.name) {
-      const isUnique = await validateUniqueName(
-        data.name,
-        isUpdate ? data.id : null
-      );
+      const isUnique = await validateUniqueName(data.name, isUpdate ? data.id : null);
 
       if (!isUnique) {
         ctx.addIssue({

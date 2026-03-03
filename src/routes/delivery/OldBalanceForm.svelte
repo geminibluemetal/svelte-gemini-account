@@ -6,10 +6,10 @@
 
   const { open, onClose, item, options } = $props();
   let initialData = {
-    entry_type: 'CREDIT',
+    entryType: 'CREDIT',
     party_id: '',
     party_name: '',
-    amount_type: '', // Cash, Paytm, Gpay, Bunk Cash, Bunk Ac, Gemini Ac, Cheque
+    amountType: '', // Cash, Paytm, Gpay, Bunk Cash, Bunk Ac, Gemini Ac, Cheque
     amount: 0,
   };
   let data = $state(initialData);
@@ -17,7 +17,7 @@
   const amountType = ['Cash', 'Paytm', 'Gpay', 'Bunk Cash', 'Bunk Ac', 'Gemini Ac', 'Cheque'];
 
   function handleFormSubmit({ formData, cancel }) {
-    formData.set('entry_type', 'CREDIT');
+    formData.set('entryType', 'CREDIT');
     if (item) formData.set('sign', item.sign);
     const partyName = formData.get('party_name');
     const party = options.party.find((p) => p.name == partyName);
@@ -70,8 +70,8 @@
     <InputField
       placeholder="Amount Type"
       options={amountType}
-      name="amount_type"
-      value={data.amount_type}
+      name="amountType"
+      value={data.amountType}
     />
     <InputField placeholder="Amount" name="amount" value={data.amount} />
   </Form>

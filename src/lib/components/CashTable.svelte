@@ -87,7 +87,7 @@
       const wrappedHandler = () => {
         if (overRow >= 0 && overRow < finance[overType].length && doAction) {
           const data = finance[overType][overRow];
-          data.entry_type = overType == 'income' ? 'INCOME' : 'EXPENSE';
+          data.entryType = overType == 'income' ? 'INCOME' : 'EXPENSE';
           handler(data);
         }
       };

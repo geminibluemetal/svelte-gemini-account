@@ -13,7 +13,8 @@ export async function getAllAddress() {
 
 export async function createAddress(data) {
   if (!data.name) return { message: 'Name is Required', ok: false };
-  if (data.name.includes('+') && !data.name.includes(' + ')) return { message: 'Add space between +', ok: false };
+  if (data.name.includes('+') && !data.name.includes(' + '))
+    return { message: 'Add space between +', ok: false };
 
   const addressExist = await fetchSingleAddressByName(data.name);
 
@@ -22,7 +23,7 @@ export async function createAddress(data) {
   }
 
   data.delivery_025 = parseFloat(data.delivery_025);
-  data.delivery_050_100 = parseFloat(data.delivery_050_100);
+  data.delivery_050100 = parseFloat(data.delivery_050100);
   data.delivery_max = parseFloat(data.delivery_max);
 
   const result = await insertAddress(data);
@@ -48,7 +49,7 @@ export async function updateAddress(data, editId) {
   }
 
   data.delivery_025 = parseFloat(data.delivery_025);
-  data.delivery_050_100 = parseFloat(data.delivery_050_100);
+  data.delivery_050100 = parseFloat(data.delivery_050100);
   data.delivery_max = parseFloat(data.delivery_max);
 
   const result = await updateAddressById(data, editId);

@@ -55,10 +55,10 @@ export async function insertToken(data) {
     party_name: data.party_name ?? null,
     vehicle: data.vehicle ?? '',
     token_item: data.token_item ?? '',
-    token_quantity: data.token_quantity ? Number(data.token_quantity) : 0,
+    tokenQuantity: data.tokenQuantity ? Number(data.tokenQuantity) : 0,
     is_cancelled: data.is_cancelled ?? false,
     serial: data.serial ?? 0,
-    token_time: data.token_time ?? null,
+    tokenTime: data.tokenTime ?? null,
     created_at: new Date(), // recommended
   };
   const result = await db.collection(collectionName).insertOne(document);
@@ -71,9 +71,9 @@ export async function updateTokenById(data, id) {
     party_name: data.party_name ?? null,
     vehicle: data.vehicle ?? '',
     token_item: data.token_item ?? '',
-    token_quantity: data.token_quantity ? Number(data.token_quantity) : 0,
+    tokenQuantity: data.tokenQuantity ? Number(data.tokenQuantity) : 0,
     is_cancelled: data.is_cancelled ? Boolean(data.is_cancelled) : false,
-    token_time: data.token_time ?? null,
+    tokenTime: data.tokenTime ?? null,
   };
   const result = await db
     .collection(collectionName)
@@ -94,9 +94,9 @@ export async function syncOrderFromDelivery(oldDelivery, newDelivery) {
     });
 
     if (oldOrder) {
-      const delivered_qty = num(oldOrder.delivered_qty) - num(oldDelivery.delivery_quantity);
-      const balance_qty = num(oldOrder.total_qty) - delivered_qty;
-      const status = examineStatusByQuantity(num(oldOrder.total_qty), delivered_qty, balance_qty);
+      const deliveredQty = num(oldOrder.deliveredQty) - num(oldDelivery.deliveryQuantity);
+      const balanceQty = num(oldOrder.totalQty) - deliveredQty;
+      const status = examineStatusByQuantity(num(oldOrder.totalQty), deliveredQty, balanceQty);
 
       const delivery_sheet_verified = oldDelivery.sign
         ? num(oldOrder.delivery_sheet_verified) - 1
@@ -106,8 +106,8 @@ export async function syncOrderFromDelivery(oldDelivery, newDelivery) {
         { order_number: oldOrder.order_number },
         {
           $set: {
-            delivered_qty,
-            balance_qty,
+            deliveredQty,
+            balanceQty,
             status,
             delivery_sheet_verified,
           },
@@ -123,11 +123,11 @@ export async function syncOrderFromDelivery(oldDelivery, newDelivery) {
     });
 
     if (newOrder) {
-      const delivered_qty = num(newOrder.delivered_qty) + num(newDelivery.delivery_quantity);
+      const deliveredQty = num(newOrder.deliveredQty) + num(newDelivery.deliveryQuantity);
 
-      const balance_qty = num(newOrder.total_qty) - delivered_qty;
+      const balanceQty = num(newOrder.totalQty) - deliveredQty;
 
-      const status = examineStatusByQuantity(num(newOrder.total_qty), delivered_qty, balance_qty);
+      const status = examineStatusByQuantity(num(newOrder.totalQty), deliveredQty, balanceQty);
 
       const delivery_sheet_verified = newDelivery.sign
         ? num(newOrder.delivery_sheet_verified) + 1
@@ -137,8 +137,8 @@ export async function syncOrderFromDelivery(oldDelivery, newDelivery) {
         { order_number: newOrder.order_number },
         {
           $set: {
-            delivered_qty,
-            balance_qty,
+            deliveredQty,
+            balanceQty,
             status,
             delivery_sheet_verified,
           },
@@ -155,19 +155,19 @@ export async function syncLedgerFromDelivery(delivery) {
 
   const num = (val) => Number(val) || 0;
 
-  const isAc = delivery.amount_type_1 === 'AC' || delivery.amount_type_2 === 'AC';
+  const isAc = delivery.amountType1 === 'AC' || delivery.amountType2 === 'AC';
   const party_name = delivery.party_name;
   const isCancelled = delivery.is_cancelled;
 
   let amount =
-    (delivery.amount_type_1 === 'AC' ? num(delivery.amount_1) : 0) +
-    (delivery.amount_type_2 === 'AC' ? num(delivery.amount_2) : 0);
+    (delivery.amountType1 === 'AC' ? num(delivery.amount1) : 0) +
+    (delivery.amountType2 === 'AC' ? num(delivery.amount2) : 0);
 
   // 🔹 Calculate fallback amount
   if (!amount) {
     const address = await fetchSingleAddressByName(delivery.address);
     const item = await fetchSingleItemByName(delivery.delivery_item);
-    const amountResult = calculateAmount(address, item, delivery.delivery_quantity);
+    const amountResult = calculateAmount(address, item, delivery.deliveryQuantity);
     if (!amountResult.success) {
       return amountResult;
     }
@@ -195,11 +195,11 @@ export async function syncLedgerFromDelivery(delivery) {
   const document = {
     party_id: party._id,
     delivery_id: new ObjectId(delivery._id),
-    amount_type: null,
-    entry_type: 'DEBIT',
+    amountType: null,
+    entryType: 'DEBIT',
     amount: amount,
     item: delivery.delivery_item ?? null,
-    qty: num(delivery.delivery_quantity),
+    qty: num(delivery.deliveryQuantity),
     vehicle: delivery.vehicle ?? null,
     address: delivery.address ?? null,
     created_at: new Date(delivery.delivered_aT),
@@ -234,10 +234,9 @@ export async function updateDeliveryById(data, id) {
       ? new Date(data.delivered_aT)
       : (oldDelivery.delivered_aT ?? null),
     delivery_item: data.delivery_item ?? null,
-    delivery_quantity:
-      data.delivery_quantity !== undefined ? Number(data.delivery_quantity) || 0 : 0,
-    amount_type_1: data.amount_type_1 ?? null,
-    amount_1: data.amount_1 !== undefined ? Number(data.amount_1) || 0 : 0,
+    deliveryQuantity: data.deliveryQuantity !== undefined ? Number(data.deliveryQuantity) || 0 : 0,
+    amountType1: data.amountType1 ?? null,
+    amount1: data.amount1 !== undefined ? Number(data.amount1) || 0 : 0,
     is_cancelled: data.is_cancelled !== undefined ? Boolean(data.is_cancelled) : false,
   };
 
@@ -264,14 +263,14 @@ export async function updateDeliveryAmountById(data, id) {
   const db = await connectDB();
   const delivery = db.collection('delivery');
 
-  const hasAmount = data.amount_1 || data.amount_type_1 || data.amount_2 || data.amount_type_2;
+  const hasAmount = data.amount1 || data.amountType1 || data.amount2 || data.amountType2;
 
   const updateFields = {
-    amount_time: hasAmount ? new Date() : null,
-    amount_type_1: data.amount_type_1 ?? null,
-    amount_1: data.amount_1 !== undefined ? Number(data.amount_1) || 0 : 0,
-    amount_type_2: data.amount_type_2 ?? null,
-    amount_2: data.amount_2 !== undefined ? Number(data.amount_2) || 0 : 0,
+    amountTime: hasAmount ? new Date() : null,
+    amountType1: data.amountType1 ?? null,
+    amount1: data.amount1 !== undefined ? Number(data.amount1) || 0 : 0,
+    amountType2: data.amountType2 ?? null,
+    amount2: data.amount2 !== undefined ? Number(data.amount2) || 0 : 0,
   };
 
   const result = await delivery.updateOne({ _id: new ObjectId(id) }, { $set: updateFields });
@@ -360,10 +359,10 @@ export async function getAllDeliveryCash(date) {
     .aggregate([
       {
         $match: {
-          amount_time: { $gte: start, $lte: end },
+          amountTime: { $gte: start, $lte: end },
           $or: [
-            { amount_type_1: 'CP', amount_1: { $ne: 0 } },
-            { amount_type_2: 'CP', amount_2: { $ne: 0 } },
+            { amountType1: 'CP', amount1: { $ne: 0 } },
+            { amountType2: 'CP', amount2: { $ne: 0 } },
           ],
         },
       },
@@ -380,10 +379,10 @@ export async function getAllDeliveryCash(date) {
           amount: {
             $add: [
               {
-                $cond: [{ $eq: ['$amount_type_1', 'CP'] }, '$amount_1', 0],
+                $cond: [{ $eq: ['$amountType1', 'CP'] }, '$amount1', 0],
               },
               {
-                $cond: [{ $eq: ['$amount_type_2', 'CP'] }, '$amount_2', 0],
+                $cond: [{ $eq: ['$amountType2', 'CP'] }, '$amount2', 0],
               },
             ],
           },
@@ -394,7 +393,7 @@ export async function getAllDeliveryCash(date) {
         $project: {
           id: '$_id',
           serial: 1,
-          time: '$amount_time',
+          time: '$amountTime',
           description: 1,
           amount: 1,
           sign: 1,

@@ -30,7 +30,7 @@
       display: 'currency',
       color: debitColor,
     },
-    { name: 'AT', key: 'amount_type', align: 'center', width: 100, color: AmountTypeColor },
+    { name: 'AT', key: 'amountType', align: 'center', width: 100, color: AmountTypeColor },
     {
       name: 'Credit',
       align: 'right',

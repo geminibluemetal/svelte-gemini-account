@@ -1,13 +1,7 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import {
-  markDelivery,
-  signDeliveryById,
-  updateDeliveryAmount,
-} from '$lib/entity/delivery/delivery.service.js';
-import {
   createOldBalance,
   deleteOldBalance,
-  getAllOldBalance,
   signOldBalanceById,
   updateOldBalance,
 } from '$lib/entity/party/party.service.js';
@@ -42,7 +36,8 @@ export async function load({ depends, url }) {
   const token = await deliveryService.deliveryList(formattedDate);
   const party = await partyService.partyList();
   const item = await itemService.itemList();
-  const oldBalance = await getAllOldBalance(formattedDate);
+  // const oldBalance = await getAllOldBalance(formattedDate);
+  const oldBalance = [];
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),
@@ -75,7 +70,8 @@ export const actions = {
   amountUpdate: async ({ request }) => {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
-    const result = await updateDeliveryAmount(data, editId);
+    const deliveryService = new DeliveryService();
+    const result = await deliveryService.amountEntry(editId, data);
 
     if (!result?.ok) {
       return fail(400, { message: result.message });
@@ -91,7 +87,8 @@ export const actions = {
   sign: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    signDeliveryById(data.id, data.current);
+    const deliveryService = new DeliveryService();
+    await deliveryService.signDelivery(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'CASH.LIST' });
@@ -102,7 +99,8 @@ export const actions = {
   mark: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    markDelivery(data.id, data.current);
+    const deliveryService = new DeliveryService();
+    await deliveryService.markDelivery(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
   },
 

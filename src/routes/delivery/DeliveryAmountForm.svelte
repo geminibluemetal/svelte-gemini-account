@@ -5,14 +5,7 @@
   import { showToast } from '$lib/stores/toast';
 
   const { open, onClose, item } = $props();
-  let initialData = {
-    amount_type_1: null, // AC, CP, Paytm, Gpay, Bunk
-    amount_1: null,
-    amount_type_2: null, // AC, CP, Paytm, Gpay, Bunk
-    amount_2: null,
-  };
-
-  let data = $state(initialData);
+  let data = $derived({ ...item });
   const amountType = ['AC', 'CP', 'Paytm', 'Gpay', 'Bunk'];
 
   function handleClose() {
@@ -23,8 +16,10 @@
     if (item) {
       formData.set('sign', item.sign);
       formData.set('address', item.address);
-      formData.set('delivery_item', item.delivery_item);
-      formData.set('delivery_quantity', item.delivery_quantity);
+      formData.set('deliveryItem', item.deliveryItem);
+      formData.set('deliveryQuantity', item.deliveryQuantity);
+      formData.set('partyName', item.partyName);
+      formData.set('paymentAt', item?.paymentAt ? item.paymentAt : '');
     }
     return async ({ result }) => {
       if (result.type == 'failure') {
@@ -35,10 +30,6 @@
       }
     };
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -55,27 +46,23 @@
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="amount_type_1"
-      value={data.amount_type_1}
+      name="amountType1"
+      value={data.amountType1}
       placeholder="Amount Type 1"
-      options={item?.party_name && data.amount_type_2 != 'AC'
-        ? amountType
-        : amountType.filter((x) => x !== 'AC')}
+      options={item?.partyName ? amountType : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
-    <InputField name="amount_1" value={data.amount_1} placeholder="Amount 1" autoComplete="off" />
+    <InputField name="amount1" value={data.amount1} placeholder="Amount 1" autoComplete="off" />
 
     <div class="mx-auto mt-2 mb-5"></div>
 
     <InputField
-      name="amount_type_2"
-      value={data.amount_type_2}
+      name="amountType2"
+      value={data.amountType2}
       placeholder="Amount Type 2"
-      options={item?.party_name && data.amount_type_1 != 'AC'
-        ? amountType
-        : amountType.filter((x) => x !== 'AC')}
+      options={amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
-    <InputField name="amount_2" value={data.amount_2} placeholder="Amount 2" autoComplete="off" />
+    <InputField name="amount2" value={data.amount2} placeholder="Amount 2" autoComplete="off" />
   </Form>
 </Model>

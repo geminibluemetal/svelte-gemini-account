@@ -24,7 +24,7 @@
     { name: 'SN', key: 'serial', align: 'center', width: '38', color: serialColor },
     { name: 'T Time', key: 'createdAt', display: 'time', align: 'center', width: '80' },
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
-    { name: 'D Time', key: 'deliveredAt', align: 'center', width: '80' },
+    { name: 'D Time', key: 'deliveredAt', align: 'center', display: 'time', width: '80' },
     { name: 'ON', key: 'orderNumber', align: 'center', width: '38', color: orderColor },
     { name: 'Party', key: 'partyName', width: '220' },
     { name: 'Address', key: 'address', width: '220' },
@@ -34,7 +34,7 @@
     { name: 'Amount1', key: 'amount1', align: 'center', color: Amount1Color },
     { name: 'AT2', key: 'amountType2', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount2', key: 'amount2', align: 'center', color: Amount2Color },
-    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
+    { name: 'Sign', key: 'sign', align: 'center', display: 'sign', color: SignColor },
   ];
 
   const oldBalanceHeaders = [
@@ -440,8 +440,6 @@
     { key: 'D', handler: handleOldBalanceDelete },
     { key: 'Enter', handler: handleOldBalanceEdit },
   ];
-
-  const toggleOpenForm = () => (formOpened = !formOpened);
 
   function customCellHighlight(item) {
     if (item.deliveryItem && item.deliveryQuantity)

@@ -39,11 +39,11 @@ export async function createOrder(data) {
   if (data.phone && data.phone.length != 10)
     return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
-  if (!data.total_qty) return { message: 'Quantity is required', ok: false };
-  if (!data.party_name && data.amount_type == 'AC')
+  if (!data.totalQty) return { message: 'Quantity is required', ok: false };
+  if (!data.party_name && data.amountType == 'AC')
     return { message: 'AC type need Party Name', ok: false };
-  if (data.amount_type != 'AC' && !data.amount) return { message: 'Amount is Required', ok: false };
-  if (data.total_qty && isNaN(Number(data.total_qty)))
+  if (data.amountType != 'AC' && !data.amount) return { message: 'Amount is Required', ok: false };
+  if (data.totalQty && isNaN(Number(data.totalQty)))
     return { message: 'Quantity should be Number', ok: false };
   if (data.amount && isNaN(Number(data.amount)))
     return { message: 'Amount should be Number', ok: false };
@@ -73,7 +73,7 @@ export async function createOrder(data) {
 
   data.order_number = currentOrderNumber;
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
-  data.balance_qty = Number(data.total_qty);
+  data.balanceQty = Number(data.totalQty);
 
   let result = await insertOrder(data);
 
@@ -95,11 +95,11 @@ export async function updateOrder(data, editId) {
   if (data.phone && data.phone.length != 10)
     return { message: 'Phone number must be 10 numbers', ok: false };
   if (!data.item) return { message: 'Item is required', ok: false };
-  if (!data.total_qty) return { message: 'Quantity is required', ok: false };
-  if (!data.party_name && data.amount_type == 'AC')
+  if (!data.totalQty) return { message: 'Quantity is required', ok: false };
+  if (!data.party_name && data.amountType == 'AC')
     return { message: 'AC type need Party Name', ok: false };
-  if (data.amount_type != 'AC' && !data.amount) return { message: 'Amount is Required', ok: false };
-  if (data.total_qty && isNaN(Number(data.total_qty)))
+  if (data.amountType != 'AC' && !data.amount) return { message: 'Amount is Required', ok: false };
+  if (data.totalQty && isNaN(Number(data.totalQty)))
     return { message: 'Quantity should be Number', ok: false };
   if (data.amount && isNaN(Number(data.amount)))
     return { message: 'Amount should be Number', ok: false };
@@ -114,7 +114,7 @@ export async function updateOrder(data, editId) {
     if (order.advance != data.advance) {
       return { message: "Advance amount can't changed after Signed", ok: false };
     }
-    if (order.amount_type != data.amount_type) {
+    if (order.amountType != data.amountType) {
       return { message: "Amount Type can't changed after Signed", ok: false };
     }
   }
@@ -130,8 +130,8 @@ export async function updateOrder(data, editId) {
   }
 
   data.balance = Number(data.amount) - Number(data.advance) - Number(data.discount);
-  data.balance_qty = (Number(data.total_qty) || 0) - (Number(order.delivered_qty) || 0);
-  data.status = await examineStatusByQuantity(data.total_qty, order.delivered_qty, data.balance_qty);
+  data.balanceQty = (Number(data.totalQty) || 0) - (Number(order.deliveredQty) || 0);
+  data.status = await examineStatusByQuantity(data.totalQty, order.deliveredQty, data.balanceQty);
 
   let result = await updateOrderById(editId, data);
 
@@ -203,7 +203,7 @@ export async function orderFullPrint(data) {
       .pairs('Address', order.address)
       .pairs('Phone', order.phone)
       .pairs('Item', order.item)
-      .pairs('Qty', formatFixed(order.total_qty))
+      .pairs('Qty', formatFixed(order.totalQty))
       .pairs('Amount', order.amount)
       .pairs('Advance', order.advance)
       .pairs('Discount', order.discount)
@@ -231,7 +231,7 @@ export async function orderPhonePrint(data) {
       .pairs('Address', order.address)
       .pairs('Phone', order.phone)
       .pairs('Item', order.item)
-      .pairs('Qty', formatFixed(order.total_qty))
+      .pairs('Qty', formatFixed(order.totalQty))
       // .pairs('Amount', order.amount)
       // .pairs('Advance', order.advance)
       // .pairs('Discount', order.discount)
@@ -264,19 +264,23 @@ export async function orderStatusToFinished(id) {
 }
 export async function orderStatusReset(id) {
   const order = await fetchSingleOrderById(id);
-  const status = await examineStatusByQuantity(order.total_qty, order.delivered_qty, order.balance_qty);
+  const status = await examineStatusByQuantity(
+    order.totalQty,
+    order.deliveredQty,
+    order.balanceQty,
+  );
   updateSingleOrderColumn(id, 'status', status);
 }
 
-export function examineStatusByQuantity(total_qty, delivered_qty, balance_qty) {
-  total_qty = Number(total_qty) || 0;
-  delivered_qty = Number(delivered_qty) || 0;
-  balance_qty = Number(balance_qty) || 0;
-  return delivered_qty >= total_qty
+export function examineStatusByQuantity(totalQty, deliveredQty, balanceQty) {
+  totalQty = Number(totalQty) || 0;
+  deliveredQty = Number(deliveredQty) || 0;
+  balanceQty = Number(balanceQty) || 0;
+  return deliveredQty >= totalQty
     ? 'Delivered'
-    : total_qty === balance_qty && delivered_qty === 0
+    : totalQty === balanceQty && deliveredQty === 0
       ? 'New'
-      : balance_qty !== 0
+      : balanceQty !== 0
         ? 'Partial'
         : 'New';
 }
@@ -292,7 +296,7 @@ export async function createTokenFromOrder(id, data) {
     party_name: order.party_name,
     vehicle: data.vehicle,
     token_item: order.item,
-    token_quantity: data.qty || order.total_qty,
+    tokenQuantity: data.qty || order.totalQty,
   };
   const result = await createToken(tokenData, false);
   if (result.lastInsertRowid) {
@@ -303,7 +307,7 @@ export async function createTokenFromOrder(id, data) {
       Phone: order.phone || '',
       Vcle: data.vehicle || 'Vehicle',
       Item: token.token_item,
-      Qty: formatFixed(data.qty || token.token_quantity),
+      Qty: formatFixed(data.qty || token.tokenQuantity),
       Date: getFormattedDate(),
       Time: getFormattedTime(),
     });
@@ -321,10 +325,10 @@ export async function clearCompletedOrder() {
 
 async function syncCashReport(order, isUpdate) {
   const advance = num(order.advance);
-  const isCashType = order.amount_type == 'Cash';
+  const isCashType = order.amountType == 'Cash';
   if (advance && isCashType) {
     const data = {
-      entry_type: 'INCOME',
+      entryType: 'INCOME',
       order_id: order.id,
       amount: advance,
       sign: order?.sign || 0,

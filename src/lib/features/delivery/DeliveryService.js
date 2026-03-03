@@ -7,7 +7,7 @@ import { getFormattedDate } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import SettingsService from '../settings/SettingsService';
 import DeliveryRepository from './DeliveryRepository';
-import { deliveryEntrySchema } from './DeliverySchema';
+import { deliveryEntrySchema, amountEntrySchema } from './DeliverySchema';
 
 const db = await connectDB();
 export default class DeliveryService {
@@ -24,8 +24,39 @@ export default class DeliveryService {
   async deliveryEntry(id, data) {
     try {
       const parsed = await deliveryEntrySchema.safeParseAsync(data);
+      console.log(parsed);
       if (!parsed.success) schemaError(parsed);
+      parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
       return await this.repository.updateById(id, parsed.data);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async amountEntry(id, data) {
+    try {
+      const parsed = await amountEntrySchema.safeParseAsync(data);
+      if (!parsed.success) schemaError(parsed);
+      parsed.data.paymentAt = data?.paymentAt ? new Date(data.paymentAt) : new Date();
+      return await this.repository.updateById(id, parsed.data);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async signDelivery(id) {
+    try {
+      const result = await this.repository.toggleSignById(id);
+      console.log(result);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async markDelivery(id) {
+    try {
+      const result = await this.repository.toggleFieldById(id, 'hasMark');
+      console.log(result);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -72,14 +103,6 @@ export default class DeliveryService {
     try {
       const filter = { status: { $in: ['New', 'Loading', 'Partial'] } };
       return await this.repository.findAll(filter);
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
-  async signDelivery(id) {
-    try {
-      return await this.repository.toggleSignById(id);
     } catch (error) {
       return handleServiceError(error);
     }

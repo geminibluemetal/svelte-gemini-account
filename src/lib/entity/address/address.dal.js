@@ -20,9 +20,18 @@ export async function insertAddress(data) {
 
   const addressDoc = {
     name: data.name ?? null,
-    delivery_025: data.delivery_025 !== undefined && !isNaN(Number(data.delivery_025)) ? Number(data.delivery_025) : null,
-    delivery_050_100: data.delivery_050_100 !== undefined && !isNaN(Number(data.delivery_050_100)) ? Number(data.delivery_050_100) : null,
-    delivery_max: data.delivery_max !== undefined && !isNaN(Number(data.delivery_max)) ? Number(data.delivery_max) : null,
+    delivery_025:
+      data.delivery_025 !== undefined && !isNaN(Number(data.delivery_025))
+        ? Number(data.delivery_025)
+        : null,
+    delivery_050100:
+      data.delivery_050100 !== undefined && !isNaN(Number(data.delivery_050100))
+        ? Number(data.delivery_050100)
+        : null,
+    delivery_max:
+      data.delivery_max !== undefined && !isNaN(Number(data.delivery_max))
+        ? Number(data.delivery_max)
+        : null,
     created_at: new Date(),
   };
 
@@ -35,9 +44,18 @@ export async function updateAddressById(data, id) {
 
   const addressDoc = {
     name: data.name ?? null,
-    delivery_025: data.delivery_025 !== undefined && !isNaN(Number(data.delivery_025)) ? Number(data.delivery_025) : null,
-    delivery_050_100: data.delivery_050_100 !== undefined && !isNaN(Number(data.delivery_050_100)) ? Number(data.delivery_050_100) : null,
-    delivery_max: data.delivery_max !== undefined && !isNaN(Number(data.delivery_max)) ? Number(data.delivery_max) : null,
+    delivery_025:
+      data.delivery_025 !== undefined && !isNaN(Number(data.delivery_025))
+        ? Number(data.delivery_025)
+        : null,
+    delivery_050100:
+      data.delivery_050100 !== undefined && !isNaN(Number(data.delivery_050100))
+        ? Number(data.delivery_050100)
+        : null,
+    delivery_max:
+      data.delivery_max !== undefined && !isNaN(Number(data.delivery_max))
+        ? Number(data.delivery_max)
+        : null,
   };
 
   const result = await db.collection(collectionName).updateOne(
