@@ -42,7 +42,7 @@
     { name: 'Party', key: 'partyName', width: '220' },
     { name: 'AT', key: 'amountType', align: 'center', color: AmountTypeColor, width: '100' },
     { name: 'Amount', key: 'amount', align: 'right', color: AmountOBColor, display: 'currency' },
-    { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
+    { name: 'Sign', key: 'sign', align: 'center', display: 'sign', color: SignColor },
   ];
 
   const viewList = $derived({
@@ -386,7 +386,10 @@
 
   function handleOldBalanceDelete(item) {
     if (item.sign) showToast("Can't Delete Signed Payments", 'danger');
-    else transportAction('?/oldBalanceDelete', { id: item.id });
+    else {
+      const confirmed = confirm(`Are you sure to delete? ${item.partyName} with ${item.amount}.`);
+      if (confirmed) transportAction('?/oldBalanceDelete', { id: item.id });
+    }
   }
 
   function handleOldBalanceSign(item) {

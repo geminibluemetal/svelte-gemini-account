@@ -1,15 +1,10 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import {
-  createOldBalance,
-  deleteOldBalance,
-  signOldBalanceById,
-  updateOldBalance,
-} from '$lib/entity/party/party.service.js';
 import AddressService from '$lib/features/address/AddressService.js';
 import DeliveryService from '$lib/features/delivery/DeliveryService.js';
 import ItemService from '$lib/features/items/ItemService.js';
 import OrderService from '$lib/features/orders/OrderService.js';
 import PartyService from '$lib/features/party/PartyService.js';
+import PartyStatementService from '$lib/features/partyStatement/PartyStatementService';
 import { formatDateTime } from '$lib/utils/dateTime.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
@@ -30,14 +25,14 @@ export async function load({ depends, url }) {
   const addressService = new AddressService();
   const partyService = new PartyService();
   const itemService = new ItemService();
+  const partyStatement = new PartyStatementService();
 
   const orders = await orderService.orderList();
   const address = await addressService.addressList();
   const token = await deliveryService.deliveryList(formattedDate);
   const party = await partyService.partyList();
   const item = await itemService.itemList();
-  // const oldBalance = await getAllOldBalance(formattedDate);
-  const oldBalance = [];
+  const oldBalance = await partyStatement.getAllOldBalance(formattedDate);
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),
@@ -118,8 +113,9 @@ export const actions = {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
     let result = null;
-    if (editId) result = await updateOldBalance(data, editId);
-    else result = await createOldBalance(data);
+    const partyStatement = new PartyStatementService();
+    if (editId) result = await partyStatement.updatePartyStatement(editId, data);
+    else result = await partyStatement.createPartyStatement(data);
 
     if (!result?.ok) {
       return fail(400, { message: result.message });
@@ -135,7 +131,8 @@ export const actions = {
   oldBalanceSign: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    signOldBalanceById(data.id, data.current);
+    const partyStatement = new PartyStatementService();
+    await partyStatement.signPartyStatement(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
     sseEmit({ type: 'CASH.LIST' });
@@ -145,7 +142,8 @@ export const actions = {
   oldBalanceDelete: async ({ request }) => {
     const formData = await request.formData();
     const data = formDataToObject(formData);
-    deleteOldBalance(data.id);
+    const partyStatement = new PartyStatementService();
+    await partyStatement.deletePartyStatement(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
     sseEmit({ type: 'CASH.LIST' });

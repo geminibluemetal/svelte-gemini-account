@@ -5,27 +5,20 @@
   import { showToast } from '$lib/stores/toast';
 
   const { open, onClose, item, options } = $props();
-  let initialData = {
-    entryType: 'CREDIT',
-    party_id: '',
-    party_name: '',
-    amountType: '', // Cash, Paytm, Gpay, Bunk Cash, Bunk Ac, Gemini Ac, Cheque
-    amount: 0,
-  };
-  let data = $state(initialData);
+  let data = $derived({ ...item });
   const partyList = $derived(options.party.map((p) => p.name));
   const amountType = ['Cash', 'Paytm', 'Gpay', 'Bunk Cash', 'Bunk Ac', 'Gemini Ac', 'Cheque'];
 
   function handleFormSubmit({ formData, cancel }) {
     formData.set('entryType', 'CREDIT');
     if (item) formData.set('sign', item.sign);
-    const partyName = formData.get('party_name');
+    const partyName = formData.get('partyName');
     const party = options.party.find((p) => p.name == partyName);
     if (!party?.id) {
       cancel();
       showToast('Party is required', 'danger');
     } else {
-      if (party) formData.set('party_id', party.id);
+      if (party) formData.set('partyId', party.id);
       return async ({ result }) => {
         if (result.type == 'failure') {
           showToast(result?.data?.message || 'Enter Correct Details', 'danger');
@@ -40,10 +33,6 @@
   function handleClose() {
     onClose();
   }
-
-  $effect(() => {
-    data = { ...item };
-  });
 </script>
 
 <Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
@@ -64,8 +53,8 @@
       placeholder="Party Name"
       options={partyList}
       silent={true}
-      name="party_name"
-      value={data.party_name}
+      name="partyName"
+      value={data.partyName}
     />
     <InputField
       placeholder="Amount Type"

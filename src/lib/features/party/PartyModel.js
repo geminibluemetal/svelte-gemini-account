@@ -1,6 +1,6 @@
 import { applyProjection } from '../base/BaseMode';
 
-export default function Address(
+export default function Party(
   {
     id = null,
     name = null,
