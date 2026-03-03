@@ -10,7 +10,7 @@ export default function Order(
     item = null,
     totalQty = 0,
     paymentAt = null,
-    amountType = 'Credit',
+    amountType = 'COD',
     amount = 0,
     advance = 0,
     discount = 0,

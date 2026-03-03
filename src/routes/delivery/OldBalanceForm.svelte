@@ -35,10 +35,6 @@
         }
       };
     }
-
-    return async ({ result }) => {
-      console.log();
-    };
   }
 
   function handleClose() {
@@ -50,12 +46,12 @@
   });
 </script>
 
-<Model {open} onClose={handleClose} autoFocusTabIndex={!!item ? 2 : 1}>
+<Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
   <Form
     action="?/oldBalance"
     method="POST"
     cancel={handleClose}
-    title={!!item ? 'Update Old Balance' : 'New Old Balance'}
+    title={item ? 'Update Old Balance' : 'New Old Balance'}
     isEdit={!!item}
     class="w-sm"
     submitButtonText={['Save', 'Update']}

@@ -38,8 +38,8 @@
 
   const viewList = $derived({
     all: data.token,
-    closed: data.token.filter((t) => t.isCloased),
-    opened: data.token.filter((t) => !t.isCloased),
+    closed: data.token.filter((t) => t.isClosed),
+    opened: data.token.filter((t) => !t.isClosed),
   });
 
   function handleTokenEdit(item) {

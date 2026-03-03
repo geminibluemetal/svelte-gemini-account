@@ -16,30 +16,31 @@
   import { page } from '$app/stores';
   import { CheckCheck, SearchXIcon, Trash } from 'lucide-svelte';
   import OldBalanceForm from './OldBalanceForm.svelte';
+  import { resolve } from '$app/paths';
 
   const { data } = $props();
   let view = $state('All');
   const headers = [
     { name: 'SN', key: 'serial', align: 'center', width: '38', color: serialColor },
-    { name: 'T Time', key: 'created_at', display: 'time', align: 'center', width: '80' },
+    { name: 'T Time', key: 'createdAt', display: 'time', align: 'center', width: '80' },
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
-    { name: 'D Time', key: 'delivery_time', align: 'center', width: '80' },
-    { name: 'ON', key: 'order_number', align: 'center', width: '38', color: orderColor },
-    { name: 'Party', key: 'party_name', width: '220' },
+    { name: 'D Time', key: 'deliveredAt', align: 'center', width: '80' },
+    { name: 'ON', key: 'orderNumber', align: 'center', width: '38', color: orderColor },
+    { name: 'Party', key: 'partyName', width: '220' },
     { name: 'Address', key: 'address', width: '220' },
-    { name: 'Item', key: 'delivery_item', width: '125' },
-    { name: 'Qty', key: 'delivery_quantity', align: 'center', display: 'decimal', width: '55' },
-    { name: 'AT1', key: 'amount_type_1', align: 'center', color: AmountTypeColor, width: '60' },
-    { name: 'Amount1', key: 'amount_1', align: 'center', color: Amount1Color },
-    { name: 'AT2', key: 'amount_type_2', align: 'center', color: AmountTypeColor, width: '60' },
-    { name: 'Amount2', key: 'amount_2', align: 'center', color: Amount2Color },
+    { name: 'Item', key: 'deliveryItem', width: '125' },
+    { name: 'Qty', key: 'deliveryQuantity', align: 'center', display: 'decimal', width: '55' },
+    { name: 'AT1', key: 'amountType1', align: 'center', color: AmountTypeColor, width: '60' },
+    { name: 'Amount1', key: 'amount1', align: 'center', color: Amount1Color },
+    { name: 'AT2', key: 'amountType2', align: 'center', color: AmountTypeColor, width: '60' },
+    { name: 'Amount2', key: 'amount2', align: 'center', color: Amount2Color },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
   ];
 
   const oldBalanceHeaders = [
     // { name: 'SN', key: 'serial', align: 'center', width: '38' },
-    { name: 'Party', key: 'party_name', width: '220' },
-    { name: 'AT', key: 'amount_type', align: 'center', color: AmountTypeColor, width: '100' },
+    { name: 'Party', key: 'partyName', width: '220' },
+    { name: 'AT', key: 'amountType', align: 'center', color: AmountTypeColor, width: '100' },
     { name: 'Amount', key: 'amount', align: 'right', color: AmountOBColor, display: 'currency' },
     { name: 'Sign', key: 'sign', align: 'center', display: 'boolean', color: SignColor },
   ];
@@ -47,43 +48,43 @@
   const viewList = $derived({
     All: data.token,
     AC: data.token
-      .filter((d) => d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC')
-      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
+      .filter((d) => d.amountType1 == 'AC' || d.amountType2 == 'AC')
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
     CP: data.token
       .filter(
         (d) =>
-          d.amount_type_1 == 'CP' ||
-          d.amount_type_1 == 'Paytm' ||
-          d.amount_type_2 == 'CP' ||
-          d.amount_type_2 == 'Paytm',
+          d.amountType1 == 'CP' ||
+          d.amountType1 == 'Paytm' ||
+          d.amountType2 == 'CP' ||
+          d.amountType2 == 'Paytm',
       )
-      .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
-      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
+      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber))
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
     Blank: data.token.filter(
-      (d) => !d.amount_type_1 && !d.amount_type_1 && !d.amount_type_2 && !d.amount_type_2,
+      (d) => !d.amountType1 && !d.amountType1 && !d.amountType2 && !d.amountType2,
     ),
     AC_Unsigned: data.token
-      .filter((d) => (d.amount_type_1 == 'AC' || d.amount_type_2 == 'AC') && !d.sign)
-      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
+      .filter((d) => (d.amountType1 == 'AC' || d.amountType2 == 'AC') && !d.sign)
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
     CP_Unsigned: data.token
       .filter(
         (d) =>
-          (d.amount_type_1 == 'CP' ||
-            d.amount_type_1 == 'Paytm' ||
-            d.amount_type_2 == 'CP' ||
-            d.amount_type_2 == 'Paytm') &&
+          (d.amountType1 == 'CP' ||
+            d.amountType1 == 'Paytm' ||
+            d.amountType2 == 'CP' ||
+            d.amountType2 == 'Paytm') &&
           !d.sign,
       )
-      .sort((a, b) => a?.order_number?.localeCompare(b.order_number))
-      .sort((a, b) => a?.party_name?.localeCompare(b.party_name)),
+      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber))
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
   });
 
   const sales = $derived(
     data.token.reduce((acc, item) => {
-      const itemName = item.delivery_item;
-      const qty = item.delivery_quantity || 0;
+      const itemName = item.deliveryItem;
+      const qty = item.deliveryQuantity || 0;
 
-      // Skip if no delivery_item or quantity
+      // Skip if no deliveryItem or quantity
       if (!itemName || qty === null || qty === undefined || qty === 0) {
         return acc;
       }
@@ -127,10 +128,10 @@
       // Check if vehicle ends with 'G'
       if (vehicle && vehicle.endsWith('G')) {
         if (Array.isArray(acc[vehicle])) {
-          acc[vehicle].push({ time: item.delivery_time, address: item.address });
+          acc[vehicle].push({ time: item.deliveryTime, address: item.address });
         } else {
           acc[vehicle] = [];
-          acc[vehicle].push({ time: item.delivery_time, address: item.address });
+          acc[vehicle].push({ time: item.deliveryTime, address: item.address });
         }
       }
 
@@ -142,7 +143,7 @@
     Object.fromEntries(
       Object.entries(
         data.token.reduce((acc, item) => {
-          const partyName = item.party_name;
+          const partyName = item.partyName;
 
           if (partyName) {
             acc[partyName] = (acc[partyName] || 0) + 1;
@@ -150,21 +151,21 @@
 
           return acc;
         }, {}),
-      ).filter(([_, count]) => count > 1),
+      ).filter(([, count]) => count > 1),
     ),
   );
 
   // Array of only Paytm amounts (numbers)
   const paytmAmountsArray = $derived(
     data.token.reduce((acc, item) => {
-      // Add amount_1 if it's Paytm
-      if (item.amount_type_1 === 'Paytm' && item.amount_1 !== null && item.amount_1 !== undefined) {
-        acc.push(Number(item.amount_1));
+      // Add amount1 if it's Paytm
+      if (item.amountType1 === 'Paytm' && item.amount1 !== null && item.amount1 !== undefined) {
+        acc.push(Number(item.amount1));
       }
 
-      // Add amount_2 if it's Paytm
-      if (item.amount_type_2 === 'Paytm' && item.amount_2 !== null && item.amount_2 !== undefined) {
-        acc.push(Number(item.amount_2));
+      // Add amount2 if it's Paytm
+      if (item.amountType2 === 'Paytm' && item.amount2 !== null && item.amount2 !== undefined) {
+        acc.push(Number(item.amount2));
       }
 
       return acc;
@@ -176,7 +177,7 @@
   }
 
   function serialColor(_, item) {
-    return item.has_mark ? HighlightCell.red : null;
+    return item.hasMark ? HighlightCell.red : null;
   }
 
   function VehicleColor(value) {
@@ -189,8 +190,8 @@
 
   function rowHighlight(item) {
     let highlight = {};
-    if (item.is_cancelled) highlight = { ...highlight, ...HighlightRow.red };
-    if (item.has_mark)
+    if (item.isCancelled) highlight = { ...highlight, ...HighlightRow.red };
+    if (item.hasMark)
       highlight = { ...highlight, border: 'border-b-3 border-b-red-500 border-gray-500' };
     return highlight;
   }
@@ -244,15 +245,15 @@
   }
 
   function Amount1Color(value, item) {
-    return AmountXColor(item.amount_type_1);
+    return AmountXColor(item.amountType1);
   }
 
   function Amount2Color(value, item) {
-    return AmountXColor(item.amount_type_2);
+    return AmountXColor(item.amountType2);
   }
 
   function AmountOBColor(value, item) {
-    return AmountXColor(item.amount_type);
+    return AmountXColor(item.amountType);
   }
 
   const availableOptions = [
@@ -301,7 +302,7 @@
   }
 
   function handleDeliveryMark(item) {
-    transportAction('?/mark', { id: item.id, current: item.has_mark });
+    transportAction('?/mark', { id: item.id, current: item.hasMark });
   }
 
   function handleDeliveryAmountUpdate(item) {
@@ -366,7 +367,7 @@
     }
   }
 
-  function handleVehicleSummary(item) {
+  function handleVehicleSummary() {
     if (
       !formOpened &&
       !amountFormOpened &&
@@ -420,6 +421,7 @@
 
       // 3. Use { keepFocus: true, replaceState: true } to prevent
       // unnecessary scroll jumps or history bloating
+      // eslint-disable-next-line svelte/no-navigation-without-resolve
       goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
     }
   }
@@ -442,13 +444,13 @@
   const toggleOpenForm = () => (formOpened = !formOpened);
 
   function customCellHighlight(item) {
-    if (item.delivery_item && item.delivery_quantity)
+    if (item.deliveryItem && item.deliveryQuantity)
       return { ...HighlightRow.green, cells: [0, 1, 2] };
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
-  const openCashReport = () => goto('/cash');
-  const openOrderBook = () => goto('/orders');
+  const openCashReport = () => goto(resolve('/cash'));
+  const openOrderBook = () => goto(resolve('/orders'));
   const openACFilter = () => (view = view == 'AC' ? 'AC_Unsigned' : 'AC');
   const openCPFilter = () => (view = view == 'CP' ? 'CP_Unsigned' : 'CP');
   const openBlankFilter = () => (view = 'Blank');
@@ -551,7 +553,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each Object.entries(sales) as [itemName, quantity], index}
+              {#each Object.entries(sales) as [itemName, quantity], index (index)}
                 <tr>
                   <td class="border px-1">{itemName}</td>
                   <!-- Item name (MS, PS, etc.) -->
@@ -570,7 +572,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each Object.entries(loads) as [vehicle, count], index}
+              {#each Object.entries(loads) as [vehicle, count], index (index)}
                 <tr>
                   <td class="border px-1">{vehicle}</td>
                   <!-- Item name (MS, PS, etc.) -->
@@ -589,7 +591,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each Object.entries(partyCounts) as [party, count], index}
+              {#each Object.entries(partyCounts) as [party, count], index (index)}
                 <tr>
                   <td class="border px-1">{party}</td>
                   <!-- Item name (MS, PS, etc.) -->
@@ -608,7 +610,7 @@
               </tr>
             </thead>
             <tbody>
-              {#each paytmAmountsArray as amount, index}
+              {#each paytmAmountsArray as amount, index (index)}
                 <tr>
                   <td class="border px-1">{index + 1}</td>
                   <!-- Item name (MS, PS, etc.) -->
@@ -645,7 +647,7 @@
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 mb-2 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>
@@ -685,7 +687,7 @@
     class="flex max-w-7xl items-start justify-start gap-2 overflow-x-auto bg-white p-5 whitespace-nowrap"
   >
     {#if Object.entries(vehicleSummary).length}
-      {#each Object.entries(vehicleSummary) as [vehicle, data]}
+      {#each Object.entries(vehicleSummary) as [vehicle, data], index (index)}
         <table class="border-2">
           <thead>
             <tr>

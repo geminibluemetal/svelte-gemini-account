@@ -1,4 +1,4 @@
-import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
+import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { printOut } from '$lib/core/server/print';
 import { serverBus } from '$lib/core/server/serverBus';
@@ -7,7 +7,7 @@ import { getFormattedDate } from '$lib/utils/dateTime';
 import { formatFixed } from '$lib/utils/number';
 import SettingsService from '../settings/SettingsService';
 import DeliveryRepository from './DeliveryRepository';
-import { deliveryCreateSchema, deliveryUpdateSchema } from './DeliverySchema';
+import { deliveryEntrySchema } from './DeliverySchema';
 
 const db = await connectDB();
 export default class DeliveryService {
@@ -16,34 +16,16 @@ export default class DeliveryService {
     this.repository = new DeliveryRepository(db);
   }
 
-  async deliveryList() {
-    return await this.repository.findAll();
+  async deliveryList(date) {
+    const dateFilter = this.repository.getDateFilter(date, 'createdAt');
+    return await this.repository.findAll(dateFilter);
   }
 
-  async createDelivery(data) {
+  async deliveryEntry(id, data) {
     try {
-      const parsed = await deliveryCreateSchema.safeParseAsync(data);
+      const parsed = await deliveryEntrySchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
-      const settings = await this.settingsService.getSettings();
-
-      parsed.data.deliveryNumber = settings.nextDeliveryNumber;
-      const delivery = await this.repository.create(parsed.data);
-
-      if (delivery?.ok) {
-        const result = await this.settingsService.updateSetting({
-          lastDeliveryNumber: settings.nextDeliveryNumber,
-        });
-        if (!result.ok)
-          throw new AppError('Delivery created but auto delivery number increment breaked');
-      }
-
-      // Emit Events
-      // 1. Handle Phone Updates for Party
-      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-      // 2. Todo: Handle Cash Report Sync
-      // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-
-      return delivery;
+      return await this.repository.updateById(id, parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -51,7 +33,7 @@ export default class DeliveryService {
 
   async updateDelivery(id, data) {
     try {
-      const parsed = await deliveryUpdateSchema.safeParseAsync({ ...data, id });
+      const parsed = await deliveryEntrySchema.safeParseAsync({ ...data, id });
       if (!parsed.success) schemaError(parsed);
 
       const delivery = await this.repository.updateById(id, parsed.data);

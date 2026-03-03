@@ -7,46 +7,55 @@
 
   const { open, onClose, item, options } = $props();
   let initialData = {
-    order_number: '',
-    party_name: '',
+    orderNumber: '',
+    partyName: '',
     address: '',
-    delivery_item: '',
-    delivery_quantity: 0,
-    is_cancelled: 0,
-    amount_type_1: '',
-    // amount_1: null,
-    // amount_type_2: '',
-    // amount_2: null,
+    deliveryItem: '',
+    deliveryQuantity: 0,
+    isCancelled: 0,
+    amountType1: '',
+    // amount1: null,
+    // amountType2: '',
+    // amount2: null,
   };
 
   let data = $state(initialData);
   let isAc = $state(false);
 
-  const orderList = $derived(['NO', ...options.orders.map((o) => o.order_number.toString())]);
+  const orderList = $derived(['NO', ...options.orders.map((o) => o.orderNumber.toString())]);
   const partyList = $derived(options.party.map((p) => p.name));
   const addressList = $derived(options.address.map((a) => a.name));
-  const vehicleList = $derived(options.vehicle.map((v) => v.short_number));
   const itemsList = $derived(options.item.map((i) => i.name));
 
   function handleClose() {
     onClose();
   }
 
+  function handleOrderHelperText(value) {
+    const order = options.orders.find((o) => o.orderNumber == value);
+    if (order) {
+      return `${order.partyName ? order.partyName + ', ' : ''}
+      ${order.address ? order.address + ', ' : ''}
+      ${order.item ? order.item + ', ' : ''}
+      ${order.amountType}`;
+    }
+  }
+
   function handleOrderNumberSelection(value) {
-    const selectedOrder = options.orders.find((o) => o.order_number == value);
-    data.party_name = '';
+    const selectedOrder = options.orders.find((o) => o.orderNumber == value);
+    data.partyName = '';
     data.address = '';
-    data.delivery_item = '';
-    if (selectedOrder?.party_name) data.party_name = selectedOrder.party_name;
+    data.deliveryItem = '';
+    if (selectedOrder?.partyName) data.partyName = selectedOrder.partyName;
     if (selectedOrder?.address) data.address = selectedOrder.address;
-    if (selectedOrder?.item) data.delivery_item = selectedOrder.item;
+    if (selectedOrder?.item) data.deliveryItem = selectedOrder.item;
   }
 
   function handleFormSubmit({ formData }) {
     if (item) {
       formData.set('vehicle', item.vehicle);
       formData.set('sign', item.sign);
-      formData.set('amount_type_2', item.amount_type_2);
+      formData.set('amountType2', item.amountType2);
     }
     return async ({ result }) => {
       if (result.type == 'failure') {
@@ -60,7 +69,7 @@
 
   $effect(() => {
     data = { ...item };
-    isAc = item?.amount_type_1 == 'AC';
+    isAc = item?.amountType1 == 'AC';
   });
 </script>
 
@@ -78,18 +87,19 @@
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField
-      name="order_number"
-      value={data.order_number}
+      name="orderNumber"
+      value={data.orderNumber}
       placeholder="Order Number"
       autoComplete="off"
       options={orderList}
+      optionHelperText={handleOrderHelperText}
       silent={true}
-      silentOnValue={item.order_number}
+      silentOnValue={item.orderNumber}
       onValueSelected={handleOrderNumberSelection}
     />
     <InputField
-      name="party_name"
-      value={data.party_name}
+      name="partyName"
+      value={data.partyName}
       placeholder="Party"
       autoComplete="off"
       options={partyList}
@@ -104,8 +114,8 @@
       silent={true}
     />
     <InputField
-      name="delivery_item"
-      value={data.delivery_item}
+      name="deliveryItem"
+      value={data.deliveryItem}
       placeholder="Item"
       autoComplete="off"
       caseMode="smartTitleChars"
@@ -114,8 +124,8 @@
       silent={true}
     />
     <InputField
-      name="delivery_quantity"
-      value={data.delivery_quantity}
+      name="deliveryQuantity"
+      value={data.deliveryQuantity}
       placeholder="Quantity"
       autoComplete="off"
       caseMode="none"
@@ -123,11 +133,11 @@
 
     <CheckBoxField bind:value={isAc} placeholder="Is AC" />
     {#if isAc}
-      <input type="hidden" name="amount_type_1" value="AC" />
+      <input type="hidden" name="amountType1" value="AC" />
     {:else}
-      <input type="hidden" name="amount_type_1" value="" />
+      <input type="hidden" name="amountType1" value="" />
     {/if}
 
-    <CheckBoxField name="is_cancelled" value={data.is_cancelled} placeholder="Is Cancelled" />
+    <CheckBoxField name="isCancelled" value={data.isCancelled} placeholder="Is Cancelled" />
   </Form>
 </Model>

@@ -1,4 +1,4 @@
-import { handleServiceError, schemaError } from '$lib/core/server/error';
+import { handleServiceError, handleSuccess, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import AddressRepository from './AddressRepository';
 import { addressCreateSchema, addressUpdateSchema } from './AddressSchema';
@@ -40,6 +40,23 @@ export default class AddressService {
   async deleteAddress(id) {
     try {
       return await this.repository.deleteById(id);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async checkAddressHasDeliveryCharge(address, quantity) {
+    try {
+      const addressData = await this.repository.findOne({ name: address });
+      if (!addressData) throw new Error('Address not found');
+
+      let checkingCharge = ''
+      if (quantity < 0.5) checkingCharge = 'chargeHalf';
+      else if (quantity <= 1) checkingCharge = 'chargeSingle';
+      else checkingCharge = 'chargeMax';
+
+      const charge = addressData.deliveryCharges[checkingCharge] > 0;
+      return handleSuccess('Address has delivery charge', { hasCharge: charge });
     } catch (error) {
       return handleServiceError(error);
     }

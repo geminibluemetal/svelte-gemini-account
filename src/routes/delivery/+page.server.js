@@ -1,23 +1,21 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import { getAllAddress } from '$lib/entity/address/address.service.js';
 import {
   markDelivery,
   signDeliveryById,
-  updateDelivery,
   updateDeliveryAmount,
 } from '$lib/entity/delivery/delivery.service.js';
-import { getAllItems } from '$lib/entity/items/items.service.js';
-import { getAllAvailableOrders } from '$lib/entity/orders/order.service.js';
 import {
   createOldBalance,
   deleteOldBalance,
   getAllOldBalance,
-  getAllParty,
   signOldBalanceById,
   updateOldBalance,
 } from '$lib/entity/party/party.service.js';
-import { getAllToken } from '$lib/entity/token/token.service.js';
-import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
+import AddressService from '$lib/features/address/AddressService.js';
+import DeliveryService from '$lib/features/delivery/DeliveryService.js';
+import ItemService from '$lib/features/items/ItemService.js';
+import OrderService from '$lib/features/orders/OrderService.js';
+import PartyService from '$lib/features/party/PartyService.js';
 import { formatDateTime } from '$lib/utils/dateTime.js';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
@@ -33,17 +31,21 @@ export async function load({ depends, url }) {
     formattedDate = formatDateTime('YY-MM-DD', date);
   }
 
-  const orders = await getAllAvailableOrders();
-  const address = await getAllAddress();
-  const token = await getAllToken(formattedDate);
-  const party = await getAllParty();
-  const vehicle = await getAllVehicle();
-  const item = await getAllItems();
+  const deliveryService = new DeliveryService();
+  const orderService = new OrderService();
+  const addressService = new AddressService();
+  const partyService = new PartyService();
+  const itemService = new ItemService();
+
+  const orders = await orderService.orderList();
+  const address = await addressService.addressList();
+  const token = await deliveryService.deliveryList(formattedDate);
+  const party = await partyService.partyList();
+  const item = await itemService.itemList();
   const oldBalance = await getAllOldBalance(formattedDate);
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),
-    vehicle: serializeDoc(vehicle),
     item: serializeDoc(item),
     address: serializeDoc(address),
     orders: serializeDoc(orders),
@@ -56,8 +58,8 @@ export const actions = {
   form: async ({ request }) => {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
-    const result = await updateDelivery(data, editId);
-
+    const deliveryService = new DeliveryService();
+    const result = await deliveryService.deliveryEntry(editId, data);
     if (!result?.ok) {
       return fail(400, { message: result.message });
     }

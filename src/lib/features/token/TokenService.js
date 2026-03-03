@@ -50,9 +50,9 @@ export default class TokenService {
     try {
       // Get last token and match id for delete last token only
       const lastToken = await this.repository.findOne({}, {}, { sort: { createdAt: -1 } });
+      if (lastToken.id !== id) throw new AppError('Can only delete last token');
       if (lastToken.isClosed) throw new AppError('Cannot delete closed token.');
-      if (lastToken.id === id) return await this.repository.deleteById(id);
-      throw new AppError('Can only delete last token');
+      return await this.repository.deleteById(id);
     } catch (error) {
       return handleServiceError(error);
     }
@@ -83,7 +83,6 @@ export default class TokenService {
   }
 
   sendPrint(token, additionalData = {}) {
-    console.log('Printing Token with data:', token, additionalData);
     printOut((p) => {
       p.reset()
         .beepOn(3, 1)
