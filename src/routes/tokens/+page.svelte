@@ -7,11 +7,12 @@
   import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import Button from '$lib/components/Button.svelte';
-  import DateNavigator from '$lib/components/DateNavigator.svelte';
-  import { commonDate } from '$lib/stores/common';
-  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { HighlightRow } from '$lib/utils/highlight';
+  import { getFormattedDate } from '$lib/utils/dateTime';
+  import { parseDate } from '$lib/utils/dateTimeParser';
+  import { updateParams } from '$lib/core/client/urlParams';
+  import NavigateButton from '$lib/components/NavigateButton.svelte';
 
   const { data } = $props();
   const headers = [
@@ -36,6 +37,7 @@
   let editableToken = $state(null);
   let view = $state('opened');
 
+  const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
   const viewList = $derived({
     all: data.token,
     closed: data.token.filter((t) => t.isClosed),
@@ -87,20 +89,22 @@
     helperOpened = !helperOpened;
   }
 
-  function handleDateNavigationChange(value) {
-    // 1. Calculate the ISO strings for a stable comparison
-    const newDateStr = value.toISOString();
-    const urlDateStr = $page.url.searchParams.get('date');
+  function handlePreviewsDate() {
+    let prev = parseDate(currentDate);
+    prev = prev.setDate(prev.getDate() - 1);
+    prev = getFormattedDate(prev);
+    updateParams({ date: prev });
+  }
 
-    // 2. Only proceed if the date has actually changed
-    if (newDateStr !== urlDateStr) {
-      $commonDate = value; // Update store
+  function handleNextDate() {
+    let next = parseDate(currentDate);
+    next = next.setDate(next.getDate() + 1);
+    next = getFormattedDate(next);
+    updateParams({ date: next });
+  }
 
-      // 3. Use { keepFocus: true, replaceState: true } to prevent
-      // unnecessary scroll jumps or history bloating
-      // eslint-disable-next-line svelte/no-navigation-without-resolve
-      goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
-    }
+  function handleTodayDate() {
+    updateParams({ date: getFormattedDate() });
   }
 
   const customEvents = [
@@ -141,11 +145,14 @@
   {#snippet sidebar()}
     <div>
       <div class="flex flex-col gap-2 p-3">
-        <DateNavigator
+        <NavigateButton
           class="focus:bg-amber-50"
-          value={$commonDate}
-          onDateChange={handleDateNavigationChange}
-        />
+          onNext={handleNextDate}
+          onPrevious={handlePreviewsDate}
+          onClick={handleTodayDate}
+        >
+          {currentDate}
+        </NavigateButton>
         <Button onclick={viewAllToken} color="primary" class="dark flex justify-between gap-2">
           <span>All</span> <span>{viewList.all.length}</span>
         </Button>

@@ -10,13 +10,15 @@
   import DeliveryAmountForm from './DeliveryAmountForm.svelte';
   import Button from '$lib/components/Button.svelte';
   import { formatFixed } from '$lib/utils/number';
-  import DateNavigator from '$lib/components/DateNavigator.svelte';
-  import { commonDate } from '$lib/stores/common';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { CheckCheck, SearchXIcon, Trash } from 'lucide-svelte';
   import OldBalanceForm from './OldBalanceForm.svelte';
   import { resolve } from '$app/paths';
+  import NavigateButton from '$lib/components/NavigateButton.svelte';
+  import { getFormattedDate } from '$lib/utils/dateTime';
+  import { parseDate } from '$lib/utils/dateTimeParser';
+  import { updateParams } from '$lib/core/client/urlParams';
 
   const { data } = $props();
   let view = $state('All');
@@ -167,6 +169,7 @@
       .filter((b) => b.amountType === 'Paytm' && b.amount != null)
       .map((b) => Number(b.amount)),
   ]);
+  const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
 
   function orderColor(v) {
     return v == 'NO' ? HighlightCell.red : null;
@@ -344,7 +347,7 @@
   }
 
   function handleFullDelete() {
-    transportAction('?/fullDelete', { date: $commonDate.toISOString() });
+    // transportAction('?/fullDelete', { date: $commonDate.toISOString() });
   }
 
   function handleReviewMode() {
@@ -361,6 +364,24 @@
     ) {
       oldBalanceOpened = true;
     }
+  }
+
+  function handlePreviewsDate() {
+    let prev = parseDate(currentDate);
+    prev = prev.setDate(prev.getDate() - 1);
+    prev = getFormattedDate(prev);
+    updateParams({ date: prev });
+  }
+
+  function handleNextDate() {
+    let next = parseDate(currentDate);
+    next = next.setDate(next.getDate() + 1);
+    next = getFormattedDate(next);
+    updateParams({ date: next });
+  }
+
+  function handleTodayDate() {
+    updateParams({ date: getFormattedDate() });
   }
 
   function handleVehicleSummary() {
@@ -409,22 +430,6 @@
     oldBalanceEditableItem = null;
   }
 
-  function handleDateNavigationChange(value) {
-    // 1. Calculate the ISO strings for a stable comparison
-    const newDateStr = value.toISOString();
-    const urlDateStr = $page.url.searchParams.get('date');
-
-    // 2. Only proceed if the date has actually changed
-    if (newDateStr !== urlDateStr) {
-      $commonDate = value; // Update store
-
-      // 3. Use { keepFocus: true, replaceState: true } to prevent
-      // unnecessary scroll jumps or history bloating
-      // eslint-disable-next-line svelte/no-navigation-without-resolve
-      goto(`?date=${newDateStr}`, { keepFocus: true, replaceState: true });
-    }
-  }
-
   const customEvents = [
     { key: '0', handler: handleDeliveryAmountUpdate },
     { key: 'ArrowRight', handler: handleDeliverySign },
@@ -446,8 +451,8 @@
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
-  const openCashReport = () => goto(resolve('/cash'));
-  const openOrderBook = () => goto(resolve('/orders'));
+  const openCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
+  const openOrderBook = () => goto(resolve(`/orders?date=${currentDate}`));
   const openACFilter = () => (view = view == 'AC' ? 'AC_Unsigned' : 'AC');
   const openCPFilter = () => (view = view == 'CP' ? 'CP_Unsigned' : 'CP');
   const openBlankFilter = () => (view = 'Blank');
@@ -519,11 +524,14 @@
   {#snippet sidebar()}
     <div class="flex w-48 flex-col gap-2">
       <div class="flex gap-2 *:flex-1">
-        <DateNavigator
+        <NavigateButton
           class="focus:bg-amber-50"
-          value={$commonDate}
-          onDateChange={handleDateNavigationChange}
-        />
+          onNext={handleNextDate}
+          onPrevious={handlePreviewsDate}
+          onClick={handleTodayDate}
+        >
+          {currentDate}
+        </NavigateButton>
       </div>
       <div class="dark flex gap-2 *:flex-1">
         <Button corner="1" color="fuchsia" onclick={openACFilter}>AC</Button>

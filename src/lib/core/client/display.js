@@ -7,7 +7,7 @@ const formatters = {
     return getFormattedDate(value);
   },
   time: function (value) {
-    if (value instanceof Date) value = new Date(value)
+    if (value instanceof Date) value = new Date(value);
     else if (value?.includes('T')) value = new Date(value);
     else value = parseTime(value);
     return getFormattedTime(value);

@@ -1,21 +1,21 @@
 <script>
   import { goto } from '$app/navigation';
-  import { page } from '$app/stores';
   import Button from '$lib/components/Button.svelte';
   import CashTable from '$lib/components/CashTable.svelte';
-  import DateNavigator from '$lib/components/DateNavigator.svelte';
   import Model from '$lib/components/Model.svelte';
   import NavigateButton from '$lib/components/NavigateButton.svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus.js';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver.js';
-  import { parseTime } from '$lib/utils/dateTimeParser.js';
+  import { parseDate, parseTime } from '$lib/utils/dateTimeParser.js';
   import { HighlightCell } from '$lib/utils/highlight.js';
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
   import CashForm from './CashForm.svelte';
   import { showToast } from '$lib/stores/toast';
-  import { commonDate } from '$lib/stores/common';
   import { resolve } from '$app/paths';
+  import { getFormattedDate } from '$lib/utils/dateTime';
+  import { updateParams } from '$lib/core/client/urlParams';
+  import { page } from '$app/stores';
 
   const { data } = $props();
 
@@ -57,14 +57,19 @@
   let formOpened = $state(false);
   let helperOpened = $state(false);
   let editableItem = $state();
-  let currentReportIndex = $state(data.reports.length > 0 ? data.reports.length - 1 : 0);
-  let lastKnownLength = $state(data.reports.length);
+  // let reportIndex = $state(data.reports.length > 0 ? data.reports.length - 1 : 0);
 
   // Number Safe
   const num = (value) => Number(value) || 0;
 
   const totalIncome = $derived(data?.income?.reduce((sum, item) => sum + num(item?.amount), 0));
   const totalExpense = $derived(data?.expense?.reduce((sum, item) => sum + num(item?.amount), 0));
+  const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
+  const reportIndex = $derived(
+    $page.url.searchParams.get('reportIndex')
+      ? num($page.url.searchParams.get('reportIndex'))
+      : data.reports.length - 1,
+  );
 
   function SignColor(value) {
     return value ? HighlightCell.green : null;
@@ -95,11 +100,11 @@
   // }
 
   function gotoDeliverySheet() {
-    goto(resolve('/delivery'));
+    goto(resolve(`/delivery?date=${currentDate}`));
   }
 
   function gotoOrderBook() {
-    goto(resolve('/orders'));
+    goto(resolve(`/orders?date=${currentDate}`));
   }
 
   function handleFormClose() {
@@ -132,22 +137,37 @@
     transportAction('?/sign', { id: item.id });
   }
 
-  function handleDateNavigationChange(value) {}
+  function handlePreviewsDate() {
+    let prev = parseDate(currentDate);
+    prev = prev.setDate(prev.getDate() - 1);
+    prev = getFormattedDate(prev);
+    updateParams({ date: prev });
+  }
+
+  function handleNextDate() {
+    let next = parseDate(currentDate);
+    next = next.setDate(next.getDate() + 1);
+    next = getFormattedDate(next);
+    updateParams({ date: next });
+  }
+
+  function handleTodayDate() {
+    updateParams({ date: getFormattedDate() });
+  }
 
   function gotoCurrentReport() {
-    $commonDate = new Date();
-    currentReportIndex = data.reports.length - 1;
+    updateParams({ reportIndex: null, date: null });
   }
 
   function handleNextReport() {
-    if (currentReportIndex < data.reports.length - 1) {
-      currentReportIndex = Number(currentReportIndex) + 1;
+    if (reportIndex < data.reports.length - 1) {
+      updateParams({ reportIndex: reportIndex + 1 });
     }
   }
 
   function handlePreviousReport() {
-    if (currentReportIndex > 0) {
-      currentReportIndex = Number(currentReportIndex) - 1;
+    if (reportIndex > 0) {
+      updateParams({ reportIndex: reportIndex - 1 });
     }
   }
 
@@ -157,12 +177,12 @@
 
   function handleDeleteReport() {
     if (!data.income.length && !data.expense.length) {
-      if (data.reports[currentReportIndex]?.id === 'current') {
+      if (data.reports[reportIndex]?.id === 'current') {
         transportAction('?/deleteReport', {
-          id: data.reports[currentReportIndex - 1]?.id,
+          id: data.reports[reportIndex - 1]?.id,
         });
       } else {
-        transportAction('?/deleteReport', { id: data.reports[currentReportIndex]?.id });
+        transportAction('?/deleteReport', { id: data.reports[reportIndex]?.id });
       }
     } else {
       showToast('Only empty reports can be deleted', 'danger');
@@ -228,41 +248,6 @@
     keyboardEventBus.off('8', handleDeleteReport);
     syncOff('CASH.LIST');
   });
-
-  $effect(() => {
-    // Only snap to end if a new report was actually added to the array
-    if (data.reports.length > lastKnownLength) {
-      currentReportIndex = data.reports.length - 1;
-    }
-    // Update the tracker
-    lastKnownLength = data.reports.length;
-  });
-
-  const searchParamsString = $derived.by(() => {
-    const params = new URLSearchParams();
-
-    const dateStr =
-      $commonDate instanceof Date ? $commonDate.toISOString().split('T')[0] : $commonDate;
-
-    const reportVal = currentReportIndex ?? data.reports.length - 1;
-
-    params.set('date', dateStr);
-    params.set('report', reportVal);
-
-    return params.toString();
-  });
-
-  $effect(() => {
-    const current = $page.url.searchParams.toString();
-
-    if (current !== searchParamsString) {
-      goto(`?${searchParamsString}`, {
-        keepFocus: true,
-        replaceState: true,
-        invalidateAll: false,
-      });
-    }
-  });
 </script>
 
 <CashTable
@@ -277,16 +262,19 @@
   customEvents={cashCustomEvents}
 >
   {#snippet right()}
-    <span class="p-1">{`Cash ${currentReportIndex + 1}`}</span>
+    <span class="p-1">{`Cash ${reportIndex + 1}`}</span>
   {/snippet}
   {#snippet sidebar()}
     <div class="flex w-48 flex-col gap-2">
       <div class="flex gap-2 *:flex-1">
-        <DateNavigator
+        <NavigateButton
           class="focus:bg-amber-50"
-          value={$commonDate}
-          onDateChange={handleDateNavigationChange}
-        />
+          onNext={handleNextDate}
+          onPrevious={handlePreviewsDate}
+          onClick={handleTodayDate}
+        >
+          {currentDate}
+        </NavigateButton>
       </div>
       <div class="flex gap-2 *:flex-1">
         <NavigateButton
@@ -298,7 +286,7 @@
           onPrevious={handlePreviousReport}
         >
           <span>
-            {`Cash ${currentReportIndex + 1}`}
+            {`Cash ${reportIndex + 1}`}
           </span>
         </NavigateButton>
       </div>

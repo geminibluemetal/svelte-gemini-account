@@ -12,6 +12,8 @@
   import Button from '$lib/components/Button.svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { getFormattedDate } from '$lib/utils/dateTime';
+  import { page } from '$app/stores';
 
   const { data } = $props();
   let view = $state('pending');
@@ -25,6 +27,7 @@
     qty: null,
   });
   const vehicleList = $derived(data.vehicle.map((v) => v.shortNumber));
+  const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
   const viewList = $derived({
     all: data.orders,
     new: data.orders.filter((o) => o.status == 'New'),
@@ -242,8 +245,8 @@
   ];
 
   const toggleOpenForm = () => (formOpened = !formOpened);
-  const gotoDeliverySheet = () => goto(resolve('/delivery'));
-  const gotoCashReport = () => goto(resolve('/cash'));
+  const gotoDeliverySheet = () => goto(resolve(`/delivery?date=${currentDate}`));
+  const gotoCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
   const handleFilterAll = () => (view = view == 'all' ? 'pending' : 'all');
   const handleFilterDelivered = () => (view = view == 'delivered' ? 'pending' : 'delivered');
   const handleFilterCancelled = () => (view = view == 'cancelled' ? 'pending' : 'cancelled');

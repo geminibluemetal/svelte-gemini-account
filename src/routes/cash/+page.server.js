@@ -5,6 +5,7 @@ import CashReportService from '$lib/features/cashReport/CashReportService';
 import DeliveryService from '$lib/features/delivery/DeliveryService';
 import PartyService from '$lib/features/party/PartyService';
 import PartyStatementService from '$lib/features/partyStatement/PartyStatementService';
+import { parseDate } from '$lib/utils/dateTimeParser';
 import { formDataToObject } from '$lib/utils/form';
 import { fail } from '@sveltejs/kit';
 
@@ -13,10 +14,12 @@ export async function load({ depends, url }) {
 
   // 1. Parse Params & Dates
   const dateParam = url.searchParams.get('date');
-  const reportIndex = parseInt(url.searchParams.get('report') || '0', 10);
+  let reportIndex = url.searchParams.get('reportIndex')
+    ? parseInt(url.searchParams.get('reportIndex'))
+    : null;
 
   // Use passed date if valid, otherwise default to today
-  const formattedDate = Date.parse(dateParam) ? new Date(dateParam) : new Date();
+  let formattedDate = dateParam ? parseDate(dateParam) : new Date();
 
   // 2. Fetch all data in parallel (Avoiding Waterfalls)
   const cashReportService = new CashReportService();
@@ -35,6 +38,7 @@ export async function load({ depends, url }) {
       partyService.partyList(),
     ]);
   reports = [...reports, { id: 'current' }];
+  reportIndex = reportIndex ?? reports.length - 1;
 
   // 3. Determine Report Time Boundaries
   const { fromDate, toDate } = getReportBoundaries(reports, reportIndex);

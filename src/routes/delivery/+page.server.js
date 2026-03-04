@@ -5,7 +5,7 @@ import ItemService from '$lib/features/items/ItemService.js';
 import OrderService from '$lib/features/orders/OrderService.js';
 import PartyService from '$lib/features/party/PartyService.js';
 import PartyStatementService from '$lib/features/partyStatement/PartyStatementService';
-import { formatDateTime } from '$lib/utils/dateTime.js';
+import { parseDate } from '$lib/utils/dateTimeParser';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
@@ -14,11 +14,7 @@ export async function load({ depends, url }) {
   depends('DELIVERY.TOKEN.LIST');
 
   const date = url.searchParams.get('date');
-  let formattedDate = formatDateTime('YY-MM-DD');
-
-  if (Date.parse(date)) {
-    formattedDate = formatDateTime('YY-MM-DD', date);
-  }
+  let formattedDate = date ? parseDate(date) : new Date();
 
   const deliveryService = new DeliveryService();
   const orderService = new OrderService();
