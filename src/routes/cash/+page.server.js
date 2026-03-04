@@ -1,12 +1,4 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import {
-  createCash,
-  createNewCashReport,
-  deleteCash,
-  deleteCashReport,
-  signCash,
-  updateCash,
-} from '$lib/entity/cash/cash.service.js';
 import CashService from '$lib/features/cash/CashService';
 import CashDescriptionService from '$lib/features/cashDescription/CashDescriptionService';
 import CashReportService from '$lib/features/cashReport/CashReportService';
@@ -42,10 +34,7 @@ export async function load({ depends, url }) {
       cashDescriptionService.cashDescriptionList(),
       partyService.partyList(),
     ]);
-
   reports = [...reports, { id: 'current' }];
-
-  console.log(reports, directCash, deliveryCash, oldBalanceCash);
 
   // 3. Determine Report Time Boundaries
   const { fromDate, toDate } = getReportBoundaries(reports, reportIndex);
@@ -53,17 +42,17 @@ export async function load({ depends, url }) {
   // 4. Filter and Categorize Data
   // Pre-filter helper to keep things DRY
   const isWithinReport = (item) => {
-    const created = new Date(item.time);
+    const created = new Date(item.createdAt);
     return created > fromDate && created < toDate;
   };
 
   let income = [...directCash, ...deliveryCash, ...oldBalanceCash].filter(
     (c) => c.entryType !== 'EXPENSE' && isWithinReport(c),
   );
-  income.sort((a, b) => new Date(a.time) - new Date(b.time));
+  income.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   let expense = directCash.filter((c) => c.entryType === 'EXPENSE' && isWithinReport(c));
-  expense.sort((a, b) => new Date(a.time) - new Date(b.time));
+  expense.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   const data = {
     income,
@@ -72,7 +61,6 @@ export async function load({ depends, url }) {
     party,
     cashDescription,
   };
-  console.log(oldBalanceCash);
   return data;
 }
 
@@ -91,8 +79,8 @@ function getReportBoundaries(reports, index) {
   const currentReport = reports[index];
 
   return {
-    fromDate: previousReport ? new Date(previousReport.created_at) : new Date(todayStart),
-    toDate: currentReport?.created_at ? new Date(currentReport.created_at) : new Date(todayEnd),
+    fromDate: previousReport ? new Date(previousReport.createdAt) : new Date(todayStart),
+    toDate: currentReport?.createdAt ? new Date(currentReport.createdAt) : new Date(todayEnd),
   };
 }
 
@@ -100,11 +88,12 @@ export const actions = {
   form: async ({ request }) => {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
+    const cashService = new CashService();
     let result;
     if (editId) {
-      result = await updateCash(data, editId);
+      result = await cashService.updateCash(editId, data);
     } else {
-      result = await createCash(data);
+      result = await cashService.createCash(data);
     }
 
     if (!result?.ok) {
@@ -117,10 +106,11 @@ export const actions = {
 
   sign: async ({ request }) => {
     const formData = await request.formData();
-    const { id, current } = formDataToObject(formData);
+    const { id } = formDataToObject(formData);
     let result;
     if (id) {
-      result = await signCash(id, current);
+      const cashService = new CashService();
+      result = await cashService.signCash(id);
     }
 
     if (!result?.ok) {
@@ -136,7 +126,8 @@ export const actions = {
     const { id } = formDataToObject(formData);
     let result;
     if (id) {
-      result = await deleteCash(id);
+      const cashService = new CashService();
+      result = await cashService.deleteCash(id);
     }
 
     if (!result?.ok) {
@@ -148,7 +139,8 @@ export const actions = {
   },
 
   newReport: async () => {
-    const result = await createNewCashReport();
+    const cashReportService = new CashReportService();
+    const result = await cashReportService.createCashReport();
     if (!result?.ok) {
       return fail(400, { message: result.message });
     }
@@ -162,7 +154,8 @@ export const actions = {
     const { id } = formDataToObject(formData);
     let result;
     if (id) {
-      result = await deleteCashReport(id);
+      const cashReportService = new CashReportService();
+      result = await cashReportService.deleteCashReport(id);
     }
 
     if (!result?.ok) {

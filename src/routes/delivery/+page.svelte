@@ -155,22 +155,18 @@
     ),
   );
 
-  // Array of only Paytm amounts (numbers)
-  const paytmAmountsArray = $derived(
-    data.token.reduce((acc, item) => {
-      // Add amount1 if it's Paytm
-      if (item.amountType1 === 'Paytm' && item.amount1 !== null && item.amount1 !== undefined) {
-        acc.push(Number(item.amount1));
-      }
+  const paytmAmountsArray = $derived([
+    ...data.token.flatMap((item) =>
+      [
+        item.amountType1 === 'Paytm' && item.amount1 != null ? Number(item.amount1) : null,
+        item.amountType2 === 'Paytm' && item.amount2 != null ? Number(item.amount2) : null,
+      ].filter(Boolean),
+    ),
 
-      // Add amount2 if it's Paytm
-      if (item.amountType2 === 'Paytm' && item.amount2 !== null && item.amount2 !== undefined) {
-        acc.push(Number(item.amount2));
-      }
-
-      return acc;
-    }, []),
-  );
+    ...data.oldBalance
+      .filter((b) => b.amountType === 'Paytm' && b.amount != null)
+      .map((b) => Number(b.amount)),
+  ]);
 
   function orderColor(v) {
     return v == 'NO' ? HighlightCell.red : null;

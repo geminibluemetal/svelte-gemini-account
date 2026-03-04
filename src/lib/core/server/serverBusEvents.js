@@ -10,4 +10,7 @@ export const EVENTS = {
     UPDATED: 'order.updated',
     DELETED: 'order.deleted',
   },
+  CASH_DESCRIPTION: {
+    CREATE_IF_NOT_EXISTS: 'cashDescription.create.if.not.exists',
+  },
 };

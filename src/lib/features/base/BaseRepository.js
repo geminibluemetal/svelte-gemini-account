@@ -94,8 +94,7 @@ export default class BaseRepository {
   // Toggle sign by aggregation
   async toggleSignById(id) {
     const result = await this.toggleFieldById(id, 'sign');
-    if (!result.acknowledged) throw new AppError('Database update failed');
-    return handleSuccess('Signed successfully', result);
+    return result;
   }
 
   // Toggle aggregation fields

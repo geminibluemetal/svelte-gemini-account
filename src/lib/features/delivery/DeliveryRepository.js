@@ -9,7 +9,7 @@ export default class DeliveryRepository extends BaseRepository {
 
   async findCashDeliveryByDate(dateFilter) {
     const projection = {
-      paymentAt: 1,
+      createdAt: 1,
       amount: 1,
       description: 1,
       reference: 1,
@@ -66,6 +66,7 @@ export default class DeliveryRepository extends BaseRepository {
             $concat: ['DS-', { $toString: '$serial' }],
           },
           entryType: 'INCOME',
+          createdAt: '$paymentAt',
         },
       },
       {

@@ -1,5 +1,5 @@
 <script>
-  import { goto, invalidate } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import Button from '$lib/components/Button.svelte';
   import CashTable from '$lib/components/CashTable.svelte';
@@ -8,30 +8,31 @@
   import NavigateButton from '$lib/components/NavigateButton.svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus.js';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver.js';
-  import { parseDate, parseTime } from '$lib/utils/dateTimeParser.js';
+  import { parseTime } from '$lib/utils/dateTimeParser.js';
   import { HighlightCell } from '$lib/utils/highlight.js';
   import { formatNumber } from '$lib/utils/number.js';
   import { onDestroy, onMount } from 'svelte';
   import CashForm from './CashForm.svelte';
   import { showToast } from '$lib/stores/toast';
   import { commonDate } from '$lib/stores/common';
+  import { resolve } from '$app/paths';
 
   const { data } = $props();
 
   const incomeHeader = [
-    { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
-    { name: 'Referance', align: 'left', key: 'serial', width: '82', color: ReferanceColor },
+    { name: 'Time', align: 'center', key: 'createdAt', width: '85', display: 'time' },
+    { name: 'Reference', align: 'left', key: 'reference', width: '82', color: ReferanceColor },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' },
+    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'sign' },
   ];
 
   const expenseHeader = [
-    { name: 'Time', align: 'center', key: 'time', width: '85', display: 'time' },
+    { name: 'Time', align: 'center', key: 'createdAt', width: '85', display: 'time' },
     { hide: true },
     { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'boolean' },
+    { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'sign' },
   ];
 
   const availableOptions = [
@@ -65,7 +66,7 @@
   const totalIncome = $derived(data?.income?.reduce((sum, item) => sum + num(item?.amount), 0));
   const totalExpense = $derived(data?.expense?.reduce((sum, item) => sum + num(item?.amount), 0));
 
-  function SignColor(value, item) {
+  function SignColor(value) {
     return value ? HighlightCell.green : null;
   }
 
@@ -89,16 +90,16 @@
     }
   }
 
-  function handleFocusSwitch() {
-    changeOverType(); // Calling client componet function
-  }
+  // function handleFocusSwitch() {
+  //   changeOverType(); // Calling client componet function
+  // }
 
   function gotoDeliverySheet() {
-    goto('/delivery');
+    goto(resolve('/delivery'));
   }
 
   function gotoOrderBook() {
-    goto('/orders');
+    goto(resolve('/orders'));
   }
 
   function handleFormClose() {
@@ -124,17 +125,14 @@
   }
 
   function handleCashSign(item) {
-    if (item.serial) {
+    if (item.reference) {
       showToast('Referance record can not sign here', 'danger');
       return;
     }
-    transportAction('?/sign', { id: item.id, current: item.sign });
+    transportAction('?/sign', { id: item.id });
   }
 
-  function handleDateNavigationChange(value) {
-    // Just update the store; the $effect will handle the URL
-    $commonDate = value;
-  }
+  function handleDateNavigationChange(value) {}
 
   function gotoCurrentReport() {
     $commonDate = new Date();
@@ -154,7 +152,7 @@
   }
 
   async function handleNewReport() {
-    const result = await transportAction('?/newReport');
+    transportAction('?/newReport');
   }
 
   function handleDeleteReport() {
@@ -172,10 +170,14 @@
   }
 
   async function handleCashDelete(item) {
-    if (item.serial) {
-      showToast('Referance record can not delete here', 'danger');
+    if (item.reference) {
+      showToast('Reference record can not delete here', 'danger');
       return;
     }
+    const confirmed = confirm(
+      `Are you sure to Delete? ${item.description} - ${formatNumber(item.amount)}`,
+    );
+    if (!confirmed) return;
     const result = await transportAction('?/delete', { id: item.id });
     if (result.type == 'failure') {
       const data = JSON.parse(result.data);
@@ -236,36 +238,25 @@
     lastKnownLength = data.reports.length;
   });
 
-  // 1. Define a derived state for the URL string to prevent unnecessary updates
   const searchParamsString = $derived.by(() => {
     const params = new URLSearchParams();
-    // Ensure date is formatted correctly (YYYY-MM-DD or ISO)
-    const dateStr = $commonDate instanceof Date ? $commonDate.toISOString() : $commonDate;
+
+    const dateStr =
+      $commonDate instanceof Date ? $commonDate.toISOString().split('T')[0] : $commonDate;
+
     const reportVal = currentReportIndex ?? data.reports.length - 1;
 
     params.set('date', dateStr);
     params.set('report', reportVal);
+
     return params.toString();
   });
 
-  // URL Sync Effect
   $effect(() => {
-    const params = new URLSearchParams($page.url.searchParams);
-    const dateStr =
-      $commonDate instanceof Date ? $commonDate.toISOString().split('T')[0] : $commonDate;
+    const current = $page.url.searchParams.toString();
 
-    // Safety check for index out of bounds (useful after deletes)
-    if (currentReportIndex >= data.reports.length) {
-      currentReportIndex = Math.max(0, data.reports.length - 1);
-    }
-
-    const reportVal = String(currentReportIndex);
-
-    if (params.get('report') !== reportVal || params.get('date') !== dateStr) {
-      params.set('date', dateStr);
-      params.set('report', reportVal);
-
-      goto(`?${params.toString()}`, {
+    if (current !== searchParamsString) {
+      goto(`?${searchParamsString}`, {
         keepFocus: true,
         replaceState: true,
         invalidateAll: false,
@@ -367,7 +358,7 @@
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 mb-2 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>

@@ -50,13 +50,31 @@ export default class PartyStatementRepository extends BaseRepository {
 
   async findAllOldBalanceCash(date) {
     const dateFilter = this.getDateFilter(date, 'createdAt');
+    const projection = {
+      amount: 1,
+      description: 1,
+      reference: 1,
+      createdAt: 1,
+      sign: 1,
+      entryType: 1,
+    }
     const pipeline = [
       {
-        $match: { ...dateFilter, amountType: 'Cash' },
+        $match: {
+          ...dateFilter,
+          amountType: 'Cash',
+          amount: { $gt: 0 },
+        },
       },
       {
         $addFields: {
-          partyObjectId: { $toObjectId: '$partyId' },
+          partyObjectId: {
+            $cond: {
+              if: { $and: [{ $ne: ['$partyId', null] }, { $ne: ['$partyId', ''] }] },
+              then: { $toObjectId: '$partyId' },
+              else: null,
+            },
+          },
         },
       },
       {
@@ -75,18 +93,22 @@ export default class PartyStatementRepository extends BaseRepository {
       },
       {
         $addFields: {
-          partyName: '$partyInfo.name',
+          description: {
+            $concat: [
+              { $ifNull: ['$partyInfo.name', ''] },
+              ' O/B',
+            ],
+          },
+          reference: 'OB',
+          entryType: 'INCOME',
         },
       },
       {
-        $project: {
-          partyInfo: 0, // Remove the entire partyInfo object
-          partyObjectId: 0, // Remove the temporary field
-        },
+        $project: projection,
       },
     ];
 
     const docs = await this.collection.aggregate(pipeline).toArray();
-    return docs.map((doc) => this.toModel(doc));
+    return docs.map((doc) => this.toModel(doc, projection));
   }
 }
