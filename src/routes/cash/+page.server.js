@@ -33,7 +33,7 @@ export async function load({ depends, url }) {
   const partyStatementService = new PartyStatementService();
   const cashDescriptionService = new CashDescriptionService();
   const partyService = new PartyService();
-  const [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] =
+  let [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] =
     await Promise.all([
       cashReportService.cashReportList(formattedDate),
       cashService.cashList(formattedDate),
@@ -42,6 +42,10 @@ export async function load({ depends, url }) {
       cashDescriptionService.cashDescriptionList(),
       partyService.partyList(),
     ]);
+
+  reports = [...reports, { id: 'current' }];
+
+  console.log(reports, directCash, deliveryCash, oldBalanceCash);
 
   // 3. Determine Report Time Boundaries
   const { fromDate, toDate } = getReportBoundaries(reports, reportIndex);

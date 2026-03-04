@@ -47,4 +47,46 @@ export default class PartyStatementRepository extends BaseRepository {
     const docs = await this.collection.aggregate(pipeline).toArray();
     return docs.map((doc) => this.toModel(doc));
   }
+
+  async findAllOldBalanceCash(date) {
+    const dateFilter = this.getDateFilter(date, 'createdAt');
+    const pipeline = [
+      {
+        $match: { ...dateFilter, amountType: 'Cash' },
+      },
+      {
+        $addFields: {
+          partyObjectId: { $toObjectId: '$partyId' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'party',
+          localField: 'partyObjectId',
+          foreignField: '_id',
+          as: 'partyInfo',
+        },
+      },
+      {
+        $unwind: {
+          path: '$partyInfo',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          partyName: '$partyInfo.name',
+        },
+      },
+      {
+        $project: {
+          partyInfo: 0, // Remove the entire partyInfo object
+          partyObjectId: 0, // Remove the temporary field
+        },
+      },
+    ];
+
+    const docs = await this.collection.aggregate(pipeline).toArray();
+    return docs.map((doc) => this.toModel(doc));
+  }
 }

@@ -56,6 +56,6 @@ export default class PartyStatementService {
   }
 
   async getAllOldBalanceCashList(date) {
-    return await this.repository.findAllOldBalance(date, { amountType: 'Cash' });
+    return await this.repository.findAllOldBalanceCash(date);
   }
 }

@@ -14,6 +14,7 @@ export default class DeliveryRepository extends BaseRepository {
       description: 1,
       reference: 1,
       sign: 1,
+      entryType: 1,
     };
     const pipeline = [
       {
@@ -64,6 +65,7 @@ export default class DeliveryRepository extends BaseRepository {
           reference: {
             $concat: ['DS-', { $toString: '$serial' }],
           },
+          entryType: 'INCOME',
         },
       },
       {
