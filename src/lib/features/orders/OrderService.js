@@ -27,7 +27,11 @@ export default class OrderService {
       if (!parsed.success) schemaError(parsed);
       const settings = await this.settingsService.getSettings();
 
+      // Store payment time for showing paytm amount for correct delivery sheet
       parsed.data.orderNumber = settings.nextOrderNumber;
+      if (parsed.data.advance && parsed.data.amountType != 'AC') {
+        parsed.data.paymentAt = new Date();
+      }
       const order = await this.repository.create(parsed.data);
 
       // Store order number in settings
@@ -54,6 +58,14 @@ export default class OrderService {
     try {
       const parsed = await orderUpdateSchema.safeParseAsync({ ...data, id });
       if (!parsed.success) schemaError(parsed);
+
+      // Store payment time for showing paytm amount for correct delivery sheet
+      parsed.data.paymentAt =
+        parsed.data.advance && parsed.data.amountType != 'AC'
+          ? parsed.data.paymentAt
+            ? new Date(parsed.data.paymentAt)
+            : new Date()
+          : null;
 
       const order = await this.repository.updateById(id, parsed.data);
 
@@ -136,19 +148,27 @@ export default class OrderService {
     }
   }
 
+  async paytmAmountFromOrders(date) {
+    const result = await this.repository.paytmAdvanceByDate(date);
+    return result.map((r) => r.advance);
+  }
+
   async generateToken(id, data) {
     const order = await this.repository.findById(data.id);
     const tokenService = new TokenService();
-    tokenService.createToken({
-      partyName: order.partyName,
-      tokenItem: order.item,
-      tokenQuantity: data.qty || order.totalQty,
-      deliveryItem: null,
-      deliveryQuantity: 0,
-      vehicle: data.vehicle,
-    }, {
-      phone: order.phone,
-    });
+    tokenService.createToken(
+      {
+        partyName: order.partyName,
+        tokenItem: order.item,
+        tokenQuantity: data.qty || order.totalQty,
+        deliveryItem: null,
+        deliveryQuantity: 0,
+        vehicle: data.vehicle,
+      },
+      {
+        phone: order.phone,
+      },
+    );
   }
 
   async singlePrint(data) {

@@ -29,6 +29,7 @@ export async function load({ depends, url }) {
   const party = await partyService.partyList();
   const item = await itemService.itemList();
   const oldBalance = await partyStatement.getAllOldBalance(formattedDate);
+  const paytmOrder = await orderService.paytmAmountFromOrders(formattedDate);
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),
@@ -36,6 +37,7 @@ export async function load({ depends, url }) {
     address: serializeDoc(address),
     orders: serializeDoc(orders),
     oldBalance: serializeDoc(oldBalance),
+    paytmOrder,
   };
 }
 

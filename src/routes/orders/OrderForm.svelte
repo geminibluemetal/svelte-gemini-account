@@ -48,7 +48,8 @@
     }
   }
 
-  function handleFormSubmit() {
+  function handleFormSubmit({ formData }) {
+    formData.set('paymentAt', item?.paymentAt ? item.paymentAt : '');
     return async ({ result }) => {
       if (result.type == 'failure') {
         showToast(result?.data?.message || 'Enter Correct Details', 'danger');

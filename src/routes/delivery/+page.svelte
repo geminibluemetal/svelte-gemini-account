@@ -168,6 +168,8 @@
     ...data.oldBalance
       .filter((b) => b.amountType === 'Paytm' && b.amount != null)
       .map((b) => Number(b.amount)),
+
+    ...data.paytmOrder,
   ]);
   const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
 

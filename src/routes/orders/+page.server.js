@@ -43,6 +43,7 @@ export const actions = {
       return fail(400, { message: result.message });
     }
 
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'CASH.LIST' });
     return result;

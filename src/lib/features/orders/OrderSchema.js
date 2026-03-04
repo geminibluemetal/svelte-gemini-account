@@ -45,6 +45,9 @@ export function orderSchema() {
       discount: z.coerce.number().default(0),
       deliveredQty: z.coerce.number().default(0),
       notes: z.string().optional().nullable(),
+      paymentAt: z.preprocess((val) => {
+        if (val == '') return null;
+      }, z.coerce.date().default(null).nullable()),
 
       // Defaults
       status: z.string().default('New'),
