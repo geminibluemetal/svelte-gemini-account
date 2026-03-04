@@ -26,7 +26,6 @@ export async function createToken(data, takePrint = true) {
 
   data.serial = serial;
   data.tokenQuantity = Number(data.tokenQuantity);
-  console.log(data);
   const result = await insertToken(data);
 
   if (result?.acknowledged) {

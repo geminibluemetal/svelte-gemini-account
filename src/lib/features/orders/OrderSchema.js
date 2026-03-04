@@ -1,6 +1,8 @@
 import { z } from 'zod';
+import SettingsService from '../settings/SettingsService';
+import OrderService from './OrderService';
 
-export function orderSchema() {
+export function orderSchema(isUpdate = false) {
   return z
     .object({
       id: z.string().optional(),
@@ -46,8 +48,10 @@ export function orderSchema() {
       deliveredQty: z.coerce.number().default(0),
       notes: z.string().optional().nullable(),
       paymentAt: z.preprocess((val) => {
-        if (val == '') return null;
-      }, z.coerce.date().default(null).nullable()),
+        val = Date.parse(val) ? new Date(val) : val;
+        if (val instanceof Date) return val;
+        return new Date();
+      }, z.coerce.date()),
 
       // Defaults
       status: z.string().default('New'),
@@ -56,8 +60,33 @@ export function orderSchema() {
       tracktorOnly: z.coerce.boolean().default(false),
       deliverySheetVerified: z.coerce.number().default(0),
     })
-    .superRefine((data, ctx) => {
+    .superRefine(async (data, ctx) => {
       const partyMissing = !data.partyName || data.partyName.trim() === '';
+
+      // Check for duplicate order number
+      if (!isUpdate) {
+        try {
+          const settingsService = new SettingsService();
+          const orderService = new OrderService();
+
+          const settings = await settingsService.getSettings();
+          const existingOrder = await orderService.getOrderByNumber(settings.nextOrderNumber);
+
+          if (existingOrder) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: `Order number ${settings.nextOrderNumber} already exists, check old orders`,
+              path: ['orderNumber'],
+            });
+          }
+        } catch (error) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Error validating order number: ${error.message}`,
+            path: ['orderNumber'],
+          });
+        }
+      }
 
       /**
        * RULE:
@@ -101,4 +130,4 @@ export function orderSchema() {
 }
 
 export const orderCreateSchema = orderSchema();
-export const orderUpdateSchema = orderSchema();
+export const orderUpdateSchema = orderSchema(true);

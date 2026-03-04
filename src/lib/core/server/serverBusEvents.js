@@ -1,14 +1,9 @@
 export const EVENTS = {
   PARTY: {
-    CREATED: 'party.created',
-    UPDATED: 'party.updated',
-    DELETED: 'party.deleted',
     FIND_AND_UPDATE_PHONE: 'party.find.and.update.phone',
   },
-  ORDER: {
-    CREATED: 'order.created',
-    UPDATED: 'order.updated',
-    DELETED: 'order.deleted',
+  CASH: {
+    SYNC_CASH_BY_ORDER_ID: 'sync.cash.by.order.id',
   },
   CASH_DESCRIPTION: {
     CREATE_IF_NOT_EXISTS: 'cashDescription.create.if.not.exists',

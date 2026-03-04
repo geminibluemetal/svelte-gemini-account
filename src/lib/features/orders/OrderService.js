@@ -21,6 +21,10 @@ export default class OrderService {
     return await this.repository.findAll();
   }
 
+  async availableOrderList() {
+    return await this.repository.findAll({ status: { $in: ['New', 'Loading', 'Partial'] } });
+  }
+
   async createOrder(data) {
     try {
       const parsed = await orderCreateSchema.safeParseAsync(data);
@@ -44,9 +48,11 @@ export default class OrderService {
 
       // Emit Events
       // 1. Handle Phone Updates for Party
-      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-      // 2. Todo: Handle Cash Report Sync
-      // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
+      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, parsed.data);
+      // 2. Handle Cash Sync
+      const orderId = order.data.insertedId;
+      const orderData = await this.repository.findById(orderId);
+      serverBus.emit(EVENTS.CASH.SYNC_CASH_BY_ORDER_ID, orderData);
 
       return order;
     } catch (error) {
@@ -71,9 +77,10 @@ export default class OrderService {
 
       // Emit Events
       // 1. Handle Phone Updates for Party
-      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-      // 2. Todo: Handle Cash Report Sync
-      // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
+      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, parsed.data);
+      // 2. Handle Cash Sync
+      const orderData = await this.repository.findById(id);
+      serverBus.emit(EVENTS.CASH.SYNC_CASH_BY_ORDER_ID, orderData);
 
       return order;
     } catch (error) {
@@ -110,7 +117,14 @@ export default class OrderService {
 
   async signOrder(id) {
     try {
-      return await this.repository.toggleSignById(id);
+      const result = await this.repository.toggleSignById(id);
+
+      // Emit Events
+      // 1. Handle Cash Sync
+      const orderData = await this.repository.findById(id);
+      serverBus.emit(EVENTS.CASH.SYNC_CASH_BY_ORDER_ID, orderData);
+
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }

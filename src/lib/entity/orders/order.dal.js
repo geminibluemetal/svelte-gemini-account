@@ -69,7 +69,6 @@ export async function insertOrder(data) {
     created_at: data.date ? new Date(data.date) : new Date(),
   };
 
-  console.log(orderData);
   const db = await connectDB();
   const result = await db.collection(collectionName).insertOne(orderData);
   return result;

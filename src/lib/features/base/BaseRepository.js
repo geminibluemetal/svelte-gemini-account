@@ -22,9 +22,9 @@ export default class BaseRepository {
   // Create
   async create(data) {
     const result = await this.collection.insertOne({
-      ...data,
       createdAt: new Date(),
       updatedAt: null,
+      ...data,
     });
     if (!result.acknowledged) throw new AppError('Database insert failed');
     return handleSuccess('Created Success', result);
@@ -55,7 +55,7 @@ export default class BaseRepository {
   async updateById(id, data) {
     const result = await this.collection.updateOne(
       { _id: this.toObjectId(id) },
-      { $set: { ...data, updatedAt: new Date() } },
+      { $set: { updatedAt: new Date(), ...data } },
     );
     if (!result.acknowledged) throw new AppError('Database update failed');
     return handleSuccess('Updated Success', result);

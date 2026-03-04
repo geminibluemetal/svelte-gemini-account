@@ -23,7 +23,7 @@ export async function load({ depends, url }) {
   const itemService = new ItemService();
   const partyStatement = new PartyStatementService();
 
-  const orders = await orderService.orderList();
+  const orders = await orderService.availableOrderList();
   const address = await addressService.addressList();
   const token = await deliveryService.deliveryList(formattedDate);
   const party = await partyService.partyList();
