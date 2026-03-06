@@ -73,6 +73,14 @@ export default class OrderService {
             : new Date()
           : null;
 
+      // Update status again becase user may change the quantity then status should change
+      const oldOrder = await this.repository.findById(id);
+      parsed.data.status = OrderService.examineStatusByQuantity(
+        parsed.data.totalQty,
+        oldOrder.deliveredQty,
+        parsed.data.totalQty - oldOrder.deliveredQty,
+      );
+
       const order = await this.repository.updateById(id, parsed.data);
 
       // Emit Events
@@ -183,6 +191,37 @@ export default class OrderService {
         phone: order.phone,
       },
     );
+  }
+
+  async updateOrderDataFromOldDelivery(oldDelivery) {
+    // Order number in delviery is string type, because we store 'NO' also in there.
+    const orderNumber = Number(oldDelivery?.orderNumber);
+    if (orderNumber) {
+      const order = await this.getOrderByNumber(orderNumber);
+      if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
+      order.deliveredQty = order.deliveredQty - oldDelivery.deliveryQuantity;
+      order.status = OrderService.examineStatusByQuantity(
+        order.totalQty,
+        order.deliveredQty,
+        order.totalQty - order.deliveredQty,
+      );
+      await this.repository.updateById(order.id, order);
+    }
+  }
+  async updateOrderDataFromNewDelivery(newDelivery) {
+    // Order number in delviery is string type, because we store 'NO' also in there.
+    const orderNumber = Number(newDelivery?.orderNumber);
+    if (orderNumber) {
+      const order = await this.getOrderByNumber(orderNumber);
+      if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
+      order.deliveredQty = order.deliveredQty + newDelivery.deliveryQuantity;
+      order.status = OrderService.examineStatusByQuantity(
+        order.totalQty,
+        order.deliveredQty,
+        order.totalQty - order.deliveredQty,
+      );
+      await this.repository.updateById(order.id, order);
+    }
   }
 
   async singlePrint(data) {

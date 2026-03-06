@@ -8,4 +8,7 @@ export const EVENTS = {
   CASH_DESCRIPTION: {
     CREATE_IF_NOT_EXISTS: 'cashDescription.create.if.not.exists',
   },
+  ORDER: {
+    UPDATE_ORDER_BY_DELIVERY: 'update.order.by.delivery',
+  },
 };

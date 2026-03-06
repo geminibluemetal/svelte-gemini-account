@@ -22,10 +22,21 @@ export default class DeliveryService {
   async deliveryEntry(id, data) {
     try {
       const parsed = await deliveryEntrySchema.safeParseAsync(data);
-      console.log(parsed);
       if (!parsed.success) schemaError(parsed);
       parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
-      return await this.repository.updateById(id, parsed.data);
+
+      // Get the delivery data before updating with new data
+      const oldDelivery = await this.repository.findById(id);
+      const result = await this.repository.updateById(id, parsed.data);
+      // Get the delivery data after updating with new data
+      const newDelivery = await this.repository.findById(id);
+
+      // If operation success we do syncing
+      if (result?.ok) {
+        // 1. Sync orders
+        serverBus.emit(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, { oldDelivery, newDelivery });
+      }
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }
@@ -44,8 +55,18 @@ export default class DeliveryService {
 
   async signDelivery(id) {
     try {
+      // Get the delivery data before updating with new data
+      const oldDelivery = await this.repository.findById(id);
       const result = await this.repository.toggleSignById(id);
-      console.log(result);
+      // Get the delivery data after updating with new data
+      const newDelivery = await this.repository.findById(id);
+
+      // If operation success we do syncing
+      if (result?.ok) {
+        // 1. Sync orders
+        serverBus.emit(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, { oldDelivery, newDelivery });
+      }
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }
