@@ -111,4 +111,64 @@ export default class PartyStatementRepository extends BaseRepository {
     const docs = await this.collection.aggregate(pipeline).toArray();
     return docs.map((doc) => this.toModel(doc, projection));
   }
+
+  async fetchAllBalanceForEachParty(type = "all") {
+    let balanceFilter = {};
+    if (type === "pending") {
+      balanceFilter = { currentBalance: { $ne: 0 } };
+    } else if (type === "nil") {
+      balanceFilter = { currentBalance: 0 };
+    }
+
+    const result = await this.db.collection("party").aggregate([
+      {
+        $lookup: {
+          from: "party_statements",
+          localField: "_id",
+          foreignField: "partyId",
+          as: "statements"
+        }
+      },
+      {
+        $addFields: {
+          totalCredit: {
+            $sum: {
+              $map: {
+                input: "$statements",
+                as: "s",
+                in: { $cond: [{ $eq: ["$$s.entryType", "CREDIT"] }, "$$s.amount", 0] }
+              }
+            }
+          },
+          totalDebit: {
+            $sum: {
+              $map: {
+                input: "$statements",
+                as: "s",
+                in: { $cond: [{ $eq: ["$$s.entryType", "DEBIT"] }, "$$s.amount", 0] }
+              }
+            }
+          }
+        }
+      },
+      {
+        $addFields: {
+          openingBal: { $ifNull: ["$openingBalance", 0] },
+          currentBalance: {
+            $subtract: [
+              { $add: [{ $ifNull: ["$openingBalance", 0] }, { $ifNull: ["$totalDebit", 0] }] },
+              { $ifNull: ["$totalCredit", 0] }
+            ]
+          }
+        }
+      },
+      { $match: balanceFilter },
+      {
+        $project: {
+          statements: 0,
+        }
+      }
+    ]).toArray();
+    return result.map(r => ({ ...r, id: r._id.toString() }));
+  }
 }

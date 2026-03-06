@@ -3,11 +3,10 @@
   import { onDestroy, onMount } from 'svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
-  import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { goto } from '$app/navigation';
   import Button from '$lib/components/Button.svelte';
-  import PrintBalance from './PrintBalance.svelte';
+  import { resolve } from '$app/paths';
 
   const { data } = $props();
 
@@ -17,16 +16,16 @@
     {
       name: 'Open Balance',
       align: 'right',
-      key: 'opening_balance',
+      key: 'openingBalance',
       width: 125,
       display: 'currency',
     },
-    { name: 'Total Amount', align: 'right', key: 'total_debit', width: 125, display: 'currency' },
-    { name: 'Total Payment', align: 'right', key: 'total_credit', width: 125, display: 'currency' },
+    { name: 'Total Amount', align: 'right', key: 'totalDebit', width: 125, display: 'currency' },
+    { name: 'Total Payment', align: 'right', key: 'totalCredit', width: 125, display: 'currency' },
     {
       name: 'Current Balance',
       align: 'right',
-      key: 'current_balance',
+      key: 'currentBalance',
       width: 125,
       display: 'currency',
     },
@@ -44,7 +43,6 @@
   ];
 
   let helperOpened = $state(false);
-  let isPrinting = $state(false);
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -63,7 +61,7 @@
   }
 
   function gotoPartyLedger(item) {
-    goto(`/statement/${item.id}`);
+    goto(resolve(`/statement/${item.id}`));
   }
 
   function handleBalanceReset(item) {
@@ -77,18 +75,17 @@
   }
 
   function handlePrint() {
-    isPrinting = true;
     window.print();
   }
 
   function handleAllFilter() {
-    goto(`?type=all`);
+    goto(resolve(`?type=all`));
   }
   function handlePendingFilter() {
-    goto(`?type=pending`);
+    goto(resolve(`?type=pending`));
   }
   function handleNilFilter() {
-    goto(`?type=nil`);
+    goto(resolve(`?type=nil`));
   }
 
   const customEvents = [
@@ -116,7 +113,7 @@
 </script>
 
 <div class="printing-content">
-  <PrintBalance title="Balance Sheet" {headers} items={data.balance} />
+  <!-- <PrintBalance title="Balance Sheet" {headers} items={data.balance} /> -->
 </div>
 
 <div class="visible-content">
@@ -134,7 +131,7 @@
   <!-- Helper Dialog -->
   <Model open={helperOpened} onClose={() => (helperOpened = false)}>
     <div class="min-w-md bg-white p-5">
-      {#each availableOptions as o}
+      {#each availableOptions as o (o.key)}
         <div class="m-1 mb-2 flex items-center gap-2">
           <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
           <span>=</span>

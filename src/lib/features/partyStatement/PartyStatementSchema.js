@@ -1,9 +1,10 @@
+import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const partyStatementSchema = z.object({
   id: z.string().optional(),
-  partyId: z.string().optional(),
-  deliveryId: z.string().optional(),
+  partyId: z.string().optional().transform((val) => ObjectId.isValid(val) ? new ObjectId(val) : null),
+  deliveryId: z.string().optional().transform((val) => ObjectId.isValid(val) ? new ObjectId(val) : null),
   amountType: z.string().trim().default(''),
   entryType: z.enum(['CREDIT', 'DEBIT']),
   item: z.string().trim().optional(),

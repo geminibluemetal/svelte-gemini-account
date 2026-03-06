@@ -194,33 +194,41 @@ export default class OrderService {
   }
 
   async updateOrderDataFromOldDelivery(oldDelivery) {
-    // Order number in delviery is string type, because we store 'NO' also in there.
-    const orderNumber = Number(oldDelivery?.orderNumber);
-    if (orderNumber) {
-      const order = await this.getOrderByNumber(orderNumber);
-      if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
-      order.deliveredQty = order.deliveredQty - oldDelivery.deliveryQuantity;
-      order.status = OrderService.examineStatusByQuantity(
-        order.totalQty,
-        order.deliveredQty,
-        order.totalQty - order.deliveredQty,
-      );
-      await this.repository.updateById(order.id, order);
+    try {
+      // Order number in delviery is string type, because we store 'NO' also in there.
+      const orderNumber = Number(oldDelivery?.orderNumber);
+      if (orderNumber) {
+        const order = await this.getOrderByNumber(orderNumber);
+        if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
+        order.deliveredQty = order.deliveredQty - oldDelivery.deliveryQuantity;
+        order.status = OrderService.examineStatusByQuantity(
+          order.totalQty,
+          order.deliveredQty,
+          order.totalQty - order.deliveredQty,
+        );
+        await this.repository.updateById(order.id, order);
+      }
+    } catch (error) {
+      return handleServiceError(error)
     }
   }
   async updateOrderDataFromNewDelivery(newDelivery) {
-    // Order number in delviery is string type, because we store 'NO' also in there.
-    const orderNumber = Number(newDelivery?.orderNumber);
-    if (orderNumber) {
-      const order = await this.getOrderByNumber(orderNumber);
-      if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
-      order.deliveredQty = order.deliveredQty + newDelivery.deliveryQuantity;
-      order.status = OrderService.examineStatusByQuantity(
-        order.totalQty,
-        order.deliveredQty,
-        order.totalQty - order.deliveredQty,
-      );
-      await this.repository.updateById(order.id, order);
+    try {
+      // Order number in delviery is string type, because we store 'NO' also in there.
+      const orderNumber = Number(newDelivery?.orderNumber);
+      if (orderNumber) {
+        const order = await this.getOrderByNumber(orderNumber);
+        if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
+        order.deliveredQty = order.deliveredQty + newDelivery.deliveryQuantity;
+        order.status = OrderService.examineStatusByQuantity(
+          order.totalQty,
+          order.deliveredQty,
+          order.totalQty - order.deliveredQty,
+        );
+        await this.repository.updateById(order.id, order);
+      }
+    } catch (error) {
+      return handleServiceError(error)
     }
   }
 

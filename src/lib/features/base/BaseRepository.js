@@ -3,6 +3,7 @@ import AppError, { handleSuccess } from '$lib/core/server/error';
 
 export default class BaseRepository {
   constructor(db, collectionName, Model) {
+    this.db = db;
     this.collection = db.collection(collectionName);
     this.Model = Model;
   }

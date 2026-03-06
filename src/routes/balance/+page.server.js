@@ -1,8 +1,10 @@
-import { getAllBalance } from '$lib/entity/party/party.service.js';
+import PartyStatementService from '$lib/features/partyStatement/PartyStatementService.js';
+import { serializeDoc } from '$lib/utils/serializer.js';
 
 export async function load({ depends, url }) {
   depends('BALANCE.LIST');
   const type = url.searchParams.get('type');
-  const balance = await getAllBalance(type);
-  return { balance };
+  const partyStatementService = new PartyStatementService();
+  const balance = await partyStatementService.getBalance(type);
+  return { balance: serializeDoc(balance) };
 }
