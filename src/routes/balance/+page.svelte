@@ -7,6 +7,7 @@
   import { goto } from '$app/navigation';
   import Button from '$lib/components/Button.svelte';
   import { resolve } from '$app/paths';
+  import PrintBalance from './PrintBalance.svelte';
 
   const { data } = $props();
 
@@ -112,9 +113,7 @@
   });
 </script>
 
-<div class="printing-content">
-  <!-- <PrintBalance title="Balance Sheet" {headers} items={data.balance} /> -->
-</div>
+<PrintBalance data={data.balance} />
 
 <div class="visible-content">
   <Table title="Balance Sheet" {headers} items={data.balance} {customEvents}>
@@ -141,18 +140,3 @@
     </div>
   </Model>
 </div>
-
-<style>
-  .printing-content {
-    display: none;
-  }
-
-  @media print {
-    .printing-content {
-      display: block;
-    }
-    .visible-content {
-      display: none;
-    }
-  }
-</style>
