@@ -16,9 +16,10 @@
   import OldBalanceForm from './OldBalanceForm.svelte';
   import { resolve } from '$app/paths';
   import NavigateButton from '$lib/components/NavigateButton.svelte';
-  import { getFormattedDate } from '$lib/utils/dateTime';
+  import { getFormattedDate, getFormattedTime } from '$lib/utils/dateTime';
   import { parseDate } from '$lib/utils/dateTimeParser';
   import { updateParams } from '$lib/core/client/urlParams';
+  import DeliveryExtraPopup from './DeliveryExtraPopup.svelte';
 
   const { data } = $props();
   let view = $state('All');
@@ -130,10 +131,16 @@
       // Check if vehicle ends with 'G'
       if (vehicle && vehicle.endsWith('G')) {
         if (Array.isArray(acc[vehicle])) {
-          acc[vehicle].push({ time: item.deliveryTime, address: item.address });
+          acc[vehicle].push({
+            time: item.deliveredAt ? getFormattedTime(item.deliveredAt) : '',
+            address: item.address,
+          });
         } else {
           acc[vehicle] = [];
-          acc[vehicle].push({ time: item.deliveryTime, address: item.address });
+          acc[vehicle].push({
+            time: item.deliveredAt ? getFormattedTime(item.deliveredAt) : '',
+            address: item.address,
+          });
         }
       }
 
@@ -288,6 +295,15 @@
   let vehicleSummaryOpened = $state(false);
   let reviewMode = $state(false);
   let editableDelivery = $state(null);
+
+  let overRowRect = $state(null);
+  let TableRef = $state(null);
+
+  function handleOverRowReset() {
+    if (TableRef) {
+      TableRef.resetOverRow();
+    }
+  }
 
   function handleDeliveryEdit(item) {
     if (
@@ -453,12 +469,29 @@
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
+  function handleOverRowChange(element) {
+    if (element) overRowRect = element?.getBoundingClientRect();
+    else overRowRect = null;
+  }
+
   const openCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
   const openOrderBook = () => goto(resolve(`/orders?date=${currentDate}`));
-  const openACFilter = () => (view = view == 'AC' ? 'AC_Unsigned' : 'AC');
-  const openCPFilter = () => (view = view == 'CP' ? 'CP_Unsigned' : 'CP');
-  const openBlankFilter = () => (view = 'Blank');
-  const openRemoveFilter = () => (view = 'All');
+  const openACFilter = () => {
+    view = view == 'AC' ? 'AC_Unsigned' : 'AC';
+    handleOverRowReset();
+  };
+  const openCPFilter = () => {
+    view = view == 'CP' ? 'CP_Unsigned' : 'CP';
+    handleOverRowReset();
+  };
+  const openBlankFilter = () => {
+    view = 'Blank';
+    handleOverRowReset();
+  };
+  const openRemoveFilter = () => {
+    view = 'All';
+    handleOverRowReset();
+  };
 
   onMount(() => {
     keyboardEventBus.on('H', handleHelper);
@@ -471,6 +504,7 @@
     keyboardEventBus.on('6', openOrderBook);
     keyboardEventBus.on('7', handleOldBalance);
     keyboardEventBus.on('8', handleVehicleSummary);
+    keyboardEventBus.on('R', handleReviewMode);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
@@ -484,11 +518,13 @@
     keyboardEventBus.off('6', openOrderBook);
     keyboardEventBus.off('7', handleOldBalance);
     keyboardEventBus.off('8', handleVehicleSummary);
+    keyboardEventBus.off('R', handleReviewMode);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
 
 <Table
+  bind:this={TableRef}
   title={`Delivery Sheet${reviewMode ? ` (Reconciliation & Review Mode)` : ''}`}
   headerColor={reviewMode ? 'blue' : 'red'}
   {headers}
@@ -502,6 +538,7 @@
     !vehicleSummaryOpened}
   {customCellHighlight}
   {rowHighlight}
+  overRowChange={(...a) => (reviewMode ? handleOverRowChange(...a) : null)}
 >
   {#snippet left()}
     <button
@@ -725,3 +762,7 @@
     {/if}
   </div>
 </Model>
+
+{#if reviewMode}
+  <DeliveryExtraPopup position="top" {overRowRect} />
+{/if}

@@ -17,6 +17,7 @@
     bottomSpace = false,
     moveToEnd = false,
     customEvents = [],
+    overRowChange = () => {},
     doAction = true,
     rowHighlight = () => {},
     customCellHighlight = () => {},
@@ -58,12 +59,21 @@
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
   };
 
-  $effect(() => {
+  function reCheckOver() {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
     $overRowRem[title] = overRow;
+    overRowChange(overRowElement, overRow);
     if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
       scrollToMiddle(overRowElement, container);
     }
+  }
+
+  export function resetOverRow() {
+    overRow = 0;
+  }
+
+  $effect(() => {
+    reCheckOver();
   });
 
   onMount(() => {
@@ -94,9 +104,13 @@
     });
 
     customHandlersMap = handlersMap;
+
+    container?.addEventListener('scroll', reCheckOver);
   });
 
   onDestroy(() => {
+    container?.addEventListener('scroll', reCheckOver);
+
     // Unregister navigation events
     keyboardEventBus.off('ArrowUp', rowUp);
     keyboardEventBus.off('ArrowDown', rowDown);
