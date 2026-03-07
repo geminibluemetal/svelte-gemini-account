@@ -12,7 +12,7 @@
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name', width: 300 },
-    { name: 'Phone', align: 'center', key: 'phone', width: 150 },
+    { name: 'Phone', align: 'center', key: 'phone', width: 110 },
     {
       name: 'Open Balance',
       align: 'right',
@@ -79,13 +79,13 @@
   }
 
   function handleAllFilter() {
-    goto(resolve(`?type=all`));
+    goto(resolve(`/balance?type=all`));
   }
   function handlePendingFilter() {
-    goto(resolve(`?type=pending`));
+    goto(resolve(`/balance?type=pending`));
   }
   function handleNilFilter() {
-    goto(resolve(`?type=nil`));
+    goto(resolve(`/balance?type=nil`));
   }
 
   const customEvents = [

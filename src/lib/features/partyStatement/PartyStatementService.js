@@ -1,4 +1,4 @@
-import { handleServiceError, schemaError } from '$lib/core/server/error';
+import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { ObjectId } from 'mongodb';
 import PartyStatementRepository from './PartyStatementRepository';
@@ -73,8 +73,21 @@ export default class PartyStatementService {
   async updatePartyStatementFromDelivery(delivery) {
     try {
       if (delivery.amountType1 == 'AC' || delivery.amountType2 == 'AC') {
-        let amount = (delivery.amountType1 == 'AC' ? delivery.amount1 : 0) + (delivery.amountType2 == 'AC' ? delivery.amount2 : 0);
-        amount = amount ? amount : await calculateAmount(delivery.address, delivery.deliveryItem, delivery.deliveryQuantity);
+        let amount =
+          (delivery.amountType1 == 'AC' ? delivery.amount1 : 0) +
+          (delivery.amountType2 == 'AC' ? delivery.amount2 : 0);
+        if (!amount) {
+          const calcResult = await calculateAmount(
+            delivery.address,
+            delivery.deliveryItem,
+            delivery.deliveryQuantity,
+          );
+          if (calcResult.success && calcResult?.data) {
+            amount = calcResult.data;
+          } else {
+            throw new AppError(calcResult.message);
+          }
+        }
         const partyService = new PartyService();
         const party = await partyService.findPartyByPartyName(delivery.partyName);
 
@@ -92,7 +105,7 @@ export default class PartyStatementService {
           address: delivery.address,
           createdAt: delivery?.deliveredAt ? new Date(delivery.deliveredAt) : new Date(),
           sign: delivery.sign,
-        }
+        };
         await this.repository.create(preparedPartyStatement);
       }
     } catch (error) {

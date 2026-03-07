@@ -57,7 +57,7 @@ export default class PartyStatementRepository extends BaseRepository {
       createdAt: 1,
       sign: 1,
       entryType: 1,
-    }
+    };
     const pipeline = [
       {
         $match: {
@@ -94,10 +94,7 @@ export default class PartyStatementRepository extends BaseRepository {
       {
         $addFields: {
           description: {
-            $concat: [
-              { $ifNull: ['$partyInfo.name', ''] },
-              ' O/B',
-            ],
+            $concat: [{ $ifNull: ['$partyInfo.name', ''] }, ' O/B'],
           },
           reference: 'OB',
           entryType: 'INCOME',
@@ -112,63 +109,81 @@ export default class PartyStatementRepository extends BaseRepository {
     return docs.map((doc) => this.toModel(doc, projection));
   }
 
-  async fetchAllBalanceForEachParty(type = "all") {
+  async fetchAllBalanceForEachParty(type = 'pending') {
     let balanceFilter = {};
-    if (type === "pending") {
+    if (type === 'pending') {
       balanceFilter = { currentBalance: { $ne: 0 } };
-    } else if (type === "nil") {
+    } else if (type === 'nil') {
       balanceFilter = { currentBalance: 0 };
     }
-
-    const result = await this.db.collection("party").aggregate([
-      {
-        $lookup: {
-          from: "party_statements",
-          localField: "_id",
-          foreignField: "partyId",
-          as: "statements"
-        }
-      },
-      {
-        $addFields: {
-          totalCredit: {
-            $sum: {
-              $map: {
-                input: "$statements",
-                as: "s",
-                in: { $cond: [{ $eq: ["$$s.entryType", "CREDIT"] }, "$$s.amount", 0] }
-              }
-            }
+    const result = await this.db
+      .collection('party')
+      .aggregate([
+        {
+          $lookup: {
+            from: 'partyStatement',
+            let: { p_id: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }],
+                  },
+                },
+              },
+            ],
+            as: 'statements',
           },
-          totalDebit: {
-            $sum: {
-              $map: {
-                input: "$statements",
-                as: "s",
-                in: { $cond: [{ $eq: ["$$s.entryType", "DEBIT"] }, "$$s.amount", 0] }
-              }
-            }
-          }
-        }
-      },
-      {
-        $addFields: {
-          openingBal: { $ifNull: ["$openingBalance", 0] },
-          currentBalance: {
-            $subtract: [
-              { $add: [{ $ifNull: ["$openingBalance", 0] }, { $ifNull: ["$totalDebit", 0] }] },
-              { $ifNull: ["$totalCredit", 0] }
-            ]
-          }
-        }
-      },
-      { $match: balanceFilter },
-      {
-        $project: {
-          statements: 0,
-        }
-      }
-    ]).toArray();
-    return result.map(r => ({ ...r, id: r._id.toString() }));
+        },
+        {
+          $addFields: {
+            totalCredit: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'CREDIT'] }, // Force Uppercase check
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+            totalDebit: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'DEBIT'] }, // Force Uppercase check
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            openingBal: { $ifNull: ['$openingBalance', 0] },
+            currentBalance: {
+              $subtract: [
+                { $add: [{ $ifNull: ['$openingBalance', 0] }, { $ifNull: ['$totalDebit', 0] }] },
+                { $ifNull: ['$totalCredit', 0] },
+              ],
+            },
+          },
+        },
+        { $match: balanceFilter },
+        { $project: { statements: 0 } },
+      ])
+      .toArray();
+    return result.map((r) => ({ ...r, id: r._id.toString() }));
   }
 }

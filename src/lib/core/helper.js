@@ -41,40 +41,31 @@ export async function calculateAmount(address, item, qty) {
 
 // Helper function to get amount based on item quantity
 function getAmountByItemQuantity(item, qty) {
-  // Convert qty to number if it's a string
   const quantity = parseFloat(qty) || 0;
-
-  // Determine which price bracket to use based on quantity
   if (quantity <= 0.25) {
-    return parseFloat(item.price_025) || 0;
+    return parseFloat(item.price.unit025) || 0;
   } else if (quantity <= 0.5) {
-    return parseFloat(item.price_050) || 0;
+    return parseFloat(item.price.unit050) || 0;
   } else if (quantity <= 1.0) {
-    return parseFloat(item.price100) || 0;
+    return parseFloat(item.price.unit100) || 0;
   } else if (quantity <= 1.5) {
-    return parseFloat(item.price150) || 0;
+    return parseFloat(item.price.unit150) || 0;
   } else if (quantity <= 2.0) {
-    return parseFloat(item.price200) || 0;
+    return parseFloat(item.price.unit200) || 0;
   } else {
-    // Handle quantities above 2.0 - you might want to add logic for this
-    // For now, return the maximum price or calculate proportionally
-    return parseFloat(item.price200) * (quantity / 2) || 0;
+    return parseFloat(item.price.unit100) * quantity || 0;
   }
 }
 
 // Helper function to get delivery charge based on quantity and address
 function getDeliveryCharge(qty, address) {
   const quantity = parseFloat(qty) || 0;
-
-  // Determine which delivery charge bracket to use
   if (quantity <= 0.25) {
-    return parseFloat(address.delivery_025) || 0;
+    return parseFloat(address.deliveryCharges.chargeHalf) || 0;
   } else if (quantity <= 1.0) {
-    // Note: In your address data, you have delivery_050100 which likely covers 0.5 to 1.0
-    return parseFloat(address.delivery_050100) || 0;
+    return parseFloat(address.deliveryCharges.chargeSingle) || 0;
   } else {
-    // For quantities above 1.0, use delivery_max
-    return parseFloat(address.delivery_max) || 0;
+    return parseFloat(address.deliveryCharges.chargeMax) * quantity || 0;
   }
 }
 
