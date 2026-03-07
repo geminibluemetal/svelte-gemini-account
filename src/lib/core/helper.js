@@ -42,6 +42,11 @@ export async function calculateAmount(address, item, qty) {
 // Helper function to get amount based on item quantity
 function getAmountByItemQuantity(item, qty) {
   const quantity = parseFloat(qty) || 0;
+
+  if (quantity > 0 && ![0.25, 0.5, 1, 1.5, 2].includes(quantity)) {
+    return parseFloat(item.price.unit100) * quantity || 0;
+  }
+
   if (quantity <= 0.25) {
     return parseFloat(item.price.unit025) || 0;
   } else if (quantity <= 0.5) {
@@ -52,8 +57,6 @@ function getAmountByItemQuantity(item, qty) {
     return parseFloat(item.price.unit150) || 0;
   } else if (quantity <= 2.0) {
     return parseFloat(item.price.unit200) || 0;
-  } else {
-    return parseFloat(item.price.unit100) * quantity || 0;
   }
 }
 

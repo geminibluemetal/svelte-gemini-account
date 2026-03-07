@@ -49,7 +49,15 @@ export default class DeliveryService {
       const parsed = await amountEntrySchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
       parsed.data.paymentAt = data?.paymentAt ? new Date(data.paymentAt) : new Date();
-      return await this.repository.updateById(id, parsed.data);
+      const result = await this.repository.updateById(id, parsed.data);
+
+      // If operation success we do syncing
+      if (result?.ok) {
+        // 1. Sync party statement
+        const newDelivery = await this.repository.findById(id);
+        serverBus.emit(EVENTS.PARTY_STATEMENT.UPDATE_PARTY_STATEMENT_BY_DELIVERY, newDelivery);
+      }
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }

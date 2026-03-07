@@ -3,11 +3,10 @@
   import { onDestroy, onMount } from 'svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
-  import { showToast } from '$lib/stores/toast';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { goto } from '$app/navigation';
-  import display from '$lib/core/client/display.js';
   import { HighlightCell } from '$lib/utils/highlight.js';
+  import { resolve } from '$app/paths';
 
   const { data } = $props();
 
@@ -16,8 +15,8 @@
   const balanceColor = (value) => (value ? { ...HighlightCell.blue, background: '' } : null);
 
   const headers = [
-    { name: 'Date', align: 'center', key: 'date', width: 100, display: 'date' },
-    { name: 'Time', align: 'center', key: 'time', width: 80, display: 'time' },
+    { name: 'Date', align: 'center', key: 'createdAt', width: 100, display: 'date' },
+    { name: 'Time', align: 'center', key: 'createdAt', width: 80, display: 'time' },
     { name: 'Vehicle', align: 'left', key: 'vehicle', width: 70 },
     { name: 'Address', align: 'left', key: 'address', width: 230 },
     { name: 'Item', align: 'left', key: 'item' },
@@ -51,7 +50,7 @@
       name: 'Sign',
       align: 'center',
       key: 'sign',
-      display: 'boolean',
+      display: 'sign',
       color: SignColor,
     },
   ];
@@ -89,24 +88,24 @@
     return value == 1 ? HighlightCell.green : null;
   }
 
-  async function transportAction(url, data) {
-    const formData = new FormData();
-    for (const key in data) {
-      formData.append(key, data[key]);
-    }
-    const res = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
-    return await res.json();
-  }
+  // async function transportAction(url, data) {
+  //   const formData = new FormData();
+  //   for (const key in data) {
+  //     formData.append(key, data[key]);
+  //   }
+  //   const res = await fetch(url, {
+  //     method: 'POST',
+  //     body: formData,
+  //   });
+  //   return await res.json();
+  // }
 
   function toggleHelper() {
     helperOpened = !helperOpened;
   }
 
   function gotoBalanceSheet() {
-    goto(`/balance`);
+    goto(resolve(`/balance`));
   }
 
   const customEvents = [
@@ -131,7 +130,7 @@
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>
   <div class="min-w-md bg-white p-5">
-    {#each availableOptions as o}
+    {#each availableOptions as o (o.key)}
       <div class="m-1 mb-2 flex items-center gap-2">
         <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
         <span>=</span>

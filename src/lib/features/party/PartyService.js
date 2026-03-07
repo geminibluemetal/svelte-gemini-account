@@ -17,6 +17,10 @@ export default class PartyService {
     return await this.repository.findOne({ name: partyName });
   }
 
+  async getPartyById(id) {
+    return await this.repository.findById(id);
+  }
+
   async createParty(data) {
     try {
       const parsed = await partyCreateSchema.safeParseAsync(data);

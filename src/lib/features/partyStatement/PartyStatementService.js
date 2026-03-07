@@ -24,6 +24,10 @@ export default class PartyStatementService {
     return await this.repository.fetchAllBalanceForEachParty(type);
   }
 
+  async getStatementByParty(partyId, openingBalance = 0) {
+    return await this.repository.fetchStatementByParty(partyId, openingBalance);
+  }
+
   async createPartyStatement(data) {
     try {
       const parsed = await partyStatementSchema.safeParseAsync(data);
@@ -72,6 +76,9 @@ export default class PartyStatementService {
 
   async updatePartyStatementFromDelivery(delivery) {
     try {
+      // First Delete Existing Record
+      await this.repository.deleteByFilter({ deliveryId: new ObjectId(delivery.id) });
+
       if (delivery.amountType1 == 'AC' || delivery.amountType2 == 'AC') {
         let amount =
           (delivery.amountType1 == 'AC' ? delivery.amount1 : 0) +
@@ -91,8 +98,6 @@ export default class PartyStatementService {
         const partyService = new PartyService();
         const party = await partyService.findPartyByPartyName(delivery.partyName);
 
-        // First Delete Existing Record
-        await this.repository.deleteByFilter({ deliveryId: new ObjectId(delivery.id) });
         const preparedPartyStatement = {
           partyId: new ObjectId(party.id),
           deliveryId: new ObjectId(delivery.id),

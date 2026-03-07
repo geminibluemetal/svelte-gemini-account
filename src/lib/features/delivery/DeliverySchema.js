@@ -77,7 +77,7 @@ export const deliveryEntrySchema = z
       const creditAmount =
         (data.amountType1 === 'AC' ? data.amount1 : 0) +
         (data.amountType2 === 'AC' ? data.amount2 : 0);
-      if (!ignoreItemList.includes(data.deliveryItem.toLowerCase()) && creditAmount != 0) {
+      if (!ignoreItemList.includes(data.deliveryItem.toLowerCase()) && !creditAmount) {
         if (data.address) {
           const isAddressHasDeliveryCharge = await validateAddressDeliveryCharge(
             data.address,
