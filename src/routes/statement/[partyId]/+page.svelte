@@ -4,9 +4,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Model from '$lib/components/Model.svelte';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
-  import { goto } from '$app/navigation';
   import { HighlightCell } from '$lib/utils/highlight.js';
-  import { resolve } from '$app/paths';
 
   const { data } = $props();
 
@@ -105,7 +103,7 @@
   }
 
   function gotoBalanceSheet() {
-    goto(resolve(`/balance`));
+    history.back();
   }
 
   const customEvents = [

@@ -2,6 +2,7 @@
   import display from '$lib/core/client/display';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
+  import { overRowRem } from '$lib/stores/common';
   import { SearchX } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
 
@@ -24,7 +25,7 @@
     left = () => {},
   } = $props();
 
-  let overRow = $state(-1);
+  let overRow = $state($overRowRem[title] ? $overRowRem[title] : -1);
   let container = $state(null);
 
   // Use a Map to store handlers by key
@@ -59,6 +60,7 @@
 
   $effect(() => {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
+    $overRowRem[title] = overRow;
     if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
       scrollToMiddle(overRowElement, container);
     }
