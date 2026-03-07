@@ -3,7 +3,7 @@ import { connectDB } from '$lib/core/server/mongodb';
 import AddressRepository from './AddressRepository';
 import { addressCreateSchema, addressUpdateSchema } from './AddressSchema';
 
-const db = await connectDB()
+const db = await connectDB();
 export default class AddressService {
   constructor() {
     this.repository = new AddressRepository(db);
@@ -11,6 +11,10 @@ export default class AddressService {
 
   async addressList() {
     return await this.repository.findAll({}, { name: 1, deliveryCharges: 1, _id: 1 });
+  }
+
+  async fetchSingleAddressByName(name) {
+    return await this.repository.findOne({ name });
   }
 
   async createAddress(data) {
@@ -50,7 +54,7 @@ export default class AddressService {
       const addressData = await this.repository.findOne({ name: address });
       if (!addressData) throw new Error('Address not found');
 
-      let checkingCharge = ''
+      let checkingCharge = '';
       if (quantity < 0.5) checkingCharge = 'chargeHalf';
       else if (quantity <= 1) checkingCharge = 'chargeSingle';
       else checkingCharge = 'chargeMax';

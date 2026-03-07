@@ -1,7 +1,7 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import { getAllItems } from '$lib/entity/items/items.service.js';
-import { getAllParty } from '$lib/entity/party/party.service.js';
-import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
+import ItemService from '$lib/features/items/ItemService';
+import PartyService from '$lib/features/party/PartyService';
+import VehicleService from '$lib/features/vehicle/VehicleService';
 import TokenService from '$lib/features/token/TokenService';
 import { parseDate } from '$lib/utils/dateTimeParser';
 import { formDataToObject } from '$lib/utils/form.js';
@@ -15,10 +15,13 @@ export async function load({ depends, url }) {
   let formattedDate = date ? parseDate(date) : new Date();
 
   const tokenService = new TokenService();
+  const itemService = new ItemService();
+  const partyService = new PartyService();
+  const vehicleService = new VehicleService();
   const token = await tokenService.tokenList(formattedDate);
-  const party = await getAllParty();
-  const vehicle = await getAllVehicle();
-  const item = await getAllItems();
+  const item = await itemService.itemList();
+  const party = await partyService.partyList();
+  const vehicle = await vehicleService.vehicleList();
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),

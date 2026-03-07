@@ -1,12 +1,18 @@
-import { fetchSingleAddressByName } from '$lib/entity/address/address.dal';
-import { fetchSingleItemByName } from '$lib/entity/items/items.dal';
+import AddressService from '$lib/features/address/AddressService';
+import ItemService from '$lib/features/items/ItemService';
 
 export async function calculateAmount(address, item, qty) {
+  const addressService = new AddressService();
+  const itemService = new ItemService();
+
   address =
     typeof address === 'object' && address !== null
       ? address
-      : await fetchSingleAddressByName(address);
-  item = typeof item === 'object' && item !== null ? item : await fetchSingleItemByName(item);
+      : await addressService.fetchSingleAddressByName(address);
+  item =
+    typeof item === 'object' && item !== null
+      ? item
+      : await itemService.fetchSingleItemByName(item);
 
   let creditAmount = 0;
   // Get base item amount based on quantity

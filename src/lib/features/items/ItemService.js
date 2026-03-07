@@ -3,7 +3,7 @@ import { connectDB } from '$lib/core/server/mongodb';
 import ItemRepository from './ItemRepository';
 import { itemCreateSchema, itemUpdateSchema } from './ItemSchema';
 
-const db = await connectDB()
+const db = await connectDB();
 export default class ItemService {
   constructor() {
     this.repository = new ItemRepository(db);
@@ -11,6 +11,10 @@ export default class ItemService {
 
   async itemList() {
     return await this.repository.findAll({}, { name: 1, _id: 1, price: 1 });
+  }
+
+  async fetchSingleItemByName(name) {
+    return await this.repository.findOne({ name });
   }
 
   async createItem(data) {
@@ -50,7 +54,7 @@ export default class ItemService {
       const itemData = await this.repository.findOne({ name: item });
       if (!itemData) throw new Error('Item not found');
 
-      let checkingPrice = ''
+      let checkingPrice = '';
       if (quantity === 0.25) checkingPrice = 'unit025';
       else if (quantity === 0.5) checkingPrice = 'unit050';
       else if (quantity === 1) checkingPrice = 'unit100';

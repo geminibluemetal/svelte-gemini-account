@@ -1,9 +1,9 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
-import { getAllAddress } from '$lib/entity/address/address.service.js';
-import { getAllItems } from '$lib/entity/items/items.service.js';
-import { getAllParty } from '$lib/entity/party/party.service.js';
-import { getAllVehicle } from '$lib/entity/vehicle/vehicle.service.js';
+import AddressService from '$lib/features/address/AddressService';
 import OrderService from '$lib/features/orders/OrderService.js';
+import ItemService from '$lib/features/items/ItemService';
+import PartyService from '$lib/features/party/PartyService';
+import VehicleService from '$lib/features/vehicle/VehicleService';
 import { formDataToObject } from '$lib/utils/form';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
@@ -11,11 +11,15 @@ import { fail } from '@sveltejs/kit';
 export async function load({ depends }) {
   depends('ORDERS.LIST');
   const orderService = new OrderService();
+  const addressService = new AddressService();
+  const itemService = new ItemService();
+  const partyService = new PartyService();
+  const vehicleService = new VehicleService();
   const orders = await orderService.orderList();
-  const party = await getAllParty();
-  const address = await getAllAddress();
-  const items = await getAllItems();
-  const vehicle = await getAllVehicle();
+  const address = await addressService.addressList();
+  const items = await itemService.itemList();
+  const party = await partyService.partyList();
+  const vehicle = await vehicleService.vehicleList();
   return {
     orders: serializeDoc(orders),
     party: serializeDoc(party),
