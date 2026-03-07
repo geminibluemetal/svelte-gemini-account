@@ -32,7 +32,7 @@
       </thead>
       <tbody>
         <!-- eslint-disable-next-line no-unused-vars -->
-        {#each Array.from({ length: data.length / 2 }) as _, index (index)}
+        {#each Array.from({ length: Math.ceil(data.length / 2) }) as _, index (index)}
           {@const col1 = 2 * index}
           {@const col2 = 2 * index + 1}
           <tr class="break-inside-avoid">

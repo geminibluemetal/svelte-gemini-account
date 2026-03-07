@@ -1,44 +1,46 @@
 <script>
-  import { onDestroy, onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let { disabled = false, children } = $props();
 
   let container;
-  let contentElement;
+  let content;
 
   onMount(() => {
     if (disabled) return;
 
-    // Get the actual DOM element of the children
-    // In Svelte 5, we need to find the rendered element
-    contentElement = document.querySelector('[data-teleport-content]');
-    if (!contentElement) return;
-
-    // Create container and append to body
+    // Create container
     container = document.createElement('div');
     container.setAttribute('data-teleport-container', '');
+
+    // Append to body immediately
     document.body.appendChild(container);
 
-    // Move the content to body
-    container.appendChild(contentElement);
-  });
-
-  onDestroy(() => {
-    if (container && container.parentElement) {
-      container.parentElement.removeChild(container);
+    // Manually move the content to the container
+    if (content) {
+      // Move the content's DOM nodes to the container
+      while (content.firstChild) {
+        container.appendChild(content.firstChild);
+      }
     }
-  });
 
-  $effect(() => {
-    if (disabled && container) {
-      container.style.display = 'none';
-    } else if (!disabled && container) {
-      container.style.display = '';
-    }
+    // Return cleanup function
+    return () => {
+      if (container && container.parentNode) {
+        // Move content back if needed
+        if (content && container.children.length > 0) {
+          while (container.firstChild) {
+            // eslint-disable-next-line svelte/no-dom-manipulating
+            content.appendChild(container.firstChild);
+          }
+        }
+        container.parentNode.removeChild(container);
+      }
+    };
   });
 </script>
 
-<!-- Mark content for teleporting -->
-<div data-teleport-content>
+<!-- This div acts as a placeholder and reference point -->
+<div bind:this={content} style="display: none;">
   {@render children()}
 </div>
