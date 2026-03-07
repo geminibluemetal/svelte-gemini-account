@@ -75,6 +75,8 @@ export default class DeliveryService {
       if (result?.ok) {
         // 1. Sync orders
         serverBus.emit(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, { oldDelivery, newDelivery });
+        // 2. Sync party statement
+        serverBus.emit(EVENTS.PARTY_STATEMENT.UPDATE_PARTY_STATEMENT_BY_DELIVERY, newDelivery);
       }
       return result;
     } catch (error) {
