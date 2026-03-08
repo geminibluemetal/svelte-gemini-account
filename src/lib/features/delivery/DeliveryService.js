@@ -1,10 +1,7 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
-import { printOut } from '$lib/core/server/print';
 import { serverBus } from '$lib/core/server/serverBus';
 import { EVENTS } from '$lib/core/server/serverBusEvents';
-import { getFormattedDate } from '$lib/utils/dateTime';
-import { formatFixed } from '$lib/utils/number';
 import DeliveryRepository from './DeliveryRepository';
 import { deliveryEntrySchema, amountEntrySchema } from './DeliverySchema';
 
@@ -112,163 +109,13 @@ export default class DeliveryService {
     }
   }
 
-  // IMPORTANT: In Later if we implement these we should also do cash report sync
-  // async deleteDelivery(id) {
-  //   try {
-
-  //     return await this.repository.deleteById(id);
-  //   } catch (error) {
-  //     return handleServiceError(error);
-  //   }
-  // }
-
-  async getDeliveryByNumber(deliveryNumber) {
-    try {
-      return await this.repository.findOne({ deliveryNumber });
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
-  async getAllAvailableDeliverys() {
-    try {
-      const filter = { status: { $in: ['New', 'Loading', 'Partial'] } };
-      return await this.repository.findAll(filter);
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
-  async changeStatus(id, status) {
-    try {
-      return await this.repository.updateById(id, { status });
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
-  async resetStatus(id) {
-    try {
-      const delivery = await this.repository.findById(id);
-      const status = DeliveryService.examineStatusByQuantity(
-        delivery.totalQty,
-        delivery.deliveredQty,
-        delivery.balanceQty,
-      );
-      return await this.repository.updateById(id, { status });
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
-  async clearCompletedDelivery() {
-    try {
-      return await this.repository.deleteByFilter({
-        status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
-      });
-    } catch (error) {
-      return handleServiceError(error);
-    }
-  }
-
   async cashList(date) {
     const dateFilter = this.repository.getDateFilter(date, 'paymentAt');
     return this.repository.findCashDeliveryByDate(dateFilter);
   }
 
-  async singlePrint(data) {
-    const delivery = await this.repository.findById(data.id);
-    await printOut((p) => {
-      p.reset()
-        .beepOn(1, 2)
-        .align('center')
-        .setTextSize(1, 0)
-        .bold(true)
-        .line('Single Cash Bill')
-        .bold(false)
-        .dashedLine(17)
-        .align('left')
-
-        .pairs('Date', getFormattedDate())
-        .pairs('Delivery', delivery.deliveryNumber)
-        .pairs('Party', delivery.partyName)
-        .pairs('Address', delivery.address)
-        .pairs('Phone', delivery.phone)
-        .pairs('Item', delivery.item)
-        .pairs('Qty', formatFixed(data.qty))
-        .pairs('Amount', data.amount)
-        .pairs('Tip', data.tip)
-        .pairs('Total', Number(data.amount) + Number(data.tip))
-        .flushPairs()
-
-        .feed(1)
-        .cut();
-    });
-  }
-
-  async fullPrint(data) {
-    const delivery = await this.repository.findById(data.id);
-    await printOut((p) => {
-      p.reset()
-        .beepOn(2, 2)
-        .align('center')
-        .setTextSize(1, 0)
-        .bold(true)
-        .line('Full Cash Bill')
-        .bold(false)
-        .dashedLine(17)
-        .align('left')
-
-        .pairs('Date', getFormattedDate())
-        .pairs('Delivery', delivery.deliveryNumber)
-        .pairs('Party', delivery.partyName)
-        .pairs('Address', delivery.address)
-        .pairs('Phone', delivery.phone)
-        .pairs('Item', delivery.item)
-        .pairs('Qty', formatFixed(delivery.totalQty))
-        .pairs('Amount', delivery.amount)
-        .pairs('Advance', delivery.advance)
-        .pairs('Discount', delivery.discount)
-        .pairs('Balance', delivery.balance)
-        .pairs('Tip', data.tip)
-        .pairs('Total', Number(delivery.balance) + Number(data.tip))
-        .flushPairs()
-
-        .feed(1)
-        .cut();
-    });
-  }
-
-  async phonePrint(data) {
-    const delivery = await this.repository.findById(data.id);
-    await printOut((p) => {
-      p.reset()
-        .beepOn(1, 1)
-        .setTextSize(1, 0)
-        .align('left')
-
-        .pairs('Delivery', delivery.deliveryNumber)
-        .pairs('Address', delivery.address)
-        .pairs('Phone', delivery.phone)
-        .pairs('Item', delivery.item)
-        .pairs('Qty', formatFixed(delivery.totalQty))
-        .flushPairs()
-
-        .feed(1)
-        .cut();
-    });
-  }
-
-  static examineStatusByQuantity(totalQty, deliveredQty, balanceQty) {
-    totalQty = Number(totalQty) || 0;
-    deliveredQty = Number(deliveredQty) || 0;
-    balanceQty = Number(balanceQty) || 0;
-    return deliveredQty >= totalQty
-      ? 'Delivered'
-      : totalQty === balanceQty && deliveredQty === 0
-        ? 'New'
-        : balanceQty !== 0
-          ? 'Partial'
-          : 'New';
+  async clearDeliveryByDate(date) {
+    const dateFilter = this.repository.getDateFilter(date, 'createdAt');
+    return this.repository.deleteByFilter(dateFilter);
   }
 }

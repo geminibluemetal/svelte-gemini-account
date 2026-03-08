@@ -297,6 +297,7 @@
   let editableDelivery = $state(null);
 
   let overRowRect = $state(null);
+  let overRowItem = $state(null);
   let TableRef = $state(null);
 
   function handleOverRowReset() {
@@ -364,12 +365,15 @@
     editableDelivery = null;
   }
 
-  function handleFullDelete() {
-    // transportAction('?/fullDelete', { date: $commonDate.toISOString() });
-  }
-
   function handleReviewMode() {
     reviewMode = !reviewMode;
+  }
+
+  function handleClearDeliverySheet() {
+    const confirmed = confirm(
+      `Are you sure? to Clear Delivery Sheet and Cash Report in ${currentDate}?`,
+    );
+    if (confirmed) transportAction('?/clearDelivery', { date: currentDate });
   }
 
   function handleOldBalance() {
@@ -469,9 +473,10 @@
     else return { ...HighlightRow.yellow, cells: [0, 1, 2] };
   }
 
-  function handleOverRowChange(element) {
+  function handleOverRowChange(element, overItem) {
     if (element) overRowRect = element?.getBoundingClientRect();
     else overRowRect = null;
+    overRowItem = overItem;
   }
 
   const openCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
@@ -505,6 +510,7 @@
     keyboardEventBus.on('7', handleOldBalance);
     keyboardEventBus.on('8', handleVehicleSummary);
     keyboardEventBus.on('R', handleReviewMode);
+    keyboardEventBus.on('C', handleClearDeliverySheet);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
@@ -519,6 +525,7 @@
     keyboardEventBus.off('7', handleOldBalance);
     keyboardEventBus.off('8', handleVehicleSummary);
     keyboardEventBus.off('R', handleReviewMode);
+    keyboardEventBus.off('C', handleClearDeliverySheet);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
@@ -543,7 +550,7 @@
   {#snippet left()}
     <button
       class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"
-      onclick={handleFullDelete}
+      onclick={handleClearDeliverySheet}
       title="Delete Current Delivery Sheet"
     >
       <Trash size={23} class="p-1 text-red-500" />
@@ -763,6 +770,12 @@
   </div>
 </Model>
 
-{#if reviewMode}
-  <DeliveryExtraPopup position="top" {overRowRect} />
+{#if reviewMode && overRowItem}
+  <DeliveryExtraPopup
+    position="top"
+    {overRowRect}
+    {overRowItem}
+    item={data.item}
+    address={data.address}
+  />
 {/if}

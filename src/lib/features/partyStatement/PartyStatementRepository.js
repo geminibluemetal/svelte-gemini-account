@@ -111,7 +111,7 @@ export default class PartyStatementRepository extends BaseRepository {
   }
 
   async fetchAllBalanceForEachParty(type = 'pending') {
-    type = type ? type : 'pending'
+    type = type ? type : 'pending';
     let balanceFilter = {};
     if (type === 'pending') {
       balanceFilter = { currentBalance: { $ne: 0 } };
@@ -215,8 +215,8 @@ export default class PartyStatementRepository extends BaseRepository {
       return {
         ...stmt,
         id: stmt._id.toString(),
-        debit: debit,           // Matches header key: 'debit'
-        credit: credit,         // Matches header key: 'credit'
+        debit: debit, // Matches header key: 'debit'
+        credit: credit, // Matches header key: 'credit'
         running_balance: currentBalance, // Matches header key: 'running_balance'
         // Ensure other header keys exist
         vehicle: stmt.vehicle || '',

@@ -1,5 +1,6 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import AddressService from '$lib/features/address/AddressService.js';
+import CashService from '$lib/features/cash/CashService';
 import DeliveryService from '$lib/features/delivery/DeliveryService.js';
 import ItemService from '$lib/features/items/ItemService.js';
 import OrderService from '$lib/features/orders/OrderService.js';
@@ -144,6 +145,41 @@ export const actions = {
     await partyStatement.deletePartyStatement(data.id);
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'BALANCE.LIST' });
+    sseEmit({ type: 'CASH.LIST' });
+  },
+
+  // Overing Details
+  deliveryOverRow: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const result = {};
+
+    if (data.orderNumber) {
+      const orderNumber = Number(data.orderNumber);
+      const orderService = new OrderService();
+      result.order = await orderService.getOrderByNumber(orderNumber);
+    }
+
+    // if (data.deliveryId) {
+    //   const partyStatementService = new PartyStatementService();
+    //   result.statement = await partyStatementService.getPartyStatementByDeliveryId(data.deliveryId);
+    // }
+
+    return serializeDoc(result);
+  },
+
+  // Clear Delivery Sheet and Cash Repor by Date
+  clearDelivery: async ({ request }) => {
+    const formData = await request.formData();
+    const { date } = formDataToObject(formData);
+    let formattedDate = date ? parseDate(date) : new Date();
+
+    const deliveryService = new DeliveryService();
+    await deliveryService.clearDeliveryByDate(formattedDate);
+    const cashService = new CashService();
+    await cashService.clearCashByDate(formattedDate);
+
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'CASH.LIST' });
   },
 };

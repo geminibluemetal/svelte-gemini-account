@@ -58,6 +58,15 @@ export default class PartyStatementService {
     }
   }
 
+  async getPartyStatementByDeliveryId(deliveryId) {
+    try {
+      deliveryId = new ObjectId(deliveryId);
+      return await this.repository.findOne({ deliveryId });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
   async deletePartyStatement(id) {
     try {
       await this.repository.deleteById(id);

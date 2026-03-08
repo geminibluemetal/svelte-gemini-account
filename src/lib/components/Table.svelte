@@ -26,7 +26,7 @@
     left = () => {},
   } = $props();
 
-  let overRow = $state($overRowRem[title] ? $overRowRem[title] : -1);
+  let overRow = $state($overRowRem[title] ? $overRowRem[title] : 0);
   let container = $state(null);
 
   // Use a Map to store handlers by key
@@ -62,7 +62,7 @@
   function reCheckOver() {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
     $overRowRem[title] = overRow;
-    overRowChange(overRowElement, overRow);
+    overRowChange(overRowElement, items[overRow], overRow);
     if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
       scrollToMiddle(overRowElement, container);
     }

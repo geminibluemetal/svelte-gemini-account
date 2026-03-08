@@ -88,4 +88,9 @@ export default class CashService {
       console.log(result);
     }
   }
+
+  async clearCashByDate(date) {
+    const dateFilter = this.repository.getDateFilter(date, 'createdAt');
+    return this.repository.deleteByFilter(dateFilter);
+  }
 }
