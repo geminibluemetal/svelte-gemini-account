@@ -230,4 +230,81 @@ export default class PartyStatementRepository extends BaseRepository {
 
     return formattedStatements;
   }
+
+  async fetchBalanceByPartyId(partyId) {
+    const pId = typeof partyId === 'string' ? new ObjectId(partyId) : partyId;
+    const result = await this.db
+      .collection('party')
+      .aggregate([
+        { $match: { _id: pId } },
+        {
+          $lookup: {
+            from: 'partyStatement',
+            let: { p_id: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: {
+                    $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }],
+                  },
+                },
+              },
+            ],
+            as: 'statements',
+          },
+        },
+        {
+          $addFields: {
+            totalCredit: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'CREDIT'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+            totalDebit: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'DEBIT'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            openingBal: { $ifNull: ['$openingBalance', 0] },
+            currentBalance: {
+              $subtract: [
+                { $add: [{ $ifNull: ['$openingBalance', 0] }, { $ifNull: ['$totalDebit', 0] }] },
+                { $ifNull: ['$totalCredit', 0] },
+              ],
+            },
+          },
+        },
+        { $project: { statements: 0 } },
+      ])
+      .toArray();
+
+    // Return the single object or null if not found
+    if (result.length === 0) return null;
+    const party = result[0];
+    return { ...party, id: party._id.toString() };
+  }
 }

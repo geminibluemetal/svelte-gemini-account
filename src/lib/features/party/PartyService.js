@@ -45,6 +45,15 @@ export default class PartyService {
     }
   }
 
+  async updateOpeningBalance(id, balance) {
+    try {
+      const openingBalance = Number(balance) || 0
+      return await this.repository.updateById(id, { openingBalance });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
   async deleteParty(id) {
     try {
       return await this.repository.deleteById(id);

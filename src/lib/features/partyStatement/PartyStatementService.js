@@ -24,6 +24,10 @@ export default class PartyStatementService {
     return await this.repository.fetchAllBalanceForEachParty(type);
   }
 
+  async getBalanceByParty(party) {
+    return await this.repository.fetchBalanceByPartyId(party);
+  }
+
   async getStatementByParty(partyId, openingBalance = 0) {
     return await this.repository.fetchStatementByParty(partyId, openingBalance);
   }
@@ -70,6 +74,15 @@ export default class PartyStatementService {
   async deletePartyStatement(id) {
     try {
       await this.repository.deleteById(id);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async deletePartyStatementByParty(partyId) {
+    try {
+      partyId = new ObjectId(partyId);
+      return await this.repository.deleteByFilter({ partyId });
     } catch (error) {
       return handleServiceError(error);
     }

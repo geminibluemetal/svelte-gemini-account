@@ -1,4 +1,7 @@
+import { sseEmit } from '$lib/core/server/sseBus.js';
+import PartyService from '$lib/features/party/PartyService.js';
 import PartyStatementService from '$lib/features/partyStatement/PartyStatementService.js';
+import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
 
 export async function load({ depends, url }) {
@@ -7,4 +10,35 @@ export async function load({ depends, url }) {
   const partyStatementService = new PartyStatementService();
   const balance = await partyStatementService.getBalance(type);
   return { balance: serializeDoc(balance) };
+}
+
+export const actions = {
+  balanceReset: async ({ request }) => {
+    const formData = await request.formData();
+    const { id } = formDataToObject(formData);
+    const partyStatementService = new PartyStatementService();
+    const balance = await partyStatementService.getBalanceByParty(id);
+    const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
+    let updateResult = {}
+    if (deleteResult?.ok) {
+      const partyService = new PartyService()
+      updateResult = await partyService.updateOpeningBalance(id, balance.currentBalance)
+    }
+    sseEmit({ type: 'BALANCE.LIST' });
+    return updateResult
+  },
+
+  balanceNil: async ({ request }) => {
+    const formData = await request.formData();
+    const { id } = formDataToObject(formData);
+    const partyStatementService = new PartyStatementService();
+    const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
+    let updateResult = {}
+    if (deleteResult?.ok) {
+      const partyService = new PartyService()
+      updateResult = await partyService.updateOpeningBalance(id, 0)
+    }
+    sseEmit({ type: 'BALANCE.LIST' });
+    return updateResult
+  }
 }

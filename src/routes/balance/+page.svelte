@@ -67,12 +67,12 @@
 
   function handleBalanceReset(item) {
     const isConfirmed = confirm(`Reset Balance For ${item.name}`);
-    if (isConfirmed) transportAction(`/balanceReset`, { id: item.id });
+    if (isConfirmed) transportAction(`?/balanceReset`, { id: item.id });
   }
 
   function handleBalanceNil(item) {
     const isConfirmed = confirm(`Nil Balance for ${item.name}`);
-    if (isConfirmed) transportAction(`/balanceNil`, { id: item.id });
+    if (isConfirmed) transportAction(`?/balanceNil`, { id: item.id });
   }
 
   function handlePrint() {
