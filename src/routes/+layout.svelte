@@ -7,6 +7,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Toast from '$lib/components/Toast.svelte';
   import { resolve } from '$app/paths';
+  import { identifyDevice } from '$lib/core/client/fingerprint';
 
   let { children, data } = $props();
   const apps = $derived(data.apps);
@@ -16,9 +17,14 @@
   // store handlers so off() works correctly
   const shortcutHandlers = [];
 
-  onMount(() => {
-    startSSE();
+  async function setVisitorIdInCookie() {
+    const visitorId = await identifyDevice();
+    document.cookie = `visitorId=${visitorId}; path=/; max-age=31536000; SameSite=Lax`;
+  }
 
+  onMount(() => {
+    setVisitorIdInCookie();
+    startSSE();
     // sidebar toggle
     // keyboardEventBus.on('Alt+X', toggleOpen);
     keyboardEventBus.on('Alt+H', gotoHome);

@@ -1,4 +1,6 @@
 <script>
+  import { resolve } from '$app/paths';
+
   let { data } = $props();
   const apps = $derived(data.apps);
 </script>
@@ -14,9 +16,9 @@
 
   <!-- App Tiles -->
   <div class="grid w-full max-w-4xl grid-cols-2 gap-6 md:grid-cols-5">
-    {#each apps as app}
+    {#each apps as app, i (i)}
       <a
-        href={app.url}
+        href={resolve(app.url)}
         class="group flex flex-col items-center justify-center rounded-2xl bg-white p-6 shadow transition hover:shadow-lg"
       >
         <div class="mb-3 text-4xl transition group-hover:scale-110">
