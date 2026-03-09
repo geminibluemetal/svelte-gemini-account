@@ -93,7 +93,8 @@ export const actions = {
   },
 
   // Sign Order
-  sign: async ({ request }) => {
+  sign: async ({ request, locals }) => {
+    if (!locals.isAdmin) return;
     const formData = await request.formData();
     const data = formDataToObject(formData);
     const orderService = new OrderService();

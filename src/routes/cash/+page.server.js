@@ -108,7 +108,8 @@ export const actions = {
     return result;
   },
 
-  sign: async ({ request }) => {
+  sign: async ({ request, locals }) => {
+    if (!locals.isAdmin) return;
     const formData = await request.formData();
     const { id } = formDataToObject(formData);
     let result;

@@ -7,7 +7,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import Toast from '$lib/components/Toast.svelte';
   import { resolve } from '$app/paths';
-  import { identifyDevice } from '$lib/core/client/fingerprint';
+  import { formatDateTime } from '$lib/utils/dateTime';
 
   let { children, data } = $props();
   const apps = $derived(data.apps);
@@ -18,8 +18,20 @@
   const shortcutHandlers = [];
 
   async function setVisitorIdInCookie() {
-    const visitorId = await identifyDevice();
-    document.cookie = `visitorId=${visitorId}; path=/; max-age=31536000; SameSite=Lax`;
+    const isAdmin = localStorage.getItem('isAdmin');
+    document.cookie = `isAdmin=${isAdmin}; path=/; max-age=31536000; SameSite=Lax`;
+  }
+
+  function toggleAdmin() {
+    const isAdmin = localStorage.getItem('isAdmin');
+    const passkey = prompt(
+      `Enter pass key?  (Current: ${isAdmin == 'true' ? 'Admin' : 'General'})`,
+    );
+    if (passkey == formatDateTime('DDMMYYYY').split('').reverse().join('')) {
+      localStorage.setItem('isAdmin', isAdmin == 'true' ? 'false' : 'true');
+      window.location.reload();
+      alert(isAdmin == 'true' ? 'Admin access has been cancelled' : 'Admin access granted');
+    }
   }
 
   onMount(() => {
@@ -28,6 +40,7 @@
     // sidebar toggle
     // keyboardEventBus.on('Alt+X', toggleOpen);
     keyboardEventBus.on('Alt+H', gotoHome);
+    keyboardEventBus.on(`Alt+Shift+Home`, toggleAdmin);
 
     // dynamic route shortcuts
     apps.forEach((app) => {
@@ -42,6 +55,7 @@
 
     // keyboardEventBus.off('Alt+X', toggleOpen);
     keyboardEventBus.off('Alt+H', gotoHome);
+    keyboardEventBus.off(`Alt+Shift+Home`, toggleAdmin);
 
     shortcutHandlers.forEach(({ key, handler }) => {
       keyboardEventBus.off(`Alt+${key}`, handler);

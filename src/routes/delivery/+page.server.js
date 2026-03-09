@@ -78,7 +78,8 @@ export const actions = {
   },
 
   // Sign Delivery Sheet
-  sign: async ({ request }) => {
+  sign: async ({ request, locals }) => {
+    if (!locals.isAdmin) return;
     const formData = await request.formData();
     const data = formDataToObject(formData);
     const deliveryService = new DeliveryService();
@@ -127,7 +128,8 @@ export const actions = {
   },
 
   // Sign Old Balance
-  oldBalanceSign: async ({ request }) => {
+  oldBalanceSign: async ({ request, locals }) => {
+    if (!locals.isAdmin) return;
     const formData = await request.formData();
     const data = formDataToObject(formData);
     const partyStatement = new PartyStatementService();
