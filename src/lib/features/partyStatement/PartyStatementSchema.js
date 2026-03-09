@@ -6,7 +6,7 @@ export const partyStatementSchema = z.object({
   partyId: z.string().optional().transform((val) => ObjectId.isValid(val) ? new ObjectId(val) : null),
   deliveryId: z.string().optional().transform((val) => ObjectId.isValid(val) ? new ObjectId(val) : null),
   amountType: z.string().trim().default(''),
-  entryType: z.enum(['CREDIT', 'DEBIT']),
+  entryType: z.enum(['CREDIT', 'DEBIT', 'ADJUST']),
   item: z.string().trim().optional(),
   qty: z.coerce
     .number({

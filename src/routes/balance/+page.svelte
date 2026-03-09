@@ -24,6 +24,13 @@
     { name: 'Total Amount', align: 'right', key: 'totalDebit', width: 125, display: 'currency' },
     { name: 'Total Payment', align: 'right', key: 'totalCredit', width: 125, display: 'currency' },
     {
+      name: 'Total Adjust',
+      align: 'right',
+      key: 'totalAdjust',
+      width: 125,
+      display: 'currency',
+    },
+    {
       name: 'Current Balance',
       align: 'right',
       key: 'currentBalance',

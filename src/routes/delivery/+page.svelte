@@ -32,7 +32,7 @@
     { name: 'Party', key: 'partyName', width: '220' },
     { name: 'Address', key: 'address', width: '220' },
     { name: 'Item', key: 'deliveryItem', width: '125' },
-    { name: 'Qty', key: 'deliveryQuantity', align: 'center', display: 'decimal', width: '55' },
+    { name: 'Qty', key: 'deliveryQuantity', align: 'center', display: 'decimal', width: '60' },
     { name: 'AT1', key: 'amountType1', align: 'center', color: AmountTypeColor, width: '60' },
     { name: 'Amount1', key: 'amount1', align: 'center', color: Amount1Color },
     { name: 'AT2', key: 'amountType2', align: 'center', color: AmountTypeColor, width: '60' },

@@ -1,5 +1,6 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
+import PartyStatementService from '../partyStatement/PartyStatementService';
 import PartyRepository from './PartyRepository';
 import { partyCreateSchema, partyUpdateSchema } from './PartySchema';
 
@@ -74,6 +75,35 @@ export default class PartyService {
           return await this.repository.updateFieldsById(party.id, { phone });
         }
       }
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async resetBalance(id) {
+    try {
+      const partyStatementService = new PartyStatementService();
+      const balance = await partyStatementService.getBalanceByParty(id);
+      const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
+      let updateResult = {}
+      if (deleteResult?.ok) {
+        updateResult = await this.updateOpeningBalance(id, balance.currentBalance)
+      }
+      return updateResult
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async nilBalance(id) {
+    try {
+      const partyStatementService = new PartyStatementService();
+      const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
+      let updateResult = {}
+      if (deleteResult?.ok) {
+        updateResult = await this.updateOpeningBalance(id, 0)
+      }
+      return updateResult
     } catch (error) {
       return handleServiceError(error);
     }

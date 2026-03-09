@@ -5,6 +5,8 @@
   import Model from '$lib/components/Model.svelte';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { HighlightCell } from '$lib/utils/highlight.js';
+  import AdjustmentForm from './AdjustmentForm.svelte';
+  import StatementForm from './StatementForm.svelte';
 
   const { data } = $props();
 
@@ -18,7 +20,7 @@
     { name: 'Vehicle', align: 'left', key: 'vehicle', width: 70 },
     { name: 'Address', align: 'left', key: 'address', width: 230 },
     { name: 'Item', align: 'left', key: 'item' },
-    { name: 'Qty', key: 'qty', align: 'right', width: 50, display: 'decimal' },
+    { name: 'Qty', key: 'qty', align: 'right', width: 60, display: 'decimal' },
     {
       name: 'Debit',
       align: 'right',
@@ -39,7 +41,7 @@
     {
       name: 'Balance',
       align: 'right',
-      key: 'running_balance',
+      key: 'runningBalance',
       width: 110,
       display: 'currency',
       color: balanceColor,
@@ -52,6 +54,20 @@
       color: SignColor,
     },
   ];
+
+  let adjustFormOpened = $state(false);
+  let statementFormOpened = $state(false);
+  let editableItem = $state(null);
+
+  const openingBalance = {
+    createdAt: data.party.updatedAt,
+    runningBalance: data.party.openingBalance,
+    amountType: 'Open Bal',
+  };
+
+  const statementItem = $derived(
+    data.party.openingBalance ? [openingBalance, ...data.statement] : data.statement,
+  );
 
   function AmountTypeColor(value) {
     switch (value) {
@@ -75,10 +91,24 @@
         return HighlightCell.green;
       case 'Cheque':
         return HighlightCell.purple;
+      case 'Open Bal':
+        return HighlightCell.gray;
+      case 'Discount':
+      case 'Roundoff':
+      case 'Tip Adjust':
+      case 'Other':
+        return HighlightCell.black;
     }
   }
 
-  const availableOptions = [{ key: 'H', description: 'List available Shortcut' }];
+  const availableOptions = [
+    { key: 'H', description: 'List available Shortcut' },
+    { key: 'R', description: 'Reset Balance' },
+    { key: 'N', description: 'Nil Balance' },
+    { key: '0', description: 'Add Adjustment (Discount, Roundoff)' },
+    { key: 'Enter', description: 'Edit statement' },
+    { key: 'Back', description: 'Return to Balance Sheet' },
+  ];
 
   let helperOpened = $state(false);
 
@@ -86,17 +116,17 @@
     return value == 1 ? HighlightCell.green : null;
   }
 
-  // async function transportAction(url, data) {
-  //   const formData = new FormData();
-  //   for (const key in data) {
-  //     formData.append(key, data[key]);
-  //   }
-  //   const res = await fetch(url, {
-  //     method: 'POST',
-  //     body: formData,
-  //   });
-  //   return await res.json();
-  // }
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+    return await res.json();
+  }
 
   function toggleHelper() {
     helperOpened = !helperOpened;
@@ -106,24 +136,50 @@
     history.back();
   }
 
+  function handleBalanceReset() {
+    const isConfirmed = confirm(`Reset Balance For ${data.party?.name}`);
+    if (isConfirmed) transportAction(`?/balanceReset`, { id: data.party?.id });
+  }
+
+  function handleBalanceNil() {
+    const isConfirmed = confirm(`Nil Balance for ${data.party?.name}`);
+    if (isConfirmed) transportAction(`?/balanceNil`, { id: data.party?.id });
+  }
+
+  function handleAdjustmentForm() {
+    adjustFormOpened = !adjustFormOpened;
+  }
+
+  function handleStatementForm(item) {
+    statementFormOpened = !statementFormOpened;
+    editableItem = statementFormOpened ? item : null;
+  }
+
   const customEvents = [
-    // { key: 'Enter', handler: gotoPartyLedger },
-    // { key: 'R', handler: handleBalanceReset }
+    { key: '0', handler: handleAdjustmentForm },
+    { key: 'Enter', handler: handleStatementForm },
   ];
 
   onMount(() => {
+    keyboardEventBus.on('R', handleBalanceReset);
+    keyboardEventBus.on('N', handleBalanceNil);
     keyboardEventBus.on('H', toggleHelper);
     keyboardEventBus.on('Backspace', gotoBalanceSheet);
     syncOn('BALANCE.LIST');
   });
   onDestroy(() => {
+    keyboardEventBus.off('R', handleBalanceReset);
+    keyboardEventBus.off('N', handleBalanceNil);
     keyboardEventBus.off('H', toggleHelper);
     keyboardEventBus.off('Backspace', gotoBalanceSheet);
     syncOff('BALANCE.LIST');
   });
 </script>
 
-<Table title={data.party?.name} {headers} items={data.statement} {customEvents} />
+<Table title={data.party?.name} {headers} items={statementItem} {customEvents} />
+
+<AdjustmentForm open={adjustFormOpened} onClose={handleAdjustmentForm} partyId={data.party?.id} />
+<StatementForm open={statementFormOpened} onClose={handleStatementForm} item={editableItem} />
 
 <!-- Helper Dialog -->
 <Model open={helperOpened} onClose={() => (helperOpened = false)}>

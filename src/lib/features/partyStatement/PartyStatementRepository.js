@@ -169,6 +169,21 @@ export default class PartyStatementRepository extends BaseRepository {
                 },
               },
             },
+            totalAdjust: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'ADJUST'] }, // Force Uppercase check
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
           },
         },
         {
@@ -177,7 +192,7 @@ export default class PartyStatementRepository extends BaseRepository {
             currentBalance: {
               $subtract: [
                 { $add: [{ $ifNull: ['$openingBalance', 0] }, { $ifNull: ['$totalDebit', 0] }] },
-                { $ifNull: ['$totalCredit', 0] },
+                { $add: [{ $ifNull: ['$totalCredit', 0] }, { $ifNull: ['$totalAdjust', 0] }] },
               ],
             },
           },
@@ -204,10 +219,11 @@ export default class PartyStatementRepository extends BaseRepository {
       const amount = stmt.amount || 0;
       const isDebit = stmt.entryType?.toUpperCase() === 'DEBIT';
       const isCredit = stmt.entryType?.toUpperCase() === 'CREDIT';
+      const isAdjust = stmt.entryType?.toUpperCase() === 'ADJUST';
 
       // Calculate Debit/Credit columns
       const debit = isDebit ? amount : 0;
-      const credit = isCredit ? amount : 0;
+      const credit = isCredit || isAdjust ? amount : 0;
 
       // Update the running balance logic
       currentBalance = currentBalance + debit - credit;
@@ -217,7 +233,7 @@ export default class PartyStatementRepository extends BaseRepository {
         id: stmt._id.toString(),
         debit: debit, // Matches header key: 'debit'
         credit: credit, // Matches header key: 'credit'
-        running_balance: currentBalance, // Matches header key: 'running_balance'
+        runningBalance: currentBalance, // Matches header key: 'runningBalance'
         // Ensure other header keys exist
         vehicle: stmt.vehicle || '',
         address: stmt.address || '',
@@ -285,6 +301,21 @@ export default class PartyStatementRepository extends BaseRepository {
                 },
               },
             },
+            totalAdjust: {
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'ADJUST'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
           },
         },
         {
@@ -293,7 +324,7 @@ export default class PartyStatementRepository extends BaseRepository {
             currentBalance: {
               $subtract: [
                 { $add: [{ $ifNull: ['$openingBalance', 0] }, { $ifNull: ['$totalDebit', 0] }] },
-                { $ifNull: ['$totalCredit', 0] },
+                { $add: [{ $ifNull: ['$totalCredit', 0] }, { $ifNull: ['$totalAdjust', 0] }] },
               ],
             },
           },

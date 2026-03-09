@@ -78,6 +78,10 @@ export const HighlightCell = {
     foreground: 'text-violet-800',
     background: 'bg-violet-300',
   },
+  black: {
+    foreground: 'text-gray-50',
+    background: 'bg-gray-950',
+  },
 };
 
 export const HighlightRow = {

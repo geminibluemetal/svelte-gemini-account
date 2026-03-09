@@ -16,14 +16,8 @@ export const actions = {
   balanceReset: async ({ request }) => {
     const formData = await request.formData();
     const { id } = formDataToObject(formData);
-    const partyStatementService = new PartyStatementService();
-    const balance = await partyStatementService.getBalanceByParty(id);
-    const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
-    let updateResult = {}
-    if (deleteResult?.ok) {
-      const partyService = new PartyService()
-      updateResult = await partyService.updateOpeningBalance(id, balance.currentBalance)
-    }
+    const partyService = new PartyService()
+    const updateResult = await partyService.resetBalance(id)
     sseEmit({ type: 'BALANCE.LIST' });
     return updateResult
   },
@@ -31,14 +25,9 @@ export const actions = {
   balanceNil: async ({ request }) => {
     const formData = await request.formData();
     const { id } = formDataToObject(formData);
-    const partyStatementService = new PartyStatementService();
-    const deleteResult = await partyStatementService.deletePartyStatementByParty(id);
-    let updateResult = {}
-    if (deleteResult?.ok) {
-      const partyService = new PartyService()
-      updateResult = await partyService.updateOpeningBalance(id, 0)
-    }
+    const partyService = new PartyService()
+    const updateResult = await partyService.nilBalance(id)
     sseEmit({ type: 'BALANCE.LIST' });
     return updateResult
-  }
+  },
 }

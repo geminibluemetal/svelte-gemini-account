@@ -54,6 +54,15 @@ export default class PartyStatementService {
     }
   }
 
+  async updateStatementAmount(id, data) {
+    try {
+      const oldBalanceResult = await this.repository.updateById(id, data);
+      return oldBalanceResult;
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
   async signPartyStatement(id) {
     try {
       await this.repository.toggleSignById(id);
@@ -114,7 +123,11 @@ export default class PartyStatementService {
           if (calcResult.success && calcResult?.data) {
             amount = calcResult.data;
           } else {
-            throw new AppError(calcResult.message);
+            // Make ignore list to ignore if price amount validaiton
+            const ignoreList = ['6sb', '4sb']
+            if (ignoreList.includes(delivery.deliveryItem)) {
+              amount = 0
+            } else throw new AppError(calcResult.message);
           }
         }
         const partyService = new PartyService();
