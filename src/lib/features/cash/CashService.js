@@ -17,6 +17,20 @@ export default class CashService {
     return await this.repository.findAll(dateFilter);
   }
 
+  async getAdvanceCashForAttendance(type) {
+    if (type == 'driver') {
+      return await this.repository.findAll({
+        $or: [
+          { description: { $regex: 'Cleaner$' } },
+          { description: { $regex: 'Driver$' } }
+        ]
+      });
+    } else { // Crusher
+      return await this.repository.findAll({
+        description: { $regex: 'Crusher$' }
+      });
+    }
+  }
   async createCash(data) {
     try {
       const parsed = await cashSchema.safeParse(data);
