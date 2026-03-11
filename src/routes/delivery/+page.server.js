@@ -99,6 +99,15 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
   },
 
+  // Revoke Delivery Entry
+  revoke: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const deliveryService = new DeliveryService();
+    await deliveryService.revokeDelivery(data.id);
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+  },
+
   // Full Delete
   fullDelete: async ({ request }) => {
     const formData = await request.formData();

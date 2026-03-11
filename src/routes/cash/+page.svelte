@@ -49,7 +49,7 @@
     { key: '🠊', description: 'Sign Cash Entry' },
     { key: 'D', description: 'Delete Cash Entry' },
     { key: 'E', description: 'Edit Cash Entry' },
-    // { key: 'C', description: 'Clear Delivery Sheet' },
+    { key: 'S', description: 'Enter stock amount' },
     // { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
     { key: 'Enter', description: 'Edit Cash Entry' },
   ];
@@ -171,8 +171,23 @@
     }
   }
 
+  async function handleStockUpdate() {
+    let stock = prompt('Stock Amount?');
+    stock = Number(stock);
+    if (stock) {
+      const data = {
+        entryType: 'INCOME',
+        description: 'Stock',
+        amount: stock,
+      };
+      const result = await transportAction('?/form', data);
+      console.log(result);
+    }
+  }
+
   async function handleNewReport() {
-    transportAction('?/newReport');
+    await transportAction('?/newReport');
+    goto(resolve(window.location.pathname));
   }
 
   function handleDeleteReport() {
@@ -184,6 +199,7 @@
       } else {
         transportAction('?/deleteReport', { id: data.reports[reportIndex]?.id });
       }
+      goto(resolve(window.location.pathname));
     } else {
       showToast('Only empty reports can be deleted', 'danger');
     }
@@ -234,6 +250,7 @@
     keyboardEventBus.on('6', gotoOrderBook);
     keyboardEventBus.on('7', handleNewReport);
     keyboardEventBus.on('8', handleDeleteReport);
+    keyboardEventBus.on('S', handleStockUpdate);
     syncOn('CASH.LIST');
   });
   onDestroy(() => {
@@ -246,6 +263,7 @@
     keyboardEventBus.off('6', gotoOrderBook);
     keyboardEventBus.off('7', handleNewReport);
     keyboardEventBus.off('8', handleDeleteReport);
+    keyboardEventBus.off('S', handleStockUpdate);
     syncOff('CASH.LIST');
   });
 </script>

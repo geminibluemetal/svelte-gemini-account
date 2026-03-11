@@ -1,4 +1,4 @@
-import { handleServiceError, schemaError } from '$lib/core/server/error';
+import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { serverBus } from '$lib/core/server/serverBus';
 import { EVENTS } from '$lib/core/server/serverBusEvents';
@@ -16,14 +16,18 @@ export default class DeliveryService {
     return await this.repository.findAll(dateFilter);
   }
 
-  async deliveryEntry(id, data) {
+  async deliveryEntry(id, data, checkValidation = true) {
     try {
-      const parsed = await deliveryEntrySchema.safeParseAsync(data);
-      if (!parsed.success) schemaError(parsed);
-      parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
+      let parsed = { data }
+      if (checkValidation) {
+        parsed = await deliveryEntrySchema.safeParseAsync(data);
+        if (!parsed.success) schemaError(parsed);
+        parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
+      }
 
       // Get the delivery data before updating with new data
       const oldDelivery = await this.repository.findById(id);
+      if (oldDelivery.sign) throw new AppError('Can not modify signed record');
       const result = await this.repository.updateById(id, parsed.data);
       // Get the delivery data after updating with new data
       const newDelivery = await this.repository.findById(id);
@@ -90,20 +94,22 @@ export default class DeliveryService {
     }
   }
 
-  async updateDelivery(id, data) {
+  async revokeDelivery(id) {
     try {
-      const parsed = await deliveryEntrySchema.safeParseAsync({ ...data, id });
-      if (!parsed.success) schemaError(parsed);
-
-      const delivery = await this.repository.updateById(id, parsed.data);
-
-      // Emit Events
-      // 1. Handle Phone Updates for Party
-      serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-      // 2. Todo: Handle Cash Report Sync
-      // serverBus.emit(EVENTS.PARTY.FIND_AND_UPDATE_PHONE, data);
-
-      return delivery;
+      const delivery = {
+        orderNumber: '',
+        partyName: '',
+        address: '',
+        deliveryItem: '',
+        deliveryQuantity: 0,
+        amountType1: null,
+        amountType2: null,
+        amount1: 0,
+        amount2: 0,
+        deliveredAt: null,
+        paymentAt: null,
+      }
+      return await this.deliveryEntry(id, delivery, false)
     } catch (error) {
       return handleServiceError(error);
     }

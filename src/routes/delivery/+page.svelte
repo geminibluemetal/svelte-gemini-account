@@ -279,7 +279,7 @@
     { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
     { key: 'C', description: 'Clear Delivery Sheet' },
-    { key: 'D', description: 'Delete Old Balance' },
+    { key: 'D', description: 'Delete Old Balance or Revoke Delviery' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
     { key: 'Enter', description: 'Delivery Entry or Edit old balance' },
   ];
@@ -321,6 +321,11 @@
 
   function handleDeliveryMark(item) {
     transportAction('?/mark', { id: item.id, current: item.hasMark });
+  }
+
+  function handleDeliveryRevoke(item) {
+    const confirmed = confirm(`Are you sure? to Revoke Delivery Serial No ${item.serial}?`);
+    if (confirmed) transportAction('?/revoke', { id: item.id });
   }
 
   function handleDeliveryAmountUpdate(item) {
@@ -453,6 +458,7 @@
   }
 
   const customEvents = [
+    { key: 'D', handler: handleDeliveryRevoke },
     { key: '0', handler: handleDeliveryAmountUpdate },
     { key: 'ArrowRight', handler: handleDeliverySign },
     { key: 'E', handler: handleDeliveryEdit },
