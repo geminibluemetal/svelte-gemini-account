@@ -11,11 +11,15 @@ export default class WeighmentService {
   }
 
   async weighmentSwitch() {
-    const status = getReadingStatus();
-    if (!status.isReading && !status.isOpen) {
-      startReading();
-    } else {
-      stopReading();
+    try {
+      const status = getReadingStatus();
+      if (!status.isReading && !status.isOpen) {
+        return await startReading();
+      } else {
+        return await stopReading();
+      }
+    } catch (error) {
+      return handleServiceError(error);
     }
   }
 

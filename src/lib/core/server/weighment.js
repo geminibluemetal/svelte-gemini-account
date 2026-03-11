@@ -19,38 +19,41 @@ const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
 let isReading = false;
 let lastWeight = null;
 
-// Function to start reading
 export function startReading() {
   if (isReading) {
-    return handleSuccess('Already Turned on');
+    return Promise.resolve(handleSuccess('Already Turned on'));
   }
 
-  // Open the port
-  port.open((err) => {
-    if (err) {
-      console.log('❌ Error opening port:', err.message);
-      return handleServiceError('Error opening weighment come port');
-    }
-
-    isReading = true;
-    return handleSuccess('Weighment Turned on');
+  return new Promise((resolve) => {
+    port.open((err) => {
+      if (err) {
+        console.log('❌ Error opening port:', err.message);
+        isReading = false;
+        // Resolve with the error handler so the service gets the value
+        resolve(handleServiceError('Can not opening weighment com port'));
+      } else {
+        isReading = true;
+        resolve(handleSuccess('Weighment Turned on'));
+      }
+    });
   });
 }
 
-// Function to stop reading
 export function stopReading() {
   if (!isReading) {
-    return handleSuccess('Already Turned off');
+    return Promise.resolve(handleSuccess('Already Turned off'));
   }
 
-  port.close((err) => {
-    if (err) {
-      console.log('❌ Error closing port:', err.message);
-      return handleServiceError('Error close weighment come port');
-    }
-
-    isReading = false;
-    return handleSuccess('Weighment Turned off');
+  return new Promise((resolve) => {
+    port.close((err) => {
+      if (err) {
+        console.log('❌ Error closing port:', err.message);
+        resolve(handleServiceError('Can not closing weighment com port'));
+      } else {
+        isReading = false;
+        resolve(handleSuccess('Weighment Turned off'));
+      }
+    });
   });
 }
 

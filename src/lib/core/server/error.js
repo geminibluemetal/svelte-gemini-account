@@ -20,6 +20,12 @@ export function schemaError(parsed) {
 export function handleServiceError(error) {
   if (error instanceof AppError) {
     return { ok: false, message: error.message };
+  } else if (error instanceof Error) {
+    console.log(error);
+    return { ok: false, message: 'Something Went Wrong' };
+  } else if (typeof error == 'string') {
+    console.log(error);
+    return { ok: false, message: error };
   } else {
     console.log(error);
     return { ok: false, message: 'Something Went Wrong' };

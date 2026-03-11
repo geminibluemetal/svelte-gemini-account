@@ -1,7 +1,9 @@
 <script>
+  import { deserialize } from '$app/forms';
   import Button from '$lib/components/Button.svelte';
   import Table from '$lib/components/Table.svelte';
   import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
+  import { showToast } from '$lib/stores/toast.js';
   import { formatNumber } from '$lib/utils/number';
   import { CirclePowerIcon, Workflow } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
@@ -28,14 +30,19 @@
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
       body: formData,
     });
-    return await res.json();
+    const result = deserialize(await response.text());
+    if (result.type == 'failure') {
+      showToast(result.data.message, 'danger');
+    } else {
+      result.data;
+    }
   }
 
-  function handleWeighmentSwitch() {
+  async function handleWeighmentSwitch() {
     transportAction('?/switchWeighment');
   }
 
