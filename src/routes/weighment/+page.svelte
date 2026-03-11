@@ -1,8 +1,12 @@
 <script>
   import Button from '$lib/components/Button.svelte';
   import Table from '$lib/components/Table.svelte';
+  import { syncOff, syncOn } from '$lib/core/client/sseReceiver';
   import { formatNumber } from '$lib/utils/number';
   import { CirclePowerIcon, Workflow } from 'lucide-svelte';
+  import { onDestroy, onMount } from 'svelte';
+
+  const { data } = $props();
 
   const headers = [
     { name: 'Empty Time', key: 'emptyTime' },
@@ -14,8 +18,39 @@
     { name: 'Net Weight', key: 'netWeight' },
   ];
 
-  let isScaleOpen = $state(false);
+  let turnedOn = $derived(data.isScaleOpen);
   let isAutoMode = $state(false);
+  let weighmentEventSoruce = null;
+  let scaleData = $state('789456');
+
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+    return await res.json();
+  }
+
+  function handleWeighmentSwitch() {
+    transportAction('?/switchWeighment');
+  }
+
+  onMount(() => {
+    syncOn('WEIGHMENT.LIST');
+    weighmentEventSoruce = new EventSource('/api/weighment');
+    weighmentEventSoruce.onmessage = function (event) {
+      scaleData = event.data;
+      console.log(event.data);
+    };
+  });
+  onDestroy(() => {
+    syncOff('WEIGHMENT.LIST');
+    if (weighmentEventSoruce) weighmentEventSoruce.close();
+  });
 </script>
 
 <Table {headers} title="Weightment">
@@ -23,9 +58,9 @@
     <div class="flex w-75 flex-col gap-2">
       <div class="dark flex gap-2 *:flex-1">
         <Button
-          color={isScaleOpen ? 'success' : 'danger'}
+          color={turnedOn ? 'success' : 'danger'}
           class="gap-2"
-          onclick={() => (isScaleOpen = !isScaleOpen)}
+          onclick={handleWeighmentSwitch}
         >
           <CirclePowerIcon /> Turn on
         </Button>
@@ -37,9 +72,15 @@
           <Workflow /> Auto mode
         </Button>
       </div>
-      <div class="w-75 rounded-lg border-2 bg-gray-200 px-4 py-2 text-right font-mono text-6xl">
-        {formatNumber(582452)}
-      </div>
+      {#if turnedOn}
+        <div class="w-75 rounded-lg border-2 bg-green-200 px-4 py-2 text-right font-mono text-6xl">
+          <span class="text-green-950">{formatNumber(scaleData)}</span>
+        </div>
+      {:else}
+        <div class="w-75 rounded-lg border-2 bg-red-200 px-4 py-2 text-right font-mono text-6xl">
+          <span class="text-red-950">OFF</span>
+        </div>
+      {/if}
       <div class="dark flex gap-2 *:flex-1">
         <Button corner="1" color="fuchsia">All</Button>
         <Button corner="2" color="fuchsia">Empty</Button>

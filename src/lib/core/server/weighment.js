@@ -1,5 +1,7 @@
 import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
+import { handleServiceError, handleSuccess } from './error';
+import { sendWeighment } from './weighmentSseBus';
 
 // Configure the port (but don't open it yet)
 const port = new SerialPort({
@@ -8,7 +10,7 @@ const port = new SerialPort({
   dataBits: 8,
   stopBits: 1,
   parity: 'none',
-  autoOpen: false // Don't auto-open
+  autoOpen: false, // Don't auto-open
 });
 
 const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
@@ -20,38 +22,35 @@ let lastWeight = null;
 // Function to start reading
 export function startReading() {
   if (isReading) {
-    console.log('⚠️ Already reading from scale');
-    return;
+    return handleSuccess('Already Turned on');
   }
 
   // Open the port
   port.open((err) => {
     if (err) {
       console.log('❌ Error opening port:', err.message);
-      return;
+      return handleServiceError('Error opening weighment come port');
     }
 
     isReading = true;
-    console.log('✅ Scale reading STARTED');
-    console.log('Waiting for weight data...\n');
+    return handleSuccess('Weighment Turned on');
   });
 }
 
 // Function to stop reading
 export function stopReading() {
   if (!isReading) {
-    console.log('⚠️ Scale is not reading');
-    return;
+    return handleSuccess('Already Turned off');
   }
 
   port.close((err) => {
     if (err) {
       console.log('❌ Error closing port:', err.message);
-      return;
+      return handleServiceError('Error close weighment come port');
     }
 
     isReading = false;
-    console.log('🛑 Scale reading STOPPED');
+    return handleSuccess('Weighment Turned off');
   });
 }
 
@@ -60,7 +59,7 @@ export function getReadingStatus() {
   return {
     isReading,
     isOpen: port.isOpen,
-    lastWeight
+    lastWeight,
   };
 }
 
@@ -75,9 +74,10 @@ parser.on('data', (data) => {
   if (weightMatch) {
     const weight = parseFloat(weightMatch[0]);
     lastWeight = weight; // Store last weight
-    console.log(`⚖️ Weight: ${weight} kg | Raw: ${cleanData}`);
+    sendWeighment(weight);
+    // console.log(`⚖️ Weight: ${weight} kg | Raw: ${cleanData}`);
   } else {
-    console.log(`📟 Raw data: ${cleanData}`);
+    // console.log(`📟 Raw data: ${cleanData}`);
   }
 });
 
