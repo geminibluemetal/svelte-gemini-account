@@ -20,7 +20,7 @@ export function createWeighmentStream() {
 }
 
 export function sendWeighment(data) {
-  const payload = `data: ${JSON.stringify(data)}\n\n`;
+  const payload = `data: ${data}\n\n`;
 
   for (const client of clients) {
     try {

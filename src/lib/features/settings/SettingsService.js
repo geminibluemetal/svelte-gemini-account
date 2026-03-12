@@ -1,7 +1,5 @@
-import { schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import SettingsRepository from './SettingsRepository';
-import { settingsSchema } from './SettingsSchema';
 
 const db = await connectDB()
 export default class SettingsService {
@@ -14,10 +12,6 @@ export default class SettingsService {
   }
 
   async updateSetting(data = {}) {
-    const parsed = await settingsSchema.safeParseAsync(data);
-    if (!parsed.success) {
-      schemaError(parsed);
-    }
-    return await this.repository.updateFields(parsed.data);
+    return await this.repository.updateFields(data);
   }
 }

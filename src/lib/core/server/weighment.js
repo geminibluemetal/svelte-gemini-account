@@ -2,90 +2,232 @@ import { SerialPort } from 'serialport';
 import { ReadlineParser } from '@serialport/parser-readline';
 import { handleServiceError, handleSuccess } from './error';
 import { sendWeighment } from './weighmentSseBus';
+import SettingsService from '$lib/features/settings/SettingsService';
 
-// Configure the port (but don't open it yet)
-const port = new SerialPort({
-  path: 'COM3',
-  baudRate: 9600,
-  dataBits: 8,
-  stopBits: 1,
-  parity: 'none',
-  autoOpen: false, // Don't auto-open
-});
+const settingsService = new SettingsService();
 
-const parser = port.pipe(new ReadlineParser({ delimiter: '\r\n' }));
+/* --------------------------------
+   GLOBAL STATE (HMR SAFE)
+-------------------------------- */
 
-// State variables
-let isReading = false;
-let lastWeight = null;
-
-export function startReading() {
-  if (isReading) {
-    return Promise.resolve(handleSuccess('Already Turned on'));
-  }
-
-  return new Promise((resolve) => {
-    port.open((err) => {
-      if (err) {
-        console.log('❌ Error opening port:', err.message);
-        isReading = false;
-        // Resolve with the error handler so the service gets the value
-        resolve(handleServiceError('Can not opening weighment com port'));
-      } else {
-        isReading = true;
-        resolve(handleSuccess('Weighment Turned on'));
-      }
-    });
-  });
-}
-
-export function stopReading() {
-  if (!isReading) {
-    return Promise.resolve(handleSuccess('Already Turned off'));
-  }
-
-  return new Promise((resolve) => {
-    port.close((err) => {
-      if (err) {
-        console.log('❌ Error closing port:', err.message);
-        resolve(handleServiceError('Can not closing weighment com port'));
-      } else {
-        isReading = false;
-        resolve(handleSuccess('Weighment Turned off'));
-      }
-    });
-  });
-}
-
-// Function to get reading status
-export function getReadingStatus() {
-  return {
-    isReading,
-    isOpen: port.isOpen,
-    lastWeight,
+if (!globalThis.weighmentState) {
+  globalThis.weighmentState = {
+    port: null,
+    parser: null,
+    isReading: false,
+    lastWeight: null
   };
 }
 
-// Handle incoming data (always listening, but only process when reading)
-parser.on('data', (data) => {
-  // Only process if we're actively reading
-  if (!isReading) return;
+const state = globalThis.weighmentState;
 
-  const cleanData = data.toString().trim();
-  const weightMatch = cleanData.match(/(\d+\.?\d*)/);
+/* --------------------------------
+   CREATE SERIAL PORT
+-------------------------------- */
 
-  if (weightMatch) {
-    const weight = parseFloat(weightMatch[0]);
-    lastWeight = weight; // Store last weight
-    sendWeighment(weight);
-    // console.log(`⚖️ Weight: ${weight} kg | Raw: ${cleanData}`);
-  } else {
-    // console.log(`📟 Raw data: ${cleanData}`);
+async function createPort() {
+
+  const settings = await settingsService.getSettings();
+
+  const portSettings = {
+    path: settings?.weighment?.path || 'COM3',
+    baudRate: settings?.weighment?.baudRate || 9600,
+    dataBits: settings?.weighment?.dataBits || 8,
+    stopBits: settings?.weighment?.stopBits || 1,
+    parity: settings?.weighment?.parity || 'none',
+    autoOpen: false
+  };
+
+  state.port = new SerialPort(portSettings);
+
+  state.parser = state.port.pipe(
+    new ReadlineParser({ delimiter: '\r' })
+  );
+
+  bindListeners();
+
+}
+
+/* --------------------------------
+   BIND SERIAL LISTENERS
+-------------------------------- */
+
+function bindListeners() {
+
+  const { port, parser } = state;
+
+  parser.removeAllListeners('data');
+
+  parser.on('data', (data) => {
+
+    if (!state.isReading) return;
+
+    const cleanData = data.toString().trim();
+
+    const weightMatch = cleanData.match(/^:(-?\d+\.?\d*)/);
+
+    if (weightMatch) {
+
+      const weight = weightMatch[1];
+
+      state.lastWeight = weight;
+
+      sendWeighment(weight);
+
+      // console.log("⚖️ Weight:", weight);
+
+    }
+
+  });
+
+  port.removeAllListeners('error');
+
+  port.on('error', (err) => {
+
+    console.log('❌ Serial Port Error:', err.message);
+
+    state.isReading = false;
+
+  });
+
+}
+
+/* --------------------------------
+   START READING
+-------------------------------- */
+
+export async function startReading() {
+
+  if (state.isReading) {
+    return handleSuccess('Already Turned on');
   }
-});
 
-// Handle errors
-port.on('error', (err) => {
-  console.log('❌ Port error:', err.message);
-  isReading = false;
-});
+  try {
+
+    if (!state.port) {
+      await createPort();
+    }
+
+    if (state.port.isOpen) {
+      state.isReading = true;
+      return handleSuccess('Weighment Turned on');
+    }
+
+    await new Promise((resolve, reject) => {
+      state.port.open((err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+
+    console.log('✅ Weighment port opened');
+
+    state.isReading = true;
+
+    return handleSuccess('Weighment Turned on');
+
+  } catch (err) {
+
+    console.log('❌ Error opening port:', err.message);
+
+    state.isReading = false;
+
+    return handleServiceError('Cannot open weighment COM port');
+
+  }
+
+}
+
+/* --------------------------------
+   STOP READING
+-------------------------------- */
+
+export async function stopReading() {
+
+  if (!state.isReading) {
+    return handleSuccess('Already Turned off');
+  }
+
+  try {
+
+    if (state.port && state.port.isOpen) {
+
+      await new Promise((resolve, reject) => {
+        state.port.close((err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+
+      console.log('🛑 Weighment port closed');
+
+    }
+
+    state.isReading = false;
+
+    return handleSuccess('Weighment Turned off');
+
+  } catch (err) {
+
+    console.log('❌ Error closing port:', err.message);
+
+    return handleServiceError('Cannot close weighment COM port');
+
+  }
+
+}
+
+/* --------------------------------
+   RELOAD PORT (WHEN SETTINGS CHANGE)
+-------------------------------- */
+
+export async function reloadPort() {
+
+  try {
+
+    if (state.port && state.port.isOpen) {
+
+      await new Promise((resolve) => state.port.close(resolve));
+
+    }
+
+    if (state.parser) {
+      state.parser.removeAllListeners();
+    }
+
+    if (state.port) {
+      state.port.removeAllListeners();
+    }
+
+    state.port = null;
+    state.parser = null;
+
+    await createPort();
+
+    console.log("🔄 Weighment port reloaded with new settings");
+
+    return handleSuccess("Weighment settings updated");
+
+  } catch (err) {
+
+    console.log("❌ Reload error:", err.message);
+
+    return handleServiceError("Failed to reload weighment port");
+
+  }
+
+}
+
+/* --------------------------------
+   STATUS
+-------------------------------- */
+
+export function getReadingStatus() {
+
+  return {
+    isReading: state.isReading,
+    isOpen: state.port ? state.port.isOpen : false,
+    lastWeight: state.lastWeight
+  };
+
+}

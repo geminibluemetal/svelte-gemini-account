@@ -1,8 +1,9 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
-import { getReadingStatus, startReading, stopReading } from '$lib/core/server/weighment';
+import { getReadingStatus, startReading, stopReading, reloadPort } from '$lib/core/server/weighment';
+import SettingsService from '../settings/SettingsService';
 import WeighmentRepository from './WeighmentRepository';
-import { weighmentCreateSchema, weighmentUpdateSchema } from './WeighmentSchema';
+import { weighmentFirstSchema, weighmentSecondSchema } from './WeighmentSchema';
 
 const db = await connectDB();
 export default class WeighmentService {
@@ -23,13 +24,30 @@ export default class WeighmentService {
     }
   }
 
+  async updateSettings(data) {
+    const weighment = {
+      path: data.path,
+      baudRate: Number(data.baudRate),
+      dataBits: Number(data.dataBits),
+      stopBits: Number(data.stopBits),
+      parity: data.parity,
+    }
+    const settingsService = new SettingsService();
+    const result = await settingsService.updateSetting({ weighment });
+    if (result.ok) {
+      reloadPort()
+    }
+    return result
+  }
+
   async weighmentList() {
     return await this.repository.findAll();
   }
 
-  async createWeighment(data) {
+  async saveFirstWeight(data) {
     try {
-      const parsed = await weighmentCreateSchema.safeParseAsync(data);
+      data.firstWeightAt = new Date()
+      const parsed = weighmentFirstSchema.safeParse(data);
       if (!parsed.success) {
         schemaError(parsed);
       }
@@ -39,9 +57,9 @@ export default class WeighmentService {
     }
   }
 
-  async updateWeighment(id, data) {
+  async completeSecondWeight(id, data) {
     try {
-      const parsed = await weighmentUpdateSchema.safeParseAsync({ ...data, id });
+      const parsed = weighmentSecondSchema.safeParse({ ...data, id });
       if (!parsed.success) {
         schemaError(parsed);
       }
