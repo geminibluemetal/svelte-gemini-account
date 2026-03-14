@@ -45,6 +45,7 @@
     { key: '6', description: 'Go to Order Book' },
     { key: '7', description: 'Create New Cash Report' },
     { key: '8', description: 'Delete Cash Report' },
+    { key: '9', description: 'Open Tokens' },
     { key: '🠈', description: 'Switch focus on Income and Expense' }, // 🠈	🠉	🠊	🠋
     { key: '🠊', description: 'Sign Cash Entry' },
     { key: 'D', description: 'Delete Cash Entry' },
@@ -106,6 +107,8 @@
   function gotoOrderBook() {
     goto(resolve(`/orders?date=${currentDate}`));
   }
+
+  const gotoToken = () => goto(resolve(`/tokens?date=${currentDate}`));
 
   function handleFormClose() {
     editableItem = null;
@@ -250,6 +253,7 @@
     keyboardEventBus.on('6', gotoOrderBook);
     keyboardEventBus.on('7', handleNewReport);
     keyboardEventBus.on('8', handleDeleteReport);
+    keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('S', handleStockUpdate);
     syncOn('CASH.LIST');
   });
@@ -263,6 +267,7 @@
     keyboardEventBus.off('6', gotoOrderBook);
     keyboardEventBus.off('7', handleNewReport);
     keyboardEventBus.off('8', handleDeleteReport);
+    keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('S', handleStockUpdate);
     syncOff('CASH.LIST');
   });

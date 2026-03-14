@@ -13,6 +13,8 @@
   import { parseDate } from '$lib/utils/dateTimeParser';
   import { updateParams } from '$lib/core/client/urlParams';
   import NavigateButton from '$lib/components/NavigateButton.svelte';
+  import { resolve } from '$app/paths';
+  import { goto } from '$app/navigation';
 
   const { data } = $props();
   const headers = [
@@ -30,6 +32,9 @@
     { key: 'D', description: 'Delete Token' },
     { key: 'P', description: 'Print Token' },
     { key: 'H', description: 'List available Shortcut' },
+    { key: '4', description: 'Go to Delivery Sheet' },
+    { key: '5', description: 'Go to Cash Report' },
+    { key: '6', description: 'Go to Orders' },
   ];
 
   let formOpened = $state(false);
@@ -119,14 +124,24 @@
     return item.isCancelled ? HighlightRow.red : null;
   }
 
+  const gotoDeliverySheet = () => goto(resolve(`/delivery?date=${currentDate}`));
+  const gotoCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
+  const gotoOrderBook = () => goto(resolve(`/orders?date=${currentDate}`));
+
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
     keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('4', gotoDeliverySheet);
+    keyboardEventBus.on('5', gotoCashReport);
+    keyboardEventBus.on('6', gotoOrderBook);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
     keyboardEventBus.off('0', toggleOpenForm);
     keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('4', gotoDeliverySheet);
+    keyboardEventBus.off('5', gotoCashReport);
+    keyboardEventBus.on('6', gotoOrderBook);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>

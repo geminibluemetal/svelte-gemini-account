@@ -275,6 +275,7 @@
     { key: '6', description: 'Open Order Book' },
     { key: '7', description: 'Open Old Balance' },
     { key: '8', description: 'Open Vehicle Summary' },
+    { key: '9', description: 'Open Tokens' },
     { key: '🠊', description: 'Sign delivery entry or old balance' },
     { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
@@ -487,6 +488,7 @@
 
   const openCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
   const openOrderBook = () => goto(resolve(`/orders?date=${currentDate}`));
+  const gotoToken = () => goto(resolve(`/tokens?date=${currentDate}`));
   const openACFilter = () => {
     view = view == 'AC' ? 'AC_Unsigned' : 'AC';
     handleOverRowReset();
@@ -515,6 +517,7 @@
     keyboardEventBus.on('6', openOrderBook);
     keyboardEventBus.on('7', handleOldBalance);
     keyboardEventBus.on('8', handleVehicleSummary);
+    keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('R', handleReviewMode);
     keyboardEventBus.on('C', handleClearDeliverySheet);
     syncOn('DELIVERY.TOKEN.LIST');
@@ -530,6 +533,7 @@
     keyboardEventBus.off('6', openOrderBook);
     keyboardEventBus.off('7', handleOldBalance);
     keyboardEventBus.off('8', handleVehicleSummary);
+    keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('R', handleReviewMode);
     keyboardEventBus.off('C', handleClearDeliverySheet);
     syncOff('DELIVERY.TOKEN.LIST');

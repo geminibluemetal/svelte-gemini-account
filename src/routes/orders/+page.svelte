@@ -70,6 +70,7 @@
     { key: '4', description: 'Go to Delivery Sheet' },
     { key: '5', description: 'Go to Cash Report' },
     { key: '6', description: 'Switch to All orders' },
+    { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
     // { key: 'D', description: 'Delete Order' },
     { key: 'P', description: 'Print Phone Number only' },
@@ -247,6 +248,7 @@
   const toggleOpenForm = () => (formOpened = !formOpened);
   const gotoDeliverySheet = () => goto(resolve(`/delivery?date=${currentDate}`));
   const gotoCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
+  const gotoToken = () => goto(resolve(`/tokens?date=${currentDate}`));
   const handleFilterAll = () => (view = view == 'all' ? 'pending' : 'all');
   const handleFilterDelivered = () => (view = view == 'delivered' ? 'pending' : 'delivered');
   const handleFilterCancelled = () => (view = view == 'cancelled' ? 'pending' : 'cancelled');
@@ -260,6 +262,7 @@
     keyboardEventBus.on('4', gotoDeliverySheet);
     keyboardEventBus.on('5', gotoCashReport);
     keyboardEventBus.on('6', handleFilterAll);
+    keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('H', toggleHelper);
     syncOn('ORDERS.LIST');
   });
@@ -271,6 +274,7 @@
     keyboardEventBus.off('4', gotoDeliverySheet);
     keyboardEventBus.off('5', gotoCashReport);
     keyboardEventBus.off('6', handleFilterAll);
+    keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('H', toggleHelper);
     syncOff('ORDERS.LIST');
   });
