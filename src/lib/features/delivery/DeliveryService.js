@@ -20,9 +20,20 @@ export default class DeliveryService {
     try {
       let parsed = { data }
       if (checkValidation) {
-        parsed = await deliveryEntrySchema.safeParseAsync(data);
-        if (!parsed.success) schemaError(parsed);
-        parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
+        if (!parsed.data.isCancelled) {
+          parsed = await deliveryEntrySchema.safeParseAsync(data);
+          if (!parsed.success) schemaError(parsed);
+          parsed.data.deliveredAt = data.deliveredAt ? new Date(data.deliveredAt) : new Date();
+        } else {
+          // When user cancelled make sure the amount and amount type should be reset
+          parsed.data = {
+            amountType1: null,
+            amountType2: null,
+            amount1: 0,
+            amount2: 0,
+            isCancelled: true
+          }
+        }
       }
 
       // Get the delivery data before updating with new data
@@ -98,7 +109,6 @@ export default class DeliveryService {
     try {
       const delivery = {
         orderNumber: '',
-        partyName: '',
         address: '',
         deliveryItem: '',
         deliveryQuantity: 0,
@@ -108,6 +118,7 @@ export default class DeliveryService {
         amount2: 0,
         deliveredAt: null,
         paymentAt: null,
+        isCancelled: false
       }
       return await this.deliveryEntry(id, delivery, false)
     } catch (error) {
