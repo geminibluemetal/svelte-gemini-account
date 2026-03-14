@@ -9,7 +9,7 @@
   import DeliveryForm from './DeliveryForm.svelte';
   import DeliveryAmountForm from './DeliveryAmountForm.svelte';
   import Button from '$lib/components/Button.svelte';
-  import { formatFixed } from '$lib/utils/number';
+  import { formatFixed, formatNumber } from '$lib/utils/number';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
   import { CheckCheck, SearchXIcon, Trash } from 'lucide-svelte';
@@ -34,9 +34,9 @@
     { name: 'Item', key: 'deliveryItem', width: '125' },
     { name: 'Qty', key: 'deliveryQuantity', align: 'center', display: 'decimal', width: '60' },
     { name: 'AT1', key: 'amountType1', align: 'center', color: AmountTypeColor, width: '60' },
-    { name: 'Amount1', key: 'amount1', align: 'center', color: Amount1Color },
+    { name: 'Amount1', key: 'amount1', align: 'center', color: Amount1Color, display: 'currency' },
     { name: 'AT2', key: 'amountType2', align: 'center', color: AmountTypeColor, width: '60' },
-    { name: 'Amount2', key: 'amount2', align: 'center', color: Amount2Color },
+    { name: 'Amount2', key: 'amount2', align: 'center', color: Amount2Color, display: 'currency' },
     { name: 'Sign', key: 'sign', align: 'center', display: 'sign', color: SignColor },
   ];
 
@@ -675,7 +675,7 @@
                 <tr>
                   <td class="border px-1">{index + 1}</td>
                   <!-- Item name (MS, PS, etc.) -->
-                  <td class="border px-1 text-right">{amount}</td>
+                  <td class="border px-1 text-right">{formatNumber(amount)}</td>
                   <!-- Quantity with 2 decimals -->
                 </tr>
               {/each}
@@ -683,7 +683,7 @@
                 <td class=" border border-black bg-black px-1 text-white">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
                 <td class=" border border-black bg-black px-1 text-right text-white">
-                  {paytmAmountsArray.reduce((total, num) => total + num, 0)}
+                  {formatNumber(paytmAmountsArray.reduce((total, num) => total + num, 0))}
                 </td>
                 <!-- Quantity with 2 decimals -->
               </tr>
