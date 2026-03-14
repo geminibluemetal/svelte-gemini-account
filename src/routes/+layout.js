@@ -9,8 +9,8 @@ export async function load() {
     { name: 'Address', emoji: '🗺️', url: '/address', key: 'A' },
     { name: 'Items', emoji: '📦', url: '/items', key: 'I' },
     { name: 'Vehicle', emoji: '🚚', url: '/vehicle', key: 'V' },
-    { name: 'Weighment', emoji: '⚖️', url: '/weighment', key: 'W' },
-    // { name: 'Weighment', emoji: '⚙️', url: '/weighment', key: 'W' },
+    // { name: 'Weighment', emoji: '⚖️', url: '/weighment', key: 'W' },
+    // { name: 'Settings', emoji: '⚙️', url: '/settings', key: 'S' },
   ];
   return { apps };
 }
