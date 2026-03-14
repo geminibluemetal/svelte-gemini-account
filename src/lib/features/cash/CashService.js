@@ -2,7 +2,6 @@ import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { serverBus } from '$lib/core/server/serverBus';
 import { EVENTS } from '$lib/core/server/serverBusEvents';
-import { getFormattedTime } from '$lib/utils/dateTime';
 import CashRepository from './CashRepository';
 import { cashSchema } from './CashSchema';
 
@@ -86,6 +85,7 @@ export default class CashService {
   }
 
   async syncCashByOrderId(data) {
+    await this.deleteCashByOrderId(data.id);
     if (data.advance && data.amountType == 'Cash') {
       const cashData = {
         orderId: data.id,
@@ -96,8 +96,6 @@ export default class CashService {
         entryType: 'INCOME',
         createdAt: new Date(data.paymentAt),
       };
-      console.log(getFormattedTime(data.paymentAt));
-      await this.deleteCashByOrderId(data.id);
       const result = await this.createCash(cashData);
       console.log(result);
     }
