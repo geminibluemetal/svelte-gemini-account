@@ -578,7 +578,7 @@
     <span class="mr-2">{view.replaceAll('_', ' ')}</span>
   {/snippet}
   {#snippet sidebar()}
-    <div class="flex w-48 flex-col gap-2">
+    <div class="flex w-46 flex-col gap-2">
       <div class="flex gap-2 *:flex-1">
         <NavigateButton
           class="focus:bg-amber-50"
