@@ -198,6 +198,7 @@ export default class PartyStatementRepository extends BaseRepository {
           },
         },
         { $match: balanceFilter },
+        { $sort: { name: 1 } },
         { $project: { statements: 0 } },
       ])
       .toArray();

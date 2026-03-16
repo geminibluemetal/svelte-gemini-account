@@ -63,9 +63,10 @@
       )
       .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber))
       .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
-    Blank: data.token.filter(
-      (d) => !d.amountType1 && !d.amountType1 && !d.amountType2 && !d.amountType2,
-    ),
+    Blank: data.token
+      .filter((d) => !d.amountType1 && !d.amountType1 && !d.amountType2 && !d.amountType2)
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName))
+      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber)),
     AC_Unsigned: data.token
       .filter((d) => (d.amountType1 == 'AC' || d.amountType2 == 'AC') && !d.sign)
       .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
@@ -154,7 +155,7 @@
         data.token.reduce((acc, item) => {
           const partyName = item.partyName;
 
-          if (partyName) {
+          if (partyName && item.deliveryItem && item.deliveryQuantity) {
             acc[partyName] = (acc[partyName] || 0) + 1;
           }
 

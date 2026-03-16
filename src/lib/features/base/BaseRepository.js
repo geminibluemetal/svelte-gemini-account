@@ -47,8 +47,8 @@ export default class BaseRepository {
   }
 
   // Find All with proper projection
-  async findAll(filter = {}, projection = {}) {
-    const docs = await this.collection.find(filter, { projection }).toArray();
+  async findAll(filter = {}, projection = {}, options) {
+    const docs = await this.collection.find(filter, { projection, ...options }).toArray();
     return docs.map((doc) => this.toModel(doc, projection));
   }
 

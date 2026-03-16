@@ -43,15 +43,42 @@
   );
 
   // Navigation functions
-  const rowUp = () => (doAction ? (overRow = overRow - 1 >= 0 ? overRow - 1 : overRow) : null);
-  const rowDown = () =>
-    doAction ? (overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow) : null;
-  const gotoTop = () => (doAction ? (overRow = 0) : null);
-  const gotoBottom = () => (doAction ? (overRow = items.length - 1) : null);
-  const jump20Top = () =>
-    doAction ? (overRow = overRow - 20 >= 0 ? overRow - 20 : overRow) : null;
-  const jump20Bottom = () =>
-    doAction ? (overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow) : null;
+  function rowUp() {
+    if (doAction) {
+      overRow = overRow - 1 >= 0 ? overRow - 1 : overRow;
+      reCheckOver(true);
+    }
+  }
+  function rowDown() {
+    if (doAction) {
+      overRow = overRow + 1 <= items.length - 1 ? overRow + 1 : overRow;
+      reCheckOver(true);
+    }
+  }
+  function gotoTop() {
+    if (doAction) {
+      overRow = 0;
+      reCheckOver(true);
+    }
+  }
+  function gotoBottom() {
+    if (doAction) {
+      overRow = items.length - 1;
+      reCheckOver(true);
+    }
+  }
+  function jump20Top() {
+    if (doAction) {
+      overRow = overRow - 20 >= 0 ? overRow - 20 : overRow;
+      reCheckOver(true);
+    }
+  }
+  function jump20Bottom() {
+    if (doAction) {
+      overRow = overRow + 20 <= items.length - 1 ? overRow + 20 : overRow;
+      reCheckOver(true);
+    }
+  }
 
   const getValue = (obj, path) => {
     if (!path) return undefined;
@@ -59,13 +86,17 @@
     return path.split('.').reduce((acc, part) => acc && acc[part], obj);
   };
 
-  function reCheckOver() {
+  function reCheckOver(forceMode = false) {
     const overRowElement = document.querySelector(`[data-over-row="${overRow}"]`);
     $overRowRem[title] = overRow;
     overRowChange(overRowElement, items[overRow], overRow);
     if (overRowElement && !isElementFullyVisible(overRowElement, container, { top: 50 })) {
-      scrollToMiddle(overRowElement, container);
+      if (forceMode) scrollToMiddle(overRowElement, container);
     }
+  }
+
+  function scrollReCheckOver() {
+    reCheckOver();
   }
 
   export function resetOverRow() {
@@ -105,11 +136,11 @@
 
     customHandlersMap = handlersMap;
 
-    container?.addEventListener('scroll', reCheckOver);
+    container?.addEventListener('scroll', scrollReCheckOver);
   });
 
   onDestroy(() => {
-    container?.addEventListener('scroll', reCheckOver);
+    container?.addEventListener('scroll', scrollReCheckOver);
 
     // Unregister navigation events
     keyboardEventBus.off('ArrowUp', rowUp);

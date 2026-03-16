@@ -131,6 +131,7 @@
       para: stringCase.para,
       smartTitle: stringCase.smartTitle,
       smartTitleChars: stringCase.smartTitleChars,
+      capitalizeWords: stringCase.capitalizeWords,
     };
     if (caseMode == 'smartTitleChars') {
       value = handlers[caseMode]?.(newVal, allowedChars) ?? newVal;

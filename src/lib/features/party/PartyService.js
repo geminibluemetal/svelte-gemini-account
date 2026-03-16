@@ -11,7 +11,7 @@ export default class PartyService {
   }
 
   async partyList() {
-    return await this.repository.findAll({}, { name: 1, phone: 1, openingBalance: 1, _id: 1 });
+    return await this.repository.findAll({}, { name: 1, phone: 1, openingBalance: 1, _id: 1 }, { sort: { name: 1 } });
   }
 
   async findPartyByPartyName(partyName) {

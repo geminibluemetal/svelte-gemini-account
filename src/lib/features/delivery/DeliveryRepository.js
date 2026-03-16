@@ -70,6 +70,11 @@ export default class DeliveryRepository extends BaseRepository {
         },
       },
       {
+        $match: {
+          amount: { $ne: 0 }
+        },
+      },
+      {
         $project: projection,
       },
     ];

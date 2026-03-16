@@ -149,7 +149,7 @@
       value={data.notes}
       placeholder="Note"
       autoComplete="off"
-      caseMode="smartTitleChars"
+      caseMode="capitalizeWords"
       allowedChars={[',', '.']}
     />
     <CheckBoxField name="isOwnerOrder" value={data.isOwnerOrder} placeholder="Is Owner Order?" />
