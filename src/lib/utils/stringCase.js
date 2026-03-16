@@ -14,10 +14,10 @@ export default {
   title: (str) =>
     typeof str === 'string'
       ? str
-          .toLowerCase()
-          .split(/\s+/)
-          .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ')
+        .toLowerCase()
+        .split(/\s+/)
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ')
       : str,
 
   // Paragraph style (capitalize first letter only)

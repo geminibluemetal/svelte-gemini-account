@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 // MongoDB connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
-const DB_NAME = process.env.DB_NAME || 'Svelte-Gemini-App-Prod';
+const DB_NAME = process.env.DB_NAME || 'Svelte-Gemini-App-Dev';
 
 async function runSeeds() {
   console.log('🚀 Starting database seeding...');
