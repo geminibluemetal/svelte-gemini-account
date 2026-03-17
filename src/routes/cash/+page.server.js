@@ -41,7 +41,7 @@ export async function load({ depends, url }) {
   reportIndex = reportIndex ?? reports.length - 1;
 
   // 3. Determine Report Time Boundaries
-  const { fromDate, toDate } = getReportBoundaries(reports, reportIndex);
+  const { fromDate, toDate } = getReportBoundaries(reports, reportIndex, formattedDate);
 
   // 4. Filter and Categorize Data
   // Pre-filter helper to keep things DRY
@@ -71,9 +71,9 @@ export async function load({ depends, url }) {
 /**
  * Helper to calculate report start and end times
  */
-function getReportBoundaries(reports, index) {
-  const todayStart = new Date().setHours(0, 0, 0, 0);
-  const todayEnd = new Date().setHours(23, 59, 59, 999);
+function getReportBoundaries(reports, index, currentDate) {
+  const todayStart = new Date(currentDate).setHours(0, 0, 0, 0);
+  const todayEnd = new Date(currentDate).setHours(23, 59, 59, 999);
 
   if (!reports || reports.length === 0) {
     return { fromDate: new Date(todayStart), toDate: new Date(todayEnd) };
