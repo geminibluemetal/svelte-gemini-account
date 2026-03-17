@@ -65,17 +65,21 @@
   });
 </script>
 
-<Model {open} onClose={handleClose} autoFocusTabIndex={item ? 2 : 1}>
+<Model
+  {open}
+  onClose={handleClose}
+  autoFocusTabIndex={item ? (item?.phone && !item?.id ? 4 : 2) : 1}
+>
   <Form
     action="?/form"
     method="POST"
     cancel={handleClose}
     class="max-w-lg"
-    title={item ? 'Update Order' : 'Create Order'}
-    isEdit={!!item}
+    title={item?.id ? 'Update Order' : 'Create Order'}
+    isEdit={!!item?.id}
     enhance={handleFormSubmit}
   >
-    {#if !!item}
+    {#if !!item?.id}
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
     <InputField

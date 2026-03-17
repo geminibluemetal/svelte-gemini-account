@@ -72,7 +72,7 @@
     { key: '6', description: 'Switch to All orders' },
     { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
-    // { key: 'D', description: 'Delete Order' },
+    { key: 'V', description: 'Copy and Reuse Order' },
     { key: 'P', description: 'Print Phone Number only' },
     { key: 'I', description: 'Single Load, Cash Bill Print' },
     { key: 'O', description: 'Full Load, Cash Bill Print' },
@@ -217,6 +217,19 @@
     }
   }
 
+  async function handleOrderCopy(item) {
+    formOpened = true;
+    const copyData = {
+      partyName: item.partyName,
+      address: item.address,
+      phone: item.phone,
+      amountType: item.amountType,
+      isOwnerOrder: item.isOwnerOrder,
+      tracktorOnly: item.tracktorOnly,
+    };
+    editableOrder = copyData;
+  }
+
   function toggleHelper() {
     helperOpened = !helperOpened;
   }
@@ -241,6 +254,7 @@
     { key: 'C', handler: handleOrderCancel },
     { key: 'F', handler: handleOrderFinish },
     { key: 'R', handler: handleOrderStatusReset },
+    { key: 'V', handler: handleOrderCopy },
     { key: 'Enter', handler: handleSinglePrint },
     { key: 'ArrowRight', handler: handleSignOrder },
   ];
