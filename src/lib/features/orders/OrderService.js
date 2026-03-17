@@ -303,14 +303,14 @@ export default class OrderService {
         .setTextSize(1, 0)
         .align('left')
 
-        .pairs('Order', order.orderNumber)
-        .pairs('Address', order.address)
+        // .pairs('Order', order.orderNumber)
+        // .pairs('Address', order.address)
         .pairs('Phone', order.phone)
-        .pairs('Item', order.item)
-        .pairs('Qty', formatFixed(order.totalQty))
+        .pairs('Item', `${order.item} - ${formatFixed(order.totalQty)}`)
+        // .pairs('Qty', formatFixed(order.totalQty))
         .flushPairs()
 
-        .feed(1)
+        .feed(2)
         .cut();
     });
   }

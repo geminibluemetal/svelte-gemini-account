@@ -54,6 +54,8 @@ export const actions = {
   amountEdit: async ({ request }) => {
     const formData = await request.formData();
     const { editId, ...data } = formDataToObject(formData);
+    data.amount = Number(data.amount)
+    if (isNaN(data.amount)) data.amount = 0
     const partyStatmentService = new PartyStatementService()
     const result = await partyStatmentService.updateStatementAmount(editId, data)
     sseEmit({ type: 'BALANCE.LIST' });
