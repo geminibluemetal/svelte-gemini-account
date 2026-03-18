@@ -152,4 +152,8 @@ export default class PartyStatementService {
       return handleServiceError(error);
     }
   }
+
+  async resetBalanceForAllParty() {
+    return await this.repository.bulkUpdateCurrentBalanceToOpeningBalance()
+  }
 }

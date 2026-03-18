@@ -339,4 +339,75 @@ export default class PartyStatementRepository extends BaseRepository {
     const party = result[0];
     return { ...party, id: party._id.toString() };
   }
+
+  async bulkUpdateCurrentBalanceToOpeningBalance() {
+    // 1. Calculate the 'Settled' Balance for every party
+    const partyBalances = await this.db
+      .collection('party')
+      .aggregate([
+        {
+          $lookup: {
+            from: 'partyStatement',
+            let: { p_id: '$_id' },
+            pipeline: [
+              {
+                $match: {
+                  $expr: { $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }] },
+                },
+              },
+            ],
+            as: 'statements',
+          },
+        },
+        {
+          $addFields: {
+            totalDebit: {
+              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'DEBIT'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+            },
+            totalCredit: {
+              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'CREDIT'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+            },
+            totalAdjust: {
+              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'ADJUST'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            newOpeningBalance: {
+              $subtract: [
+                { $add: [{ $ifNull: ['$openingBalance', 0] }, '$totalDebit'] },
+                { $add: ['$totalCredit', '$totalAdjust'] },
+              ],
+            },
+          },
+        },
+      ])
+      .toArray();
+
+    if (partyBalances.length === 0) return { message: 'No data to settle.' };
+
+    // 2. Prepare Bulk Write for Party Collection
+    const bulkOps = partyBalances.map((pb) => ({
+      updateOne: {
+        filter: { _id: pb._id },
+        update: { $set: { openingBalance: pb.newOpeningBalance } },
+      },
+    }));
+
+    // 3. Execute Updates
+    const updateResult = await this.db.collection('party').bulkWrite(bulkOps);
+
+    // 4. CLEAR the entire PartyStatement collection
+    // Only do this if the update was successful to prevent data loss!
+    if (updateResult.modifiedCount > 0 || updateResult.upsertedCount > 0) {
+      await this.db.collection('partyStatement').deleteMany({});
+    }
+
+    return {
+      updatedParties: updateResult.modifiedCount,
+      statementsCleared: true
+    };
+  }
 }

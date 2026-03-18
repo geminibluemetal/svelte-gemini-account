@@ -8,6 +8,8 @@
   import Button from '$lib/components/Button.svelte';
   import { resolve } from '$app/paths';
   import PrintBalance from './PrintBalance.svelte';
+  import { deserialize } from '$app/forms';
+  import { showToast } from '$lib/stores/toast';
 
   const { data } = $props();
 
@@ -57,11 +59,11 @@
     for (const key in data) {
       formData.append(key, data[key]);
     }
-    const res = await fetch(url, {
+    const response = await fetch(url, {
       method: 'POST',
       body: formData,
     });
-    return await res.json();
+    return deserialize(await response.text());
   }
 
   function toggleHelper() {
@@ -96,6 +98,20 @@
     goto(resolve(`/balance?type=nil`));
   }
 
+  async function handleBulkReset() {
+    if (!confirm('Are you sure? This will settle all balances and clear history.')) return;
+    try {
+      const response = await transportAction(`?/bulkBalanceResetForAll`);
+      if (response.type == 'success') {
+        showToast(`${response?.data?.updatedParties || 'All'} parties balance was reset`);
+      } else {
+        showToast('Error Occured', 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
   const customEvents = [
     { key: 'Enter', handler: gotoPartyLedger },
     { key: 'R', handler: handleBalanceReset },
@@ -125,11 +141,14 @@
 <div class="visible-content">
   <Table title="Balance Sheet" {headers} items={data.balance} {customEvents}>
     {#snippet sidebar()}
-      <div class="flex w-25 flex-col gap-2">
-        <Button corner="1" color="primary" onclick={handleAllFilter}>All</Button>
-        <Button corner="2" color="primary" onclick={handlePendingFilter}>Pending</Button>
-        <Button corner="3" color="primary" onclick={handleNilFilter}>Nil</Button>
-        <Button corner="P" class="dark" onclick={handlePrint}>Print</Button>
+      <div class="dark flex w-25 flex-col gap-2">
+        <Button corner="1" color="fuchsia" onclick={handleAllFilter}>All</Button>
+        <Button corner="2" color="fuchsia" onclick={handlePendingFilter}>Pending</Button>
+        <Button corner="3" color="fuchsia" onclick={handleNilFilter}>Nil</Button>
+        <Button corner="P" onclick={handlePrint}>Print</Button>
+        {#if data?.isAdmin}
+          <Button color="danger" onclick={handleBulkReset}>Reset All</Button>
+        {/if}
       </div>
     {/snippet}
   </Table>
