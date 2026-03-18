@@ -88,8 +88,8 @@
           d.amountType2 == 'CP' ||
           d.amountType2 == 'Paytm',
       )
-      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber))
-      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
+      .sort((a, b) => a?.partyName?.localeCompare(b?.partyName))
+      .sort((a, b) => a?.orderNumber?.localeCompare(b?.orderNumber)),
     Blank: data.token
       .filter((d) => !d.amountType1 && !d.amountType1 && !d.amountType2 && !d.amountType2)
       .sort((a, b) => a?.partyName?.localeCompare(b.partyName))
