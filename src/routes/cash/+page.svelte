@@ -189,12 +189,16 @@
   }
 
   async function handleNewReport() {
-    await transportAction('?/newReport');
-    goto(resolve(window.location.pathname));
+    const confirmed = confirm('Are you sure? to create new Cash Report');
+    if (confirmed) {
+      await transportAction('?/newReport');
+      goto(resolve(window.location.pathname));
+    }
   }
 
   function handleDeleteReport() {
-    if (!data.income.length && !data.expense.length) {
+    const confirmed = confirm('Are you sure? to delete Cash Report');
+    if (!data.income.length && !data.expense.length && confirmed) {
       if (data.reports[reportIndex]?.id === 'current') {
         transportAction('?/deleteReport', {
           id: data.reports[reportIndex - 1]?.id,
@@ -251,8 +255,8 @@
     keyboardEventBus.on('4', gotoDeliverySheet);
     keyboardEventBus.on('5', gotoCurrentReport);
     keyboardEventBus.on('6', gotoOrderBook);
-    keyboardEventBus.on('7', handleNewReport);
-    keyboardEventBus.on('8', handleDeleteReport);
+    // keyboardEventBus.on('7', handleNewReport);
+    // keyboardEventBus.on('8', handleDeleteReport);
     keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('S', handleStockUpdate);
     syncOn('CASH.LIST');
@@ -265,8 +269,8 @@
     keyboardEventBus.off('4', gotoDeliverySheet);
     keyboardEventBus.off('5', gotoCurrentReport);
     keyboardEventBus.off('6', gotoOrderBook);
-    keyboardEventBus.off('7', handleNewReport);
-    keyboardEventBus.off('8', handleDeleteReport);
+    // keyboardEventBus.off('7', handleNewReport);
+    // keyboardEventBus.off('8', handleDeleteReport);
     keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('S', handleStockUpdate);
     syncOff('CASH.LIST');
@@ -314,8 +318,8 @@
         </NavigateButton>
       </div>
       <div class="dark flex gap-2 *:flex-1">
-        <Button color="fuchsia" corner="7" onclick={handleNewReport}>New</Button>
-        <Button color="fuchsia" corner="8" onclick={handleDeleteReport}>Delete</Button>
+        <Button color="fuchsia" onclick={handleNewReport}>New</Button>
+        <Button color="fuchsia" onclick={handleDeleteReport}>Delete</Button>
       </div>
       <div class="dark flex gap-2 *:flex-1">
         <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>

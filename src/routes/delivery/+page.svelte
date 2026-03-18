@@ -29,7 +29,7 @@
     { name: 'Vehicle', key: 'vehicle', color: VehicleColor, width: '65' },
     { name: 'D Time', key: 'deliveredAt', align: 'center', display: 'time', width: '80' },
     { name: 'ON', key: 'orderNumber', align: 'center', width: '38', color: orderColor },
-    { name: 'Party', key: 'partyName', width: '220' },
+    { name: 'Party', key: 'partyName', width: '220', suffix: partySerialSuffix },
     { name: 'Address', key: 'address', width: '220' },
     { name: 'Item', key: 'deliveryItem', width: '125' },
     { name: 'Qty', key: 'deliveryQuantity', align: 'center', display: 'decimal', width: '60' },
@@ -47,6 +47,33 @@
     { name: 'Amount', key: 'amount', align: 'right', color: AmountOBColor, display: 'currency' },
     { name: 'Sign', key: 'sign', align: 'center', display: 'sign', color: SignColor },
   ];
+
+  // 1. Pre-calculate totals and occurrence indices
+  const totals = {};
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  const instanceMap = new Map(); // Using a Map to store indices for each specific token object
+  // We process the data once to build our metadata
+  const tracker = {};
+  data.token.forEach((t) => {
+    if (!t.partyName) return;
+    // Count totals
+    totals[t.partyName] = (totals[t.partyName] || 0) + 1;
+    // Track this specific instance's number
+    tracker[t.partyName] = (tracker[t.partyName] || 0) + 1;
+    instanceMap.set(t, tracker[t.partyName]);
+  });
+
+  // 2. The function the Table component calls for the 'suffix'
+  function partySerialSuffix(val, row) {
+    const name = row.partyName;
+    // If name is empty or only appears once, return nothing
+    if (!name || totals[name] <= 1) {
+      return '';
+    }
+    // Get the instance number we stored earlier for this specific row object
+    const currentIdx = instanceMap.get(row);
+    return currentIdx;
+  }
 
   const viewList = $derived({
     All: data.token,

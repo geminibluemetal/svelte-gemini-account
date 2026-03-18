@@ -52,7 +52,14 @@
       options={item?.partyName ? amountType : amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
-    <InputField name="amount1" value={data.amount1} placeholder="Amount 1" autoComplete="off" />
+    <InputField
+      name="amount1"
+      value={data.amount1}
+      placeholder="Amount 1"
+      autoComplete="off"
+      caseMode="smartTitleChars"
+      allowedChars={['=', '+']}
+    />
 
     <div class="mx-auto mt-2 mb-5"></div>
 
@@ -63,6 +70,13 @@
       options={amountType.filter((x) => x !== 'AC')}
       autoComplete="off"
     />
-    <InputField name="amount2" value={data.amount2} placeholder="Amount 2" autoComplete="off" />
+    <InputField
+      name="amount2"
+      value={data.amount2}
+      placeholder="Amount 2"
+      autoComplete="off"
+      caseMode="smartTitleChars"
+      allowedChars={['=', '+']}
+    />
   </Form>
 </Model>

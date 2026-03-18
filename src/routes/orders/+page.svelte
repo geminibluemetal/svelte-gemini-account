@@ -87,7 +87,7 @@
 
   function notesDisplay(value, item) {
     let prefix = '';
-    prefix += item.tracktorOnly ? '(🚜)' : '';
+    prefix += item.tracktorOnly ? '(🚗)' : '';
     prefix += item.status == 'Loading' ? '(⬆️)' : '';
     return `${prefix} ${value}`;
   }
@@ -314,18 +314,23 @@
           </Button>
         {/if}
         {#if viewList.all.length}
-          <Button color="primary" onclick={() => (view = 'all')} class="flex justify-between gap-2">
+          <Button
+            color="fuchsia"
+            corner="6"
+            onclick={() => (view = 'all')}
+            class="flex justify-between gap-2"
+          >
             <span>All</span> <span>{viewList.all.length}</span>
           </Button>
         {/if}
         {#if viewList.new.length}
-          <Button color="primary" onclick={() => (view = 'new')} class="flex justify-between gap-2">
+          <Button color="fuchsia" onclick={() => (view = 'new')} class="flex justify-between gap-2">
             <span>New</span> <span>{viewList.new.length}</span>
           </Button>
         {/if}
         {#if viewList.loading.length}
           <Button
-            color="primary"
+            color="fuchsia"
             onclick={() => (view = 'loading')}
             class="flex justify-between gap-2"
           >
@@ -334,7 +339,7 @@
         {/if}
         {#if viewList.partial.length}
           <Button
-            color="primary"
+            color="fuchsia"
             onclick={() => (view = 'partial')}
             class="flex justify-between gap-2"
           >
@@ -343,7 +348,8 @@
         {/if}
         {#if viewList.pending.length}
           <Button
-            color="primary"
+            color="fuchsia"
+            corner="#"
             onclick={() => (view = 'pending')}
             class="flex justify-between gap-2"
           >
@@ -352,7 +358,8 @@
         {/if}
         {#if viewList.delivered.length}
           <Button
-            color="primary"
+            color="fuchsia"
+            corner="1"
             onclick={() => (view = 'delivered')}
             class="flex justify-between gap-2"
           >
@@ -361,7 +368,8 @@
         {/if}
         {#if viewList.cancelled.length}
           <Button
-            color="primary"
+            color="fuchsia"
+            corner="2"
             onclick={() => (view = 'cancelled')}
             class="flex justify-between gap-2"
           >
@@ -370,13 +378,20 @@
         {/if}
         {#if viewList.finished.length}
           <Button
-            color="primary"
+            color="fuchsia"
+            corner="3"
             onclick={() => (view = 'finished')}
             class="flex justify-between gap-2"
           >
             <span>Finished</span> <span>{viewList.finished.length}</span>
           </Button>
         {/if}
+      </div>
+      <div class="dark flex flex-col gap-2 p-1">
+        <div class="flex gap-2 *:flex-1">
+          <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>
+          <Button color="primary" corner="5" onclick={gotoCashReport}>CR</Button>
+        </div>
       </div>
     </div>
   {/snippet}

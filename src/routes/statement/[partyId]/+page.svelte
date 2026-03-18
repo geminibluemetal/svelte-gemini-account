@@ -59,11 +59,11 @@
   let statementFormOpened = $state(false);
   let editableItem = $state(null);
 
-  const openingBalance = {
+  const openingBalance = $derived({
     createdAt: data.party.updatedAt,
     runningBalance: data.party.openingBalance,
     amountType: 'Open Bal',
-  };
+  });
 
   const statementItem = $derived(
     data.party.openingBalance ? [openingBalance, ...data.statement] : data.statement,

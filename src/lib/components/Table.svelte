@@ -165,7 +165,7 @@
     <div class="grid" style="grid-template-columns: {gridTemplate};">
       <!-- TITLE ROW -->
       <div
-        class="sticky top-0 col-span-full flex border-b-2 border-white text-center font-bold text-white
+        class="sticky top-0 z-20 col-span-full flex border-b-2 border-white text-center font-bold text-white
           {headerColor == 'blue' ? 'bg-blue-700' : 'bg-red-700'}"
       >
         <div class="flex flex-1 text-left">{@render left()}</div>
@@ -221,7 +221,7 @@
             {@const value = getValue(item, header.key)}
             {@const color = header?.color ? header.color(value, item) : null}
             <div
-              class="px-1
+              class="relative px-1
                 {rowColor?.border ? rowColor.border : 'border-b border-gray-500'}
                 {hideAction && col == headers.length - 1 ? 'border-r-0' : 'border-r'}
                 {header?.align ? `text-${header.align}` : 'text-left'}
@@ -242,11 +242,32 @@
             >
               {#if header?.display && header.display instanceof Function}
                 {header.display(value, item)}
+                {#if header?.suffix && header?.suffix(value, item)}
+                  <div
+                    class="absolute right-0 mt-1 mr-1 inline-flex h-4 items-center justify-center rounded-full bg-black px-1 text-sm text-white"
+                  >
+                    {header?.suffix(value, item)}
+                  </div>
+                {/if}
               {:else if value != null && value !== '' && value !== 0 && value !== '0'}
                 {#if header?.display}
                   {display(header.display, value)}
+                  {#if header?.suffix && header?.suffix(value, item)}
+                    <div
+                      class="absolute right-0 mt-1 mr-1 inline-flex h-4 items-center justify-center rounded-full bg-black px-1 text-sm text-white"
+                    >
+                      {header?.suffix(value, item)}
+                    </div>
+                  {/if}
                 {:else}
                   {value}
+                  {#if header?.suffix && header?.suffix(value, item)}
+                    <div
+                      class="absolute right-0 mt-1 mr-1 inline-flex h-4 items-center justify-center rounded-full bg-black px-1 text-sm text-white"
+                    >
+                      {header?.suffix(value, item)}
+                    </div>
+                  {/if}
                 {/if}
               {/if}
             </div>

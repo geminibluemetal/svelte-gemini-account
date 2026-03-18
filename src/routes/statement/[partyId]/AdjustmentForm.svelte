@@ -41,7 +41,14 @@
       options={adjustmentType}
       autoComplete="off"
     />
-    <InputField name="amount" value={data.amount} placeholder="Amount" autoComplete="off" />
+    <InputField
+      name="amount"
+      value={data.amount}
+      placeholder="Amount"
+      autoComplete="off"
+      caseMode="smartTitleChars"
+      allowedChars={['=', '-']}
+    />
     <input type="hidden" name="partyId" value={partyId} />
     <input type="hidden" name="entryType" value="ADJUST" />
   </Form>

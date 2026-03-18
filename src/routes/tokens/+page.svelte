@@ -32,6 +32,9 @@
     { key: 'D', description: 'Delete Token' },
     { key: 'P', description: 'Print Token' },
     { key: 'H', description: 'List available Shortcut' },
+    { key: '1', description: 'All Token Filter' },
+    { key: '2', description: 'Opened Token Filter' },
+    { key: '3', description: 'Closed Token Filter' },
     { key: '4', description: 'Go to Delivery Sheet' },
     { key: '5', description: 'Go to Cash Report' },
     { key: '6', description: 'Go to Orders' },
@@ -131,6 +134,9 @@
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
     keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('1', viewAllToken);
+    keyboardEventBus.on('2', viewOpenedToken);
+    keyboardEventBus.on('3', viewClosedToken);
     keyboardEventBus.on('4', gotoDeliverySheet);
     keyboardEventBus.on('5', gotoCashReport);
     keyboardEventBus.on('6', gotoOrderBook);
@@ -139,9 +145,12 @@
   onDestroy(() => {
     keyboardEventBus.off('0', toggleOpenForm);
     keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('1', viewAllToken);
+    keyboardEventBus.off('2', viewOpenedToken);
+    keyboardEventBus.off('3', viewClosedToken);
     keyboardEventBus.off('4', gotoDeliverySheet);
     keyboardEventBus.off('5', gotoCashReport);
-    keyboardEventBus.on('6', gotoOrderBook);
+    keyboardEventBus.off('6', gotoOrderBook);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
@@ -168,13 +177,28 @@
         >
           {currentDate}
         </NavigateButton>
-        <Button onclick={viewAllToken} color="primary" class="dark flex justify-between gap-2">
+        <Button
+          onclick={viewAllToken}
+          color="fuchsia"
+          corner="1"
+          class="dark flex justify-between gap-2"
+        >
           <span>All</span> <span>{viewList.all.length}</span>
         </Button>
-        <Button onclick={viewOpenedToken} color="primary" class="dark flex justify-between gap-2">
+        <Button
+          onclick={viewOpenedToken}
+          color="fuchsia"
+          corner="2"
+          class="dark flex justify-between gap-2"
+        >
           <span>Opened</span> <span>{viewList.opened.length}</span>
         </Button>
-        <Button onclick={viewClosedToken} color="primary" class="dark flex justify-between gap-2">
+        <Button
+          onclick={viewClosedToken}
+          color="fuchsia"
+          corner="3"
+          class="dark flex justify-between gap-2"
+        >
           <span>Closed</span> <span>{viewList.closed.length}</span>
         </Button>
       </div>
