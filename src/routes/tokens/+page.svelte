@@ -15,6 +15,7 @@
   import NavigateButton from '$lib/components/NavigateButton.svelte';
   import { resolve } from '$app/paths';
   import { goto } from '$app/navigation';
+  import { LucidePen, LucidePlusCircle, LucidePrinter } from 'lucide-svelte';
 
   const { data } = $props();
   const headers = [
@@ -127,6 +128,18 @@
     return item.isCancelled ? HighlightRow.red : null;
   }
 
+  function dispatchKey({ key = 'Enter', code, keyCode, target = document, type = 'keydown' } = {}) {
+    const event = new KeyboardEvent(type, {
+      key,
+      code: code || key,
+      keyCode: keyCode || key.charCodeAt(0),
+      which: keyCode || key.charCodeAt(0),
+      bubbles: true,
+      cancelable: true,
+    });
+    target.dispatchEvent(event);
+  }
+
   const gotoDeliverySheet = () => goto(resolve(`/delivery?date=${currentDate}`));
   const gotoCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
   const gotoOrderBook = () => goto(resolve(`/orders?date=${currentDate}`));
@@ -201,6 +214,19 @@
         >
           <span>Closed</span> <span>{viewList.closed.length}</span>
         </Button>
+        <div class="dark flex flex-col gap-2 p-1 lg:hidden">
+          <div class="flex gap-2 *:flex-1">
+            <Button color="success" corner="0" onclick={toggleOpenForm}>
+              <LucidePlusCircle />
+            </Button>
+            <Button color="success" corner="E" onclick={() => dispatchKey({ key: 'e' })}>
+              <LucidePen />
+            </Button>
+            <Button color="success" corner="P" onclick={() => dispatchKey({ key: 'p' })}>
+              <LucidePrinter />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   {/snippet}

@@ -14,6 +14,16 @@
   import { resolve } from '$app/paths';
   import { getFormattedDate } from '$lib/utils/dateTime';
   import { page } from '$app/stores';
+  import {
+    LucideBlend,
+    LucidePen,
+    LucidePhone,
+    LucidePlusCircle,
+    LucideReceiptIndianRupee,
+    LucideRotateCcw,
+    LucideSquareArrowUp,
+    LucideTicket,
+  } from 'lucide-svelte';
 
   const { data } = $props();
   let view = $state('pending');
@@ -243,6 +253,18 @@
     };
   }
 
+  function dispatchKey({ key = 'Enter', code, keyCode, target = document, type = 'keydown' } = {}) {
+    const event = new KeyboardEvent(type, {
+      key,
+      code: code || key,
+      keyCode: keyCode || key.charCodeAt(0),
+      which: keyCode || key.charCodeAt(0),
+      bubbles: true,
+      cancelable: true,
+    });
+    target.dispatchEvent(event);
+  }
+
   const customEvents = [
     { key: 'E', handler: handleOrderEdit },
     // { key: 'D', handler: handleOrderDelete },
@@ -391,6 +413,41 @@
         <div class="flex gap-2 *:flex-1">
           <Button color="primary" corner="4" onclick={gotoDeliverySheet}>DS</Button>
           <Button color="primary" corner="5" onclick={gotoCashReport}>CR</Button>
+        </div>
+      </div>
+      <div class="dark flex flex-col gap-2 p-1 lg:hidden">
+        <div class="flex gap-2 *:flex-1">
+          <Button color="success" corner="0" onclick={toggleOpenForm}>
+            <LucidePlusCircle />
+          </Button>
+          <Button color="success" corner="E" onclick={() => dispatchKey({ key: 'e' })}>
+            <LucidePen />
+          </Button>
+          <Button color="success" corner="V" onclick={() => dispatchKey({ key: 'v' })}>
+            <LucideBlend />
+          </Button>
+        </div>
+        <div class="flex gap-2 *:flex-1">
+          <Button color="success" corner="P" onclick={() => dispatchKey({ key: 'p' })}>
+            <LucidePhone />
+          </Button>
+          <Button color="success" corner="I" onclick={() => dispatchKey({ key: 'i' })}>
+            <LucideReceiptIndianRupee />
+          </Button>
+          <Button color="success" corner="O" onclick={() => dispatchKey({ key: 'o' })}>
+            <LucideReceiptIndianRupee />
+          </Button>
+        </div>
+        <div class="flex gap-2 *:flex-1">
+          <Button color="success" corner="T" onclick={() => dispatchKey({ key: 't' })}>
+            <LucideTicket />
+          </Button>
+          <Button color="success" corner="L" onclick={() => dispatchKey({ key: 'l' })}>
+            <LucideSquareArrowUp />
+          </Button>
+          <Button color="success" corner="R" onclick={() => dispatchKey({ key: 'r' })}>
+            <LucideRotateCcw />
+          </Button>
         </div>
       </div>
     </div>
