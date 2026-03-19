@@ -10,6 +10,9 @@
   import PrintBalance from './PrintBalance.svelte';
   import { deserialize } from '$app/forms';
   import { showToast } from '$lib/stores/toast';
+  import { page } from '$app/stores';
+  import stringCase from '$lib/utils/stringCase';
+  import { HighlightCell } from '$lib/utils/highlight';
 
   const { data } = $props();
 
@@ -38,6 +41,7 @@
       key: 'currentBalance',
       width: 125,
       display: 'currency',
+      color: AmountMinimumColor,
     },
   ];
 
@@ -53,6 +57,12 @@
   ];
 
   let helperOpened = $state(false);
+
+  function AmountMinimumColor(val) {
+    if (!isNaN(val) && val <= 500 && val) {
+      return HighlightCell.green;
+    }
+  }
 
   async function transportAction(url, data) {
     const formData = new FormData();
@@ -140,6 +150,9 @@
 
 <div class="visible-content">
   <Table title="Balance Sheet" {headers} items={data.balance} {customEvents}>
+    {#snippet right()}
+      <span class="mr-2">{stringCase.title($page.url.searchParams.get('type'))}</span>
+    {/snippet}
     {#snippet sidebar()}
       <div class="dark flex w-25 flex-col gap-2">
         <Button corner="1" color="fuchsia" onclick={handleAllFilter}>All</Button>

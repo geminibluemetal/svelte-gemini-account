@@ -48,29 +48,38 @@
     { name: 'Sign', key: 'sign', align: 'center', display: 'sign', color: SignColor },
   ];
 
-  // 1. Pre-calculate totals and occurrence indices
-  const totals = {};
-  // eslint-disable-next-line svelte/prefer-svelte-reactivity
-  const instanceMap = new Map(); // Using a Map to store indices for each specific token object
-  // We process the data once to build our metadata
-  const tracker = {};
-  data.token.forEach((t) => {
-    if (!t.partyName) return;
-    // Count totals
-    totals[t.partyName] = (totals[t.partyName] || 0) + 1;
-    // Track this specific instance's number
-    tracker[t.partyName] = (tracker[t.partyName] || 0) + 1;
-    instanceMap.set(t, tracker[t.partyName]);
+  // Replace the non-reactive Map and tracker with derived values
+  const tokenData = $derived(data.token);
+  // Create reactive maps using $derived
+  const instanceMap = $derived.by(() => {
+    // eslint-disable-next-line svelte/prefer-svelte-reactivity
+    const map = new Map();
+    const tracker = {};
+    tokenData.forEach((t) => {
+      if (!t.partyName) return;
+      tracker[t.partyName] = (tracker[t.partyName] || 0) + 1;
+      map.set(t, tracker[t.partyName]);
+    });
+    return map;
   });
 
-  // 2. The function the Table component calls for the 'suffix'
+  const totals = $derived.by(() => {
+    const counts = {};
+    tokenData.forEach((t) => {
+      if (!t.partyName) return;
+      counts[t.partyName] = (counts[t.partyName] || 0) + 1;
+    });
+    return counts;
+  });
+
+  // Then update partySerialSuffix to use these reactive values
   function partySerialSuffix(val, row) {
     const name = row.partyName;
     // If name is empty or only appears once, return nothing
     if (!name || totals[name] <= 1) {
       return '';
     }
-    // Get the instance number we stored earlier for this specific row object
+    // Get the instance number from the reactive map
     const currentIdx = instanceMap.get(row);
     return currentIdx;
   }
