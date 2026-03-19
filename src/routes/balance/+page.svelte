@@ -151,7 +151,7 @@
 <div class="visible-content">
   <Table title="Balance Sheet" {headers} items={data.balance} {customEvents}>
     {#snippet right()}
-      <span class="mr-2">{stringCase.title($page.url.searchParams.get('type'))}</span>
+      <span class="mr-2">{stringCase.title($page.url.searchParams.get('type') || 'Pending')}</span>
     {/snippet}
     {#snippet sidebar()}
       <div class="dark flex w-25 flex-col gap-2">
