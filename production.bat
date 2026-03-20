@@ -9,4 +9,4 @@ call pm2 start ecosystem.config.cjs
 call pm2 save
 
 echo Update complete!
-pause
+timeout /t 5
