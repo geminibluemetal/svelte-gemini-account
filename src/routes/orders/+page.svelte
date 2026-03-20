@@ -74,12 +74,14 @@
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
     { key: '0', description: 'New Order' },
-    { key: '1', description: 'Switch to Delivered orders' },
-    { key: '2', description: 'Switch to Cancelled orders' },
-    { key: '3', description: 'Switch to Finsihed orders' },
+    { key: '1', description: 'Filter Delivered orders' },
+    { key: '2', description: 'Filter Cancelled orders' },
+    { key: '3', description: 'Filter Finsihed orders' },
     { key: '4', description: 'Go to Delivery Sheet' },
     { key: '5', description: 'Go to Cash Report' },
-    { key: '6', description: 'Switch to All orders' },
+    { key: '6', description: 'Filter Pending orders' },
+    { key: '7', description: 'Show All orders' },
+    { key: '8', description: 'Filter Loading orders' },
     { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
     { key: 'V', description: 'Copy and Reuse Order' },
@@ -285,10 +287,14 @@
   const gotoDeliverySheet = () => goto(resolve(`/delivery?date=${currentDate}`));
   const gotoCashReport = () => goto(resolve(`/cash?date=${currentDate}`));
   const gotoToken = () => goto(resolve(`/tokens?date=${currentDate}`));
-  const handleFilterAll = () => (view = view == 'all' ? 'pending' : 'all');
-  const handleFilterDelivered = () => (view = view == 'delivered' ? 'pending' : 'delivered');
-  const handleFilterCancelled = () => (view = view == 'cancelled' ? 'pending' : 'cancelled');
-  const handleFilterFinished = () => (view = view == 'finished' ? 'pending' : 'finished');
+  const handleFilterAll = () => (view = 'all');
+  const handleFilterDelivered = () => (view = 'delivered');
+  const handleFilterCancelled = () => (view = 'cancelled');
+  const handleFilterFinished = () => (view = 'finished');
+  const handleFilterPending = () => (view = 'pending');
+  const handleFilterLoading = () => (view = 'loading');
+  // const handleFilterPartial = () => (view = 'partial');
+  // const handleFilterNew = () => (view = 'new');
 
   onMount(() => {
     keyboardEventBus.on('0', toggleOpenForm);
@@ -297,7 +303,9 @@
     keyboardEventBus.on('3', handleFilterFinished);
     keyboardEventBus.on('4', gotoDeliverySheet);
     keyboardEventBus.on('5', gotoCashReport);
-    keyboardEventBus.on('6', handleFilterAll);
+    keyboardEventBus.on('6', handleFilterPending);
+    keyboardEventBus.on('7', handleFilterAll);
+    keyboardEventBus.on('8', handleFilterLoading);
     keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('H', toggleHelper);
     syncOn('ORDERS.LIST');
@@ -309,7 +317,9 @@
     keyboardEventBus.off('3', handleFilterFinished);
     keyboardEventBus.off('4', gotoDeliverySheet);
     keyboardEventBus.off('5', gotoCashReport);
-    keyboardEventBus.off('6', handleFilterAll);
+    keyboardEventBus.off('6', handleFilterPending);
+    keyboardEventBus.off('7', handleFilterAll);
+    keyboardEventBus.off('8', handleFilterLoading);
     keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('H', toggleHelper);
     syncOff('ORDERS.LIST');
@@ -338,7 +348,7 @@
         {#if viewList.all.length}
           <Button
             color="fuchsia"
-            corner="6"
+            corner="7"
             onclick={() => (view = 'all')}
             class="flex justify-between gap-2"
           >
@@ -353,6 +363,7 @@
         {#if viewList.loading.length}
           <Button
             color="fuchsia"
+            corner="8"
             onclick={() => (view = 'loading')}
             class="flex justify-between gap-2"
           >
@@ -371,7 +382,7 @@
         {#if viewList.pending.length}
           <Button
             color="fuchsia"
-            corner="#"
+            corner="6"
             onclick={() => (view = 'pending')}
             class="flex justify-between gap-2"
           >
