@@ -94,7 +94,7 @@
     { key: 'C', description: 'Set Cancelled status for Order' },
     { key: 'F', description: 'Set Finished status for Order' },
     { key: 'R', description: 'Reset Current status Automatically' },
-    { key: 'Enter', description: 'Single Load Cash Bill Print' },
+    { key: 'Enter', description: 'Full Load Cash Bill Print' },
   ];
 
   function notesDisplay(value, item) {
@@ -279,7 +279,7 @@
     { key: 'F', handler: handleOrderFinish },
     { key: 'R', handler: handleOrderStatusReset },
     { key: 'V', handler: handleOrderCopy },
-    { key: 'Enter', handler: handleSinglePrint },
+    { key: 'Enter', handler: handleFullPrint },
     { key: 'ArrowRight', handler: handleSignOrder },
   ];
 
