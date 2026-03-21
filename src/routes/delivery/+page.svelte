@@ -115,8 +115,8 @@
             d.amountType2 == 'Paytm') &&
           !d.sign,
       )
-      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber))
-      .sort((a, b) => a?.partyName?.localeCompare(b.partyName)),
+      .sort((a, b) => a?.partyName?.localeCompare(b.partyName))
+      .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber)),
   });
 
   const sales = $derived(
