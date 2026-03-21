@@ -376,7 +376,7 @@
             onclick={() => (view = 'partial')}
             class="flex justify-between gap-2"
           >
-            <span>Parital</span> <span>{viewList.partial.length}</span>
+            <span>Partial</span> <span>{viewList.partial.length}</span>
           </Button>
         {/if}
         {#if viewList.pending.length}

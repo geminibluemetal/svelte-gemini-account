@@ -168,17 +168,23 @@
 </script>
 
 {#if displayData?.order || displayData?.amount}
-  <div class="absolute left-1/4 z-50 w-sm" style:top={`${topPositioin}px`} bind:this={popupElement}>
+  <div
+    class="absolute left-1/4 z-50 {displayData?.order ? `w-2xl` : `w-sm`}"
+    style:top={`${topPositioin}px`}
+    bind:this={popupElement}
+  >
     <div class="rounded-lg bg-white p-3 shadow-[0_0_20px_10px_rgba(0,0,0,0.3)]">
       <div class="flex gap-2">
         {#if displayData?.order}
           <div class="flex-1 rounded border-2 p-2">
-            <div class="pb-1 text-center font-bold">Coresponding Order</div>
-            {#each Object.entries(displayData.order) as [key, value] (key)}
-              <div class="flex justify-between border-t border-gray-400">
-                <span>{key}</span> <span>{value}</span>
-              </div>
-            {/each}
+            <div class="col-span-2 pb-1 text-center font-bold">Coresponding Order</div>
+            <div class="columns-2 gap-6">
+              {#each Object.entries(displayData.order) as [key, value] (key)}
+                <div class="flex justify-between border-t border-gray-400">
+                  <span>{key}</span> <span>{value}</span>
+                </div>
+              {/each}
+            </div>
           </div>
         {/if}
         {#if displayData?.amount}
