@@ -135,10 +135,10 @@
             ...displayData.order,
             Status: result.data.order.status,
             Sign: result.data.order.sign ? 'Yes' : 'No',
-            // 'Is Owner Order': result.data.order.isOwnerOrder ? 'Yes' : 'No',
-            // 'Tracktor Only': result.data.order.tracktorOnly ? 'Yes' : 'No',
-            // Notes: result.data.order.notes,
-            // DSV: result.data.order.deliverySheetVerified,
+            'Is Owner Order': result.data.order.isOwnerOrder ? 'Yes' : 'No',
+            'Tracktor Only': result.data.order.tracktorOnly ? 'Yes' : 'No',
+            Notes: result.data.order.notes,
+            DSV: result.data.order.deliverySheetVerified,
           };
         } else {
           displayData.order = null;
