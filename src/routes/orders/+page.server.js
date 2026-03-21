@@ -143,12 +143,12 @@ export const actions = {
     const orderService = new OrderService();
     const result = await orderService.generateToken(data.id, data);
     if (!result?.ok) {
-      return fail(400, { message: result.message });
+      return fail(400, { message: 'Error in Quick Token' });
     }
 
     sseEmit({ type: 'ORDERS.LIST' });
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
-    return result;
+    return { ok: true, message: 'Token Created' };
   },
 
   // Clear Orders

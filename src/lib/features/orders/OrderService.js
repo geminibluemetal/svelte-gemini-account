@@ -177,6 +177,7 @@ export default class OrderService {
 
   async generateToken(id, data) {
     const order = await this.repository.findById(data.id);
+    const result = await this.changeStatus(data.id, 'Loading')
     const tokenService = new TokenService();
     tokenService.createToken(
       {
@@ -191,6 +192,7 @@ export default class OrderService {
         phone: order.phone,
       },
     );
+    return result
   }
 
   async updateOrderDataFromOldDelivery(oldDelivery) {
