@@ -76,7 +76,7 @@
       placeholder="Amount 2"
       autoComplete="off"
       caseMode="smartTitleChars"
-      allowedChars={['=', '+']}
+      allowedChars={['=', '+', '-', '*', '/']}
     />
   </Form>
 </Model>
