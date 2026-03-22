@@ -10,7 +10,7 @@ export default class ItemService {
   }
 
   async itemList() {
-    return await this.repository.findAll({}, { name: 1, _id: 1, price: 1 });
+    return await this.repository.findAll({}, { name: 1, _id: 1, price: 1, category: 1 });
   }
 
   async fetchSingleItemByName(name) {

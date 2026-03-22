@@ -119,13 +119,46 @@
       .sort((a, b) => a?.orderNumber?.localeCompare(b.orderNumber)),
   });
 
-  const sales = $derived(
+  const crusherSales = $derived(
     data.token.reduce((acc, item) => {
       const itemName = item.deliveryItem;
       const qty = item.deliveryQuantity || 0;
+      const ignoreList = ['6sb', '4sb'];
+      const shouldIgnore = ignoreList.includes(itemName);
 
       // Skip if no deliveryItem or quantity
-      if (!itemName || qty === null || qty === undefined || qty === 0) {
+      if (!itemName || qty === null || qty === undefined || qty === 0 || shouldIgnore) {
+        return acc;
+      }
+
+      // Check if the item contains " + " separator
+      if (itemName.includes(' + ')) {
+        // Split by " + " and trim whitespace
+        const items = itemName.split(' + ').map((i) => i.trim());
+        const splitQty = qty / items.length;
+
+        // Add equal quantity to each split item
+        items.forEach((splitItem) => {
+          acc[splitItem] = (acc[splitItem] || 0) + splitQty;
+        });
+      } else {
+        // Single item, add full quantity
+        acc[itemName] = (acc[itemName] || 0) + qty;
+      }
+
+      return acc;
+    }, {}),
+  );
+
+  const brickSales = $derived(
+    data.token.reduce((acc, item) => {
+      const itemName = item.deliveryItem;
+      const qty = item.deliveryQuantity || 0;
+      const ignoreList = ['6sb', '4sb'];
+      const shouldIgnore = ignoreList.includes(itemName);
+
+      // Skip if no deliveryItem or quantity
+      if (!itemName || qty === null || qty === undefined || qty === 0 || !shouldIgnore) {
         return acc;
       }
 
@@ -643,15 +676,15 @@
         <Button corner="8" color="accent" onclick={handleVehicleSummary}>Vehicle Summary</Button>
       </div>
       <div class="flex w-full flex-col gap-2 overflow-auto">
-        {#if Object.entries(sales).length}
+        {#if Object.entries(crusherSales).length}
           <table class="w-full border-2">
             <thead>
               <tr>
-                <th class="border border-black bg-black text-white" colspan="2">Sales</th>
+                <th class="border border-black bg-black text-white" colspan="2">Crusher Sales</th>
               </tr>
             </thead>
             <tbody>
-              {#each Object.entries(sales) as [itemName, quantity], index (index)}
+              {#each Object.entries(crusherSales) as [itemName, quantity], index (index)}
                 <tr>
                   <td class="border px-1">{itemName}</td>
                   <!-- Item name (MS, PS, etc.) -->
@@ -659,6 +692,47 @@
                   <!-- Quantity with 2 decimals -->
                 </tr>
               {/each}
+              <tr>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class=" border border-black bg-black px-1 text-right text-white">
+                  {formatNumber(
+                    // eslint-disable-next-line no-unused-vars
+                    Object.entries(crusherSales).reduce((total, [i, q]) => total + q, 0),
+                  )}
+                </td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            </tbody>
+          </table>
+        {/if}
+        {#if Object.entries(brickSales).length}
+          <table class="w-full border-2">
+            <thead>
+              <tr>
+                <th class="border border-black bg-black text-white" colspan="2">Brick Sales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each Object.entries(brickSales) as [itemName, quantity], index (index)}
+                <tr>
+                  <td class="border px-1">{itemName}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{formatFixed(quantity)}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+              <tr>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class=" border border-black bg-black px-1 text-right text-white">
+                  {formatNumber(
+                    // eslint-disable-next-line no-unused-vars
+                    Object.entries(brickSales).reduce((total, [i, q]) => total + q, 0),
+                  )}
+                </td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
             </tbody>
           </table>
         {/if}

@@ -32,6 +32,8 @@ export function itemSchema(isUpdate = false) {
       .trim()
       .min(1, 'Item name cannot be empty'),
 
+    category: z.string().trim().default('Crusher'),
+
     // Price object validation
     price: z.object(
       {

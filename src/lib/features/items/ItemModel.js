@@ -4,6 +4,7 @@ export default function Item(
   {
     id = null,
     name = null,
+    category = null,
     price = {
       unit025: 0,
       unit050: 0,
@@ -19,6 +20,7 @@ export default function Item(
   const allFields = {
     id,
     name,
+    category,
     price,
     createdAt,
     updatedAt,

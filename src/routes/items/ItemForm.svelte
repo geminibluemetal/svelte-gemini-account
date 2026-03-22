@@ -12,6 +12,7 @@
       ? { ...item }
       : {
           name: '',
+          category: 'Crusher',
           price: {
             unit025: '',
             unit050: '',
@@ -72,6 +73,14 @@
       autoComplete="off"
       onValueChange={handleNameChange}
     />
+
+    <InputField
+      name="category"
+      value={data.category}
+      placeholder="Category"
+      options={['Crusher', 'Bricks']}
+    />
+
     <InputField
       name="price[unit025]"
       value={data.price?.unit025}

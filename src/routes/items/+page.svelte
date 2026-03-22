@@ -11,6 +11,7 @@
 
   const headers = [
     { name: 'Name', align: 'left', key: 'name' },
+    { name: 'Category', align: 'left', key: 'category' },
     { name: '0.25', align: 'right', key: 'price.unit025' },
     { name: '0.50', align: 'right', key: 'price.unit050' },
     { name: '1.00', align: 'right', key: 'price.unit100' },
