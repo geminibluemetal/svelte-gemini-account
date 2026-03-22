@@ -57,8 +57,7 @@
       value={data.amount1}
       placeholder="Amount 1"
       autoComplete="off"
-      caseMode="smartTitleChars"
-      allowedChars={['=', '+', '-', '*', '/']}
+      caseMode="capitalizeWords"
     />
 
     <div class="mx-auto mt-2 mb-5"></div>
@@ -75,8 +74,7 @@
       value={data.amount2}
       placeholder="Amount 2"
       autoComplete="off"
-      caseMode="smartTitleChars"
-      allowedChars={['=', '+', '-', '*', '/']}
+      caseMode="capitalizeWords"
     />
   </Form>
 </Model>

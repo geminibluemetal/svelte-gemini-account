@@ -237,16 +237,20 @@
   const paytmAmountsArray = $derived([
     ...data.token.flatMap((item) =>
       [
-        item.amountType1 === 'Paytm' && item.amount1 != null ? Number(item.amount1) : null,
-        item.amountType2 === 'Paytm' && item.amount2 != null ? Number(item.amount2) : null,
+        item.amountType1 === 'Paytm' && item.amount1 != null
+          ? { amount: Number(item.amount1), type: 'Delivery' }
+          : null,
+        item.amountType2 === 'Paytm' && item.amount2 != null
+          ? { amount: Number(item.amount2), type: 'Delivery' }
+          : null,
       ].filter(Boolean),
     ),
 
     ...data.oldBalance
       .filter((b) => b.amountType === 'Paytm' && b.amount != null)
-      .map((b) => Number(b.amount)),
+      .map((b) => ({ amount: Number(b.amount), type: 'Old Balance' })),
 
-    ...data.paytmOrder,
+    ...data.paytmOrder.map((amount) => ({ amount: Number(amount), type: 'Order Advance' })),
   ]);
   const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
 
@@ -782,11 +786,19 @@
               </tr>
             </thead>
             <tbody>
-              {#each paytmAmountsArray as amount, index (index)}
-                <tr>
-                  <td class="border px-1">{index + 1}</td>
+              {#each paytmAmountsArray as paytm, index (index)}
+                <tr
+                  class=" {paytm.type == 'Order Advance'
+                    ? 'text-red-700'
+                    : paytm.type == 'Old Balance'
+                      ? 'text-blue-700'
+                      : 'text-black'}"
+                >
+                  <td class="border border-black px-1">{index + 1}</td>
                   <!-- Item name (MS, PS, etc.) -->
-                  <td class="border px-1 text-right">{formatNumber(amount)}</td>
+                  <td class="border border-black px-1 text-right font-bold">
+                    {formatNumber(paytm.amount)}
+                  </td>
                   <!-- Quantity with 2 decimals -->
                 </tr>
               {/each}
@@ -794,7 +806,9 @@
                 <td class=" border border-black bg-black px-1 text-white">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
                 <td class=" border border-black bg-black px-1 text-right text-white">
-                  {formatNumber(paytmAmountsArray.reduce((total, num) => total + num, 0))}
+                  {formatNumber(
+                    paytmAmountsArray.reduce((total, paytm) => total + paytm.amount, 0),
+                  )}
                 </td>
                 <!-- Quantity with 2 decimals -->
               </tr>
