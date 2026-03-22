@@ -58,7 +58,7 @@
       placeholder="Amount 1"
       autoComplete="off"
       caseMode="smartTitleChars"
-      allowedChars={['=', '+']}
+      allowedChars={['=', '+', '-', '*', '/']}
     />
 
     <div class="mx-auto mt-2 mb-5"></div>
