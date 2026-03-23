@@ -238,6 +238,7 @@
       amountType: item.amountType,
       isOwnerOrder: item.isOwnerOrder,
       tracktorOnly: item.tracktorOnly,
+      notes: item.notes,
     };
     editableOrder = copyData;
   }
