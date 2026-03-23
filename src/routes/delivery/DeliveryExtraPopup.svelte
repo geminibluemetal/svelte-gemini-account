@@ -114,7 +114,7 @@
             'Order number': result.data.order.orderNumber,
             'Party name': result.data.order.partyName,
             Address: result.data.order.address,
-            // Phone: result.data.order.phone,
+            Phone: result.data.order.phone,
             Item: result.data.order.item,
             'Total Quantity': formatFixed(result.data.order.totalQty),
             'Delivered Quantity': formatFixed(result.data.order.deliveredQty),

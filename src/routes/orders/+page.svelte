@@ -84,7 +84,7 @@
     { key: '8', description: 'Filter Loading orders' },
     { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
-    { key: 'V', description: 'Copy and Reuse Order' },
+    { key: 'V', description: 'Create Copy and Reuse Order' },
     { key: 'P', description: 'Print Phone Number only' },
     { key: 'I', description: 'Single Load, Cash Bill Print' },
     { key: 'O', description: 'Full Load, Cash Bill Print' },

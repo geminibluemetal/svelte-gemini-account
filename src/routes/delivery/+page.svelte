@@ -700,7 +700,7 @@
                 <td class=" border border-black bg-black px-1 text-white">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
                 <td class=" border border-black bg-black px-1 text-right text-white">
-                  {formatNumber(
+                  {formatFixed(
                     // eslint-disable-next-line no-unused-vars
                     Object.entries(crusherSales).reduce((total, [i, q]) => total + q, 0),
                   )}
@@ -730,7 +730,7 @@
                 <td class=" border border-black bg-black px-1 text-white">Total</td>
                 <!-- Item name (MS, PS, etc.) -->
                 <td class=" border border-black bg-black px-1 text-right text-white">
-                  {formatNumber(
+                  {formatFixed(
                     // eslint-disable-next-line no-unused-vars
                     Object.entries(brickSales).reduce((total, [i, q]) => total + q, 0),
                   )}
@@ -756,6 +756,15 @@
                   <!-- Quantity with 2 decimals -->
                 </tr>
               {/each}
+              <tr>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class=" border border-black bg-black px-1 text-right text-white">
+                  <!-- eslint-disable-next-line no-unused-vars -->
+                  {Object.entries(loads).reduce((total, [i, q]) => total + q, 0)}
+                </td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
             </tbody>
           </table>
         {/if}
@@ -775,6 +784,15 @@
                   <!-- Quantity with 2 decimals -->
                 </tr>
               {/each}
+              <tr>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class=" border border-black bg-black px-1 text-right text-white">
+                  <!-- eslint-disable-next-line no-unused-vars -->
+                  {Object.entries(partyCounts).reduce((total, [i, q]) => total + q, 0)}
+                </td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
             </tbody>
           </table>
         {/if}
@@ -794,7 +812,7 @@
                       ? 'text-blue-700'
                       : 'text-black'}"
                 >
-                  <td class="border border-black px-1">{index + 1}</td>
+                  <td class="border border-black px-1 font-bold">{index + 1}</td>
                   <!-- Item name (MS, PS, etc.) -->
                   <td class="border border-black px-1 text-right font-bold">
                     {formatNumber(paytm.amount)}
