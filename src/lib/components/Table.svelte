@@ -3,6 +3,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { isElementFullyVisible, scrollToMiddle } from '$lib/core/client/visibilityCheck';
   import { overRowRem } from '$lib/stores/common';
+  import { getFormattedTimestamp } from '$lib/utils/dateTime';
   import { SearchX } from 'lucide-svelte';
   import { onDestroy, onMount } from 'svelte';
 
@@ -239,6 +240,9 @@
                 {color?.foreground || rowColor?.foreground}"
               onmousemove={() => (overRow = row)}
               data-over-row={row}
+              title={header?.display == 'time' || header?.display == 'date'
+                ? getFormattedTimestamp(value)
+                : ''}
             >
               {#if header?.display && header.display instanceof Function}
                 {header.display(value, item)}
