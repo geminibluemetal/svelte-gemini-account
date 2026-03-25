@@ -24,13 +24,16 @@ export async function load({ depends, url }) {
   const itemService = new ItemService();
   const partyStatement = new PartyStatementService();
 
-  const orders = await orderService.availableOrderList();
-  const address = await addressService.addressList();
-  const token = await deliveryService.deliveryList(formattedDate);
-  const party = await partyService.partyList();
-  const item = await itemService.itemList();
-  const oldBalance = await partyStatement.getAllOldBalance(formattedDate);
-  const paytmOrder = await orderService.paytmAmountFromOrders(formattedDate);
+  // Make parllel fetching for better performance
+  const [orders, address, token, party, item, oldBalance, paytmOrder] = await Promise.all([
+    orderService.availableOrderList(),
+    addressService.addressList(),
+    deliveryService.deliveryList(formattedDate),
+    partyService.partyList(),
+    itemService.itemList(),
+    partyStatement.getAllOldBalance(formattedDate),
+    orderService.paytmAmountFromOrders(formattedDate),
+  ]);
   return {
     token: serializeDoc(token),
     party: serializeDoc(party),
