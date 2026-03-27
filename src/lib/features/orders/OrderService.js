@@ -162,9 +162,24 @@ export default class OrderService {
 
   async clearCompletedOrder() {
     try {
-      return await this.repository.deleteByFilter({
-        status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
+      // return await this.repository.deleteByFilter({
+      //   status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
+      // });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async clearOrderForDelivery(date) {
+    try {
+      const filter = {
+        ...this.repository.getDateFilter(date, 'paymentAt'),
+        amountType: 'Paytm'
+      };
+      const result = await this.repository.updateByFilter(filter, {
+        isCleared: true
       });
+      return result
     } catch (error) {
       return handleServiceError(error);
     }

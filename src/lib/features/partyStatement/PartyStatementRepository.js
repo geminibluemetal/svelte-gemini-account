@@ -11,7 +11,7 @@ export default class PartyStatementRepository extends BaseRepository {
     const dateFilter = this.getDateFilter(date, 'createdAt');
     const pipeline = [
       {
-        $match: { ...dateFilter, ...extraFilter, amount: { $gt: 0 }, entryType: 'CREDIT' },
+        $match: { ...dateFilter, ...extraFilter, amount: { $gt: 0 }, entryType: 'CREDIT', isCleared: false },
       },
       {
         $addFields: {

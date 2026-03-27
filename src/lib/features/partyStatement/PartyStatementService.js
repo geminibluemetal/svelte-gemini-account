@@ -105,6 +105,21 @@ export default class PartyStatementService {
     }
   }
 
+  async clearPartyStatementForDelivery(date) {
+    try {
+      const filter = {
+        ...this.repository.getDateFilter(date, 'createdAt'),
+        amount: { $gt: 0 }, entryType: 'CREDIT', isCleared: false
+      };
+      const result = await this.repository.updateByFilter(filter, {
+        isCleared: true
+      });
+      return result
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
   async updatePartyStatementFromDelivery(delivery) {
     try {
       // First Delete Existing Record

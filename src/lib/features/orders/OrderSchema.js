@@ -48,15 +48,12 @@ export function orderSchema(isUpdate = false) {
     discount: z.coerce.number().default(0),
 
     notes: z.string().optional().nullable(),
-    paymentAt: z.preprocess((val) => {
-      val = Date.parse(val) ? new Date(val) : val;
-      if (val instanceof Date) return val;
-      return new Date();
-    }, z.coerce.date()),
 
     // Defaults
     status: z.string().default('New'),
     sign: z.coerce.boolean().default(false),
+    isCleared: z.coerce.boolean().default(false),
+    isHidden: z.coerce.boolean().default(false),
     isOwnerOrder: z.coerce.boolean().default(false),
     tracktorOnly: z.coerce.boolean().default(false),
   };

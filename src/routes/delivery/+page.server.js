@@ -192,6 +192,10 @@ export const actions = {
     await deliveryService.clearDeliveryByDate(formattedDate);
     const cashService = new CashService();
     await cashService.clearCashByDate(formattedDate);
+    const orderService = new OrderService();
+    await orderService.clearOrderForDelivery(formattedDate);
+    const partyStatementService = new PartyStatementService();
+    await partyStatementService.clearPartyStatementForDelivery(formattedDate);
 
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'CASH.LIST' });

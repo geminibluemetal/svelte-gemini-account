@@ -12,6 +12,7 @@ export default class OrderRepository extends BaseRepository {
       {
         $match: {
           ...dateFilter,
+          isCleared: false,
           amountType: 'Paytm',
           advance: { $gt: 0 },
         },

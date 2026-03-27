@@ -76,6 +76,13 @@ export default class BaseRepository {
     return handleSuccess('Fields updated successfully', result);
   }
 
+  // Bulk Update By Filter
+  async updateByFilter(filter = {}, updates = {}) {
+    const result = await this.collection.updateMany(filter, { $set: updates });
+    if (!result.acknowledged) throw new AppError('Database update failed');
+    return handleSuccess('Bulk updated successfully', result);
+  }
+
   // Delete
   async deleteById(id) {
     const result = await this.collection.deleteOne({

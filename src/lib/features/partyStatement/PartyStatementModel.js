@@ -14,6 +14,8 @@ export default function PartyStatement(
     vehicle = null,
     address = null,
     sign = false,
+    isCleared = false,
+    isHidden = false,
     createdAt = null,
     updatedAt = null,
     ...extraFields
@@ -33,6 +35,8 @@ export default function PartyStatement(
     vehicle,
     address,
     sign,
+    isCleared,
+    isHidden,
     createdAt,
     updatedAt,
     ...extraFields

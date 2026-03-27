@@ -19,4 +19,6 @@ export const partyStatementSchema = z.object({
   vehicle: z.string().optional().nullable(),
   address: z.string().trim().nullable().optional(),
   sign: z.coerce.boolean().default(false),
+  isCleared: z.coerce.boolean().default(false),
+  isHidden: z.coerce.boolean().default(false),
 });
