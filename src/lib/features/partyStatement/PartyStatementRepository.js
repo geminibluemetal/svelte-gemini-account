@@ -11,7 +11,13 @@ export default class PartyStatementRepository extends BaseRepository {
     const dateFilter = this.getDateFilter(date, 'createdAt');
     const pipeline = [
       {
-        $match: { ...dateFilter, ...extraFilter, amount: { $gt: 0 }, entryType: 'CREDIT', isCleared: false },
+        $match: {
+          ...dateFilter,
+          ...extraFilter,
+          amount: { $gt: 0 },
+          entryType: 'CREDIT',
+          isCleared: false,
+        },
       },
       {
         $addFields: {
@@ -65,6 +71,7 @@ export default class PartyStatementRepository extends BaseRepository {
           ...dateFilter,
           amountType: 'Cash',
           amount: { $gt: 0 },
+          isCleared: false,
         },
       },
       {
@@ -129,7 +136,10 @@ export default class PartyStatementRepository extends BaseRepository {
               {
                 $match: {
                   $expr: {
-                    $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }],
+                    $and: [
+                      { $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }] },
+                      { $ne: ['$isHidden', true] },
+                    ],
                   },
                 },
               },
@@ -209,7 +219,7 @@ export default class PartyStatementRepository extends BaseRepository {
     // 1. Fetch statements from DB, sorted by date (Ascending)
     const statements = await this.db
       .collection('partyStatement')
-      .find({ partyId: new ObjectId(partyId) })
+      .find({ partyId: new ObjectId(partyId), isHidden: { $ne: true } })
       .sort({ createdAt: 1 })
       .toArray();
 
@@ -262,7 +272,10 @@ export default class PartyStatementRepository extends BaseRepository {
               {
                 $match: {
                   $expr: {
-                    $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }],
+                    $and: [
+                      { $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }] },
+                      { $ne: ['$isHidden', true] },
+                    ],
                   },
                 },
               },
@@ -352,7 +365,12 @@ export default class PartyStatementRepository extends BaseRepository {
             pipeline: [
               {
                 $match: {
-                  $expr: { $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }] },
+                  $expr: {
+                    $and: [
+                      { $eq: [{ $toString: '$partyId' }, { $toString: '$$p_id' }] },
+                      { $ne: ['$isHidden', true] },
+                    ],
+                  },
                 },
               },
             ],
@@ -362,13 +380,49 @@ export default class PartyStatementRepository extends BaseRepository {
         {
           $addFields: {
             totalDebit: {
-              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'DEBIT'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'DEBIT'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
             },
             totalCredit: {
-              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'CREDIT'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'CREDIT'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
             },
             totalAdjust: {
-              $sum: { $map: { input: '$statements', as: 's', in: { $cond: [{ $eq: [{ $toUpper: '$$s.entryType' }, 'ADJUST'] }, { $ifNull: ['$$s.amount', 0] }, 0] } } }
+              $sum: {
+                $map: {
+                  input: '$statements',
+                  as: 's',
+                  in: {
+                    $cond: [
+                      { $eq: [{ $toUpper: '$$s.entryType' }, 'ADJUST'] },
+                      { $ifNull: ['$$s.amount', 0] },
+                      0,
+                    ],
+                  },
+                },
+              },
             },
           },
         },
@@ -407,7 +461,7 @@ export default class PartyStatementRepository extends BaseRepository {
 
     return {
       updatedParties: updateResult.modifiedCount,
-      statementsCleared: true
+      statementsCleared: true,
     };
   }
 }

@@ -18,7 +18,7 @@ export default class OrderService {
   }
 
   async orderList() {
-    return await this.repository.findAll();
+    return await this.repository.findAll({ isHidden: { $ne: true } });
   }
 
   async availableOrderList() {
@@ -162,9 +162,18 @@ export default class OrderService {
 
   async clearCompletedOrder() {
     try {
-      // return await this.repository.deleteByFilter({
-      //   status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
-      // });
+      await this.repository.updateByFilter(
+        {
+          status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
+        },
+        {
+          isHidden: true,
+        },
+      );
+      return await this.repository.deleteByFilter({
+        isHidden: true,
+        isCleared: true,
+      });
     } catch (error) {
       return handleServiceError(error);
     }
@@ -174,12 +183,11 @@ export default class OrderService {
     try {
       const filter = {
         ...this.repository.getDateFilter(date, 'paymentAt'),
-        amountType: 'Paytm'
       };
       const result = await this.repository.updateByFilter(filter, {
-        isCleared: true
+        isCleared: true,
       });
-      return result
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }
@@ -192,7 +200,7 @@ export default class OrderService {
 
   async generateToken(id, data) {
     const order = await this.repository.findById(data.id);
-    const result = await this.changeStatus(data.id, 'Loading')
+    const result = await this.changeStatus(data.id, 'Loading');
     const tokenService = new TokenService();
     tokenService.createToken(
       {
@@ -207,7 +215,7 @@ export default class OrderService {
         phone: order.phone,
       },
     );
-    return result
+    return result;
   }
 
   async updateOrderDataFromOldDelivery(oldDelivery) {
@@ -226,7 +234,7 @@ export default class OrderService {
         await this.repository.updateById(order.id, order);
       }
     } catch (error) {
-      return handleServiceError(error)
+      return handleServiceError(error);
     }
   }
   async updateOrderDataFromNewDelivery(newDelivery) {
@@ -245,7 +253,7 @@ export default class OrderService {
         await this.repository.updateById(order.id, order);
       }
     } catch (error) {
-      return handleServiceError(error)
+      return handleServiceError(error);
     }
   }
 

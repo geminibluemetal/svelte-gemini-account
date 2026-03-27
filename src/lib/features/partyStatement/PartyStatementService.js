@@ -109,12 +109,11 @@ export default class PartyStatementService {
     try {
       const filter = {
         ...this.repository.getDateFilter(date, 'createdAt'),
-        amount: { $gt: 0 }, entryType: 'CREDIT', isCleared: false
       };
       const result = await this.repository.updateByFilter(filter, {
-        isCleared: true
+        isCleared: true,
       });
-      return result
+      return result;
     } catch (error) {
       return handleServiceError(error);
     }
@@ -139,9 +138,9 @@ export default class PartyStatementService {
             amount = calcResult.data;
           } else {
             // Make ignore list to ignore if price amount validaiton
-            const ignoreList = ['6sb', '4sb']
+            const ignoreList = ['6sb', '4sb'];
             if (ignoreList.includes(delivery.deliveryItem)) {
-              amount = 0
+              amount = 0;
             } else throw new AppError(calcResult.message);
           }
         }
@@ -169,6 +168,6 @@ export default class PartyStatementService {
   }
 
   async resetBalanceForAllParty() {
-    return await this.repository.bulkUpdateCurrentBalanceToOpeningBalance()
+    return await this.repository.bulkUpdateCurrentBalanceToOpeningBalance();
   }
 }
