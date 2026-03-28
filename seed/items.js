@@ -13,6 +13,7 @@ export const seedData = [
       unit200: 8800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS',
@@ -24,6 +25,7 @@ export const seedData = [
       unit200: 9000.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm',
@@ -35,6 +37,7 @@ export const seedData = [
       unit200: 5600.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '50mm',
@@ -46,6 +49,7 @@ export const seedData = [
       unit200: 4800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm',
@@ -57,6 +61,7 @@ export const seedData = [
       unit200: 4800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm',
@@ -68,6 +73,7 @@ export const seedData = [
       unit200: 5000.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '6mm',
@@ -79,6 +85,7 @@ export const seedData = [
       unit200: 5000.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'Dust',
@@ -90,6 +97,7 @@ export const seedData = [
       unit200: 5600.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'Allmix',
@@ -101,6 +109,7 @@ export const seedData = [
       unit200: 4800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'Mixing',
@@ -112,6 +121,7 @@ export const seedData = [
       unit200: 2800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MW',
@@ -123,6 +133,7 @@ export const seedData = [
       unit200: 800.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '6sb',
@@ -134,6 +145,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Bricks'
   },
   {
     name: '4sb',
@@ -145,6 +157,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Bricks'
   },
   {
     name: 'MS + 20mm',
@@ -156,6 +169,7 @@ export const seedData = [
       unit200: 7400.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + Dust',
@@ -167,6 +181,7 @@ export const seedData = [
       unit200: 7400.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + PS',
@@ -178,6 +193,7 @@ export const seedData = [
       unit200: 9000.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm + 6mm',
@@ -189,6 +205,7 @@ export const seedData = [
       unit200: 5000.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + 20mm',
@@ -200,6 +217,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + 12mm',
@@ -211,6 +229,7 @@ export const seedData = [
       unit200: 6900.0,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + 50mm',
@@ -222,6 +241,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + 6mm',
@@ -233,6 +253,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'MS + 40mm',
@@ -244,6 +265,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + 12mm',
@@ -255,6 +277,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + 40mm',
@@ -266,6 +289,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + 50mm',
@@ -277,6 +301,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + 6mm',
@@ -288,6 +313,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: 'PS + Dust',
@@ -299,6 +325,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm + 20mm',
@@ -310,6 +337,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm + 40mm',
@@ -321,6 +349,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm + 50mm',
@@ -332,6 +361,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '12mm + Dust',
@@ -343,6 +373,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm + 40mm',
@@ -354,6 +385,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm + 50mm',
@@ -365,6 +397,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm + Allmix',
@@ -376,6 +409,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm + Mix',
@@ -387,6 +421,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '20mm + Dust',
@@ -398,6 +433,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm + 50mm',
@@ -409,6 +445,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm + 6mm',
@@ -420,6 +457,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm + Allmix',
@@ -431,6 +469,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm + Mix',
@@ -442,6 +481,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '40mm + Dust',
@@ -453,6 +493,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '50mm + 6mm',
@@ -464,6 +505,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '50mm + Allmix',
@@ -475,6 +517,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '50mm + Mix',
@@ -486,6 +529,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '50mm + Dust',
@@ -497,6 +541,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '6mm + Allmix',
@@ -508,6 +553,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '6mm + Mix',
@@ -519,6 +565,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
   {
     name: '6mm + Dust',
@@ -530,6 +577,7 @@ export const seedData = [
       unit200: null,
     },
     createdAt: new Date(),
+    category: 'Crusher'
   },
 ];
 
