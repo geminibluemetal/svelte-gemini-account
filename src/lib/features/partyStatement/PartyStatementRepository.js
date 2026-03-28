@@ -455,9 +455,13 @@ export default class PartyStatementRepository extends BaseRepository {
 
     // 4. CLEAR the entire PartyStatement collection
     // Only do this if the update was successful to prevent data loss!
+    // Step 4.1: Mark all as hidden
     if (updateResult.modifiedCount > 0 || updateResult.upsertedCount > 0) {
-      await this.db.collection('partyStatement').deleteMany({});
+      await this.db.collection('partyStatement').updateMany({}, { $set: { isHidden: true } });
     }
+    // Step 4.2: Delete only already-cleared ones
+    await this.db.collection('partyStatement').deleteMany({ isHidden: true, isCleared: true });
+
 
     return {
       updatedParties: updateResult.modifiedCount,

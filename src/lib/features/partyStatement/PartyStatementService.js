@@ -12,10 +12,6 @@ export default class PartyStatementService {
     this.repository = new PartyStatementRepository(db);
   }
 
-  async partyStatementList() {
-    return await this.repository.findAll();
-  }
-
   async getAllOldBalance(date) {
     return await this.repository.findAllOldBalance(date);
   }
@@ -45,6 +41,10 @@ export default class PartyStatementService {
 
   async updatePartyStatement(id, data) {
     try {
+      const oldBalance = await this.repository.findById(id)
+      if (oldBalance.isHidden) {
+        return handleServiceError(`Can't Edit Old Balance after Balance Reset`)
+      }
       const parsed = await partyStatementSchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
       const oldBalanceResult = await this.repository.updateById(id, parsed.data);
@@ -91,7 +91,8 @@ export default class PartyStatementService {
   async deletePartyStatementByParty(partyId) {
     try {
       partyId = new ObjectId(partyId);
-      return await this.repository.deleteByFilter({ partyId });
+      await this.repository.updateByFilter({ partyId }, { isHidden: true });
+      return await this.repository.deleteByFilter({ partyId, isHidden: true, isCleared: true });
     } catch (error) {
       return handleServiceError(error);
     }
