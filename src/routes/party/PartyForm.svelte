@@ -36,8 +36,8 @@
     {#if !!item}
       <input type="hidden" name="editId" value={item?.id} />
     {/if}
-    <InputField name="name" value={data.name} placeholder="Party Name" autoComplete="off" />
     <InputField name="phone" value={data.phone} type="number" placeholder="Phone" />
+    <InputField name="name" value={data.name} placeholder="Party Name" autoComplete="off" />
     <InputField
       name="openingBalance"
       value={data.openingBalance}
