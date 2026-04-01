@@ -12,12 +12,9 @@ export function parseDate(input) {
   const [day, month, yearPart] = input.split(/\W/);
   const date = new Date();
 
-  if (day) date.setDate(+day);
-  if (month) date.setMonth(+month - 1);
-
-  if (yearPart) {
-    date.setFullYear(normalizeYear(yearPart));
-  }
+  if (yearPart) date.setFullYear(normalizeYear(Number(yearPart)));
+  if (month) date.setMonth(Number(month) - 1);
+  if (day) date.setDate(Number(day));
 
   date.setHours(0, 0, 0, 0);
 
