@@ -170,6 +170,23 @@ export default class OrderService {
           isHidden: true,
         },
       );
+      await this.repository.updateByFilter(
+        {
+          status: { $in: ['Delivered', 'Cancelled', 'Finished'] },
+          $or: [
+            { amountType: { $ne: 'Paytm' } },
+            {
+              $and: [
+                { amountType: 'Paytm' },
+                { advance: 0 }
+              ]
+            }
+          ]
+        },
+        {
+          isCleared: true,
+        },
+      );
       return await this.repository.deleteByFilter({
         isHidden: true,
         isCleared: true,
