@@ -154,7 +154,7 @@ export default class OrderService {
         order.deliveredQty,
         order.balanceQty,
       );
-      return await this.repository.updateById(id, { status });
+      return await this.repository.updateById(id, { status, assignedVehicle: '' });
     } catch (error) {
       return handleServiceError(error);
     }

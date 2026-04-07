@@ -115,10 +115,10 @@
   ];
 
   function notesDisplay(value, item) {
-    let prefix = '';
-    prefix += item.tracktorOnly ? '(🚗)' : '';
-    prefix += item.status == 'Loading' ? `(⬆️-${item?.assignedVehicle?.replace(' G', '')})` : '';
-    return `${prefix} ${value}`;
+    const tractor = item.tracktorOnly ? '(🚗)' : '';
+    const vehicle = item.assignedVehicle?.replace(' G', '') ?? '';
+    const loading = item.status === 'Loading' ? `(⬆️${vehicle ? `-${vehicle}` : ''})` : '';
+    return `${tractor}${loading} ${value}`.trim();
   }
 
   function OrderNumberColor(value, item) {
