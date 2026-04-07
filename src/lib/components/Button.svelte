@@ -34,6 +34,8 @@
       dark:bg-cyan-700 dark:hover:bg-cyan-800 dark:focus:bg-cyan-800 dark:outline-cyan-800 dark:active:bg-cyan-900`,
     fuchsia: `bg-fuchsia-400 text-white hover:bg-fuchsia-500 focus:bg-fuchsia-500 outline-fuchsia-500 active:bg-fuchsia-600
       dark:bg-fuchsia-700 dark:hover:bg-fuchsia-800 dark:focus:bg-fuchsia-800 dark:outline-fuchsia-800 dark:active:bg-fuchsia-900`,
+    gray: `bg-gray-400 text-white hover:bg-gray-500 focus:bg-gray-500 outline-gray-500 active:bg-gray-600
+      dark:bg-gray-700 dark:hover:bg-gray-800 dark:focus:bg-gray-800 dark:outline-gray-800 dark:active:bg-gray-900`,
   };
 
   const sizeStyles = {

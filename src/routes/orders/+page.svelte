@@ -38,6 +38,9 @@
   });
   const vehicleList = $derived(data.vehicle.map((v) => v.shortNumber));
   const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
+  let filterItem = $state();
+  let filterQty = $state();
+
   const viewList = $derived({
     all: data.orders,
     new: data.orders.filter((o) => o.status == 'New'),
@@ -50,6 +53,20 @@
       (o) => o.status == 'New' || o.status == 'Loading' || o.status == 'Partial',
     ),
   });
+  const viewListItems = [...new Set(viewList[view].map((o) => o.item))];
+  const viewListQty = [...new Set(viewList[view].map((o) => o.balanceQty))];
+
+  const filterList = $derived(
+    viewList[view].filter((o) => {
+      if (filterItem != 'All Item') {
+        if (o.item != filterItem) return false;
+      }
+      if (filterQty != 'All Qty') {
+        if (o.balanceQty != filterQty) return false;
+      }
+      return true;
+    }),
+  );
 
   const headers = [
     { name: 'Date', align: 'center', key: 'createdAt', display: 'date', width: '96' },
@@ -330,7 +347,7 @@
 <Table
   title="Order Book"
   {headers}
-  items={viewList[view]}
+  items={filterList}
   hideSerial={true}
   {customEvents}
   {rowHighlight}
@@ -461,6 +478,35 @@
             <LucideRotateCcw />
           </Button>
         </div>
+      </div>
+
+      <!-- Filter by Item and Quantity -->
+      <div class="flex flex-col gap-2 p-1">
+        <select
+          class="appearance-none rounded border-2 border-gray-300 p-1 px-2 outline-none"
+          bind:value={filterItem}
+        >
+          <option>All Item</option>
+          {#each viewListItems as i (i)}
+            <option value={i}>{i}</option>
+          {/each}
+        </select>
+        <select
+          class="appearance-none rounded border-2 border-gray-300 p-1 px-2 outline-none"
+          bind:value={filterQty}
+        >
+          <option>All Qty</option>
+          {#each viewListQty as i (i)}
+            <option value={i}>{i}</option>
+          {/each}
+        </select>
+        <Button
+          color="gray"
+          onclick={() => ((filterItem = 'All Item'), (filterQty = 'All Qty'))}
+          class="flex justify-between gap-2"
+        >
+          <span>Remove</span>
+        </Button>
       </div>
     </div>
   {/snippet}
