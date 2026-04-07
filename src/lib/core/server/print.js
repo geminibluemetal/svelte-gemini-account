@@ -4,6 +4,7 @@ import { join } from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import { ESCPOSPrinter } from './escPos';
+import { tmpdir } from 'os';
 
 const execAsync = promisify(exec);
 
@@ -17,7 +18,7 @@ const TEMP_FILENAME = 'print_job.txt';
  * @returns {Promise<boolean>} - Success status
  */
 export async function printOut(content) {
-  const tempPath = join(process.cwd(), TEMP_FILENAME);
+  const tempPath = join(tmpdir(), TEMP_FILENAME);
 
   try {
     const printer = new ESCPOSPrinter();

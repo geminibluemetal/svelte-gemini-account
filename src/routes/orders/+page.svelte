@@ -117,7 +117,7 @@
   function notesDisplay(value, item) {
     let prefix = '';
     prefix += item.tracktorOnly ? '(🚗)' : '';
-    prefix += item.status == 'Loading' ? '(⬆️)' : '';
+    prefix += item.status == 'Loading' ? `(⬆️-${item?.assignedVehicle?.replace(' G', '')})` : '';
     return `${prefix} ${value}`;
   }
 

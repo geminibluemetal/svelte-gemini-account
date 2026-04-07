@@ -217,8 +217,13 @@ export default class OrderService {
 
   async generateToken(id, data) {
     const order = await this.repository.findById(data.id);
-    const result = await this.changeStatus(data.id, 'Loading');
+    // const result = await this.changeStatus(data.id, 'Loading');
+    const result = await this.repository.updateById(data.id, {
+      assignedVehicle: data.vehicle,
+      status: 'Loading',
+    });
     const tokenService = new TokenService();
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
     tokenService.createToken(
       {
         partyName: order.partyName,
@@ -230,6 +235,7 @@ export default class OrderService {
       },
       {
         phone: order.phone,
+        phone2: additionalPhones ? additionalPhones.join(", ") : null,
       },
     );
     return result;
@@ -276,6 +282,7 @@ export default class OrderService {
 
   async singlePrint(data) {
     const order = await this.repository.findById(data.id);
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
     await printOut((p) => {
       p.reset()
         .beepOn(1, 2)
@@ -293,6 +300,7 @@ export default class OrderService {
         .pairs('Party', order.partyName)
         .pairs('Address', order.address)
         .pairs('Phone', order.phone)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
         .pairs('Item', order.item)
         .pairs('Qty', formatFixed(data.qty))
         .pairs('Amount', data.amount)
@@ -307,6 +315,7 @@ export default class OrderService {
 
   async fullPrint(data) {
     const order = await this.repository.findById(data.id);
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
     await printOut((p) => {
       p.reset()
         .beepOn(2, 2)
@@ -324,6 +333,7 @@ export default class OrderService {
         .pairs('Party', order.partyName)
         .pairs('Address', order.address)
         .pairs('Phone', order.phone)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
         .pairs('Item', order.item)
         .pairs('Qty', formatFixed(order.totalQty))
         .pairs('Amount', order.amount)
@@ -341,6 +351,7 @@ export default class OrderService {
 
   async phonePrint(data) {
     const order = await this.repository.findById(data.id);
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
     await printOut((p) => {
       p.reset()
         .beepOn(1, 1)
@@ -350,6 +361,7 @@ export default class OrderService {
         // .pairs('Order', order.orderNumber)
         // .pairs('Address', order.address)
         .pairs('Phone', order.phone)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
         .pairs('Item', `${order.item} - ${formatFixed(order.totalQty)}`)
         // .pairs('Qty', formatFixed(order.totalQty))
         .flushPairs()

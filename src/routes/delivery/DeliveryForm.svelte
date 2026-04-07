@@ -4,6 +4,7 @@
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
+  import { formatFixed } from '$lib/utils/number';
 
   const { open, onClose, item, options } = $props();
   let initialData = {
@@ -140,5 +141,20 @@
     {/if}
 
     <CheckBoxField name="isCancelled" value={data.isCancelled} placeholder="Is Cancelled" />
+
+    <div class="rounded border-2 border-gray-400 p-2 text-sm">
+      <div><span class="text-gray-500">Token Item:</span> {data.tokenItem}</div>
+      <div>
+        <span class="text-gray-500">Token Quantity:</span>
+        {formatFixed(data.tokenQuantity)}
+      </div>
+      <div>
+        <span class="text-gray-500">Loading Order Numbers:</span>
+        {options.orders
+          .filter((o) => o.status == 'Loading')
+          .map((o) => o.orderNumber)
+          .join(', ')}
+      </div>
+    </div>
   </Form>
 </Model>

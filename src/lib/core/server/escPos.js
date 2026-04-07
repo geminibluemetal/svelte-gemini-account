@@ -69,6 +69,14 @@ export class ESCPOSPrinter {
     this._pairsCache.push({ label, value: value ? value : '-', totalWidth });
     return this;
   }
+  pairsOptional(label, value, totalWidth = 32) {
+    // Store pairs in cache to calculate max width later
+    if (!this._pairsCache) this._pairsCache = [];
+    if (value) {
+      this._pairsCache.push({ label, value: value ? value : '-', totalWidth });
+    }
+    return this;
+  }
   flushPairs() {
     if (!this._pairsCache || this._pairsCache.length === 0) return this;
 
