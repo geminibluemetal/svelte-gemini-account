@@ -54,7 +54,14 @@
         autoComplete="off"
       />
     {/if}
-    <InputField name="amount" value={item.amount} placeholder="Amount" autoComplete="off" />
+    <InputField
+      name="amount"
+      value={item.amount}
+      placeholder="Amount"
+      autoComplete="off"
+      caseMode="smartTitleChars"
+      allowedChars={['=', '-']}
+    />
     <input type="hidden" name="editId" value={item.id} />
   </Form>
 </Model>
