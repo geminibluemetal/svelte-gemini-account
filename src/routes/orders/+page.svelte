@@ -53,8 +53,8 @@
       (o) => o.status == 'New' || o.status == 'Loading' || o.status == 'Partial',
     ),
   });
-  const viewListItems = [...new Set(viewList[view].map((o) => o.item))];
-  const viewListQty = [...new Set(viewList[view].map((o) => o.balanceQty))];
+  const viewListItems = $derived([...new Set(viewList[view].map((o) => o.item))]);
+  const viewListQty = $derived([...new Set(viewList[view].map((o) => o.balanceQty))]);
 
   const filterList = $derived(
     viewList[view].filter((o) => {
@@ -486,7 +486,7 @@
           class="appearance-none rounded border-2 border-gray-300 p-1 px-2 outline-none"
           bind:value={filterItem}
         >
-          <option>All Item</option>
+          <option value="All Item">All Item</option>
           {#each viewListItems as i (i)}
             <option value={i}>{i}</option>
           {/each}
@@ -495,7 +495,7 @@
           class="appearance-none rounded border-2 border-gray-300 p-1 px-2 outline-none"
           bind:value={filterQty}
         >
-          <option>All Qty</option>
+          <option value="All Qty">All Qty</option>
           {#each viewListQty as i (i)}
             <option value={i}>{i}</option>
           {/each}
