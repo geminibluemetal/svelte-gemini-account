@@ -353,8 +353,8 @@
     { key: '🠊', description: 'Sign delivery entry or old balance' },
     { key: 'M', description: 'Mark Delivery Entry' },
     { key: 'E', description: 'Delivery Entry or Edit old balance' },
-    { key: 'C', description: 'Clear Delivery Sheet' },
-    { key: 'D', description: 'Delete Old Balance or Revoke Delviery' },
+    // { key: 'C', description: 'Clear Whole Delivery Sheet' },
+    { key: 'D', description: 'Delete Old Balance or Single Delviery Entry' },
     { key: 'R', description: 'Turn on Reconciliation & Review Mode' },
     { key: 'Enter', description: 'Delivery Entry or Edit old balance' },
   ];
@@ -593,7 +593,7 @@
     keyboardEventBus.on('8', handleVehicleSummary);
     keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('R', handleReviewMode);
-    keyboardEventBus.on('C', handleClearDeliverySheet);
+    // keyboardEventBus.on('C', handleClearDeliverySheet);
     syncOn('DELIVERY.TOKEN.LIST');
   });
   onDestroy(() => {
@@ -609,7 +609,7 @@
     keyboardEventBus.off('8', handleVehicleSummary);
     keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('R', handleReviewMode);
-    keyboardEventBus.off('C', handleClearDeliverySheet);
+    // keyboardEventBus.off('C', handleClearDeliverySheet);
     syncOff('DELIVERY.TOKEN.LIST');
   });
 </script>
