@@ -17,6 +17,14 @@ export default class OrderService {
     this.repository = new OrderRepository(db);
   }
 
+  async getById(id) {
+    try {
+      return await this.repository.findById(id);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
   async orderList() {
     return await this.repository.findAll({ isHidden: { $ne: true } });
   }

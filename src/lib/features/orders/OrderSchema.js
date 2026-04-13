@@ -49,6 +49,11 @@ export function orderSchema(isUpdate = false) {
 
     notes: z.string().optional().nullable(),
 
+    paymentAt: z
+      .string()
+      .datetime() // validates ISO 8601
+      .transform((val) => new Date(val)),
+
     // Defaults
     status: z.string().default('New'),
     sign: z.coerce.boolean().default(false),
@@ -66,6 +71,19 @@ export function orderSchema(isUpdate = false) {
   }
 
   return z.object(schemaShape).superRefine(async (data, ctx) => {
+
+    if (isUpdate) {
+      const orderService = new OrderService();
+      const order = await orderService.getById(data.id);
+      if (order.sign) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Order can't be updated as it is already signed`,
+          path: ['orderNumber'],
+        });
+      }
+    }
+
     const partyMissing = !data.partyName || data.partyName.trim() === '';
 
     // Check for duplicate order number
