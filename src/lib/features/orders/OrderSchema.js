@@ -49,10 +49,14 @@ export function orderSchema(isUpdate = false) {
 
     notes: z.string().optional().nullable(),
 
-    paymentAt: z
-      .string()
-      .datetime() // validates ISO 8601
-      .transform((val) => new Date(val)),
+    paymentAt: z.preprocess(
+      (val) => (val === '' ? undefined : val),
+      z
+        .string()
+        .datetime()
+        .transform((val) => new Date(val))
+        .optional(),
+    ),
 
     // Defaults
     status: z.string().default('New'),
@@ -71,7 +75,6 @@ export function orderSchema(isUpdate = false) {
   }
 
   return z.object(schemaShape).superRefine(async (data, ctx) => {
-
     if (isUpdate) {
       const orderService = new OrderService();
       const order = await orderService.getById(data.id);
