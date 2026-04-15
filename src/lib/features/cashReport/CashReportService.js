@@ -30,4 +30,13 @@ export default class CashReportService {
       return handleServiceError(error);
     }
   }
+
+  async clearCashReportByDate(date) {
+    try {
+      const dateFilter = this.repository.getDateFilter(date, 'createdAt');
+      return await this.repository.deleteByFilter(dateFilter);
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
 }

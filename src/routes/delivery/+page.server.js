@@ -1,6 +1,7 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
 import AddressService from '$lib/features/address/AddressService.js';
 import CashService from '$lib/features/cash/CashService';
+import CashReportService from '$lib/features/cashReport/CashReportService.js';
 import DeliveryService from '$lib/features/delivery/DeliveryService.js';
 import ItemService from '$lib/features/items/ItemService.js';
 import OrderService from '$lib/features/orders/OrderService.js';
@@ -192,6 +193,8 @@ export const actions = {
     await deliveryService.clearDeliveryByDate(formattedDate);
     const cashService = new CashService();
     await cashService.clearCashByDate(formattedDate);
+    const cashReportService = new CashReportService();
+    await cashReportService.clearCashReportByDate(formattedDate);
     const orderService = new OrderService();
     await orderService.clearOrderForDelivery(formattedDate);
     const partyStatementService = new PartyStatementService();
