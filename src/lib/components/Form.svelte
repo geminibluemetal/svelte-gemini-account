@@ -20,6 +20,7 @@
   } = $props();
 
   let formEl = $state(null);
+  let isSubmitting = $state(false);
 
   function submit() {
     formEl?.requestSubmit();
@@ -32,9 +33,31 @@
     else window.history.back();
   }
 
+  // function conditionalEnhance(node, handler) {
+  //   if (!handler) return;
+  //   return enhance(node, handler);
+  // }
+
   function conditionalEnhance(node, handler) {
-    if (!handler) return;
-    return enhance(node, handler);
+    return enhance(node, (actionInput) => {
+      if (isSubmitting) {
+        actionInput.cancel(); // Abort the second click
+        return;
+      }
+
+      isSubmitting = true;
+
+      // Run the user-provided handler if it exists
+      const customCallback = handler ? handler(actionInput) : undefined;
+
+      return async (result) => {
+        // If the user provided a callback that returns a function, run it
+        if (typeof customCallback === 'function') {
+          await customCallback(result);
+        }
+        isSubmitting = false; // Re-enable after finish
+      };
+    });
   }
 </script>
 
@@ -76,7 +99,13 @@
   <div
     class="flex justify-end gap-2 rounded-b-lg border-t-2 border-amber-200 bg-amber-100 px-3 py-2 dark:border-amber-900 dark:bg-amber-950"
   >
-    <Button color="success" type="submit" class={hideSubmitButton && 'invisible'}>
+    <Button
+      color="success"
+      type="submit"
+      class="{loading ? 'pointer-events-none opacity-80' : ''}
+      {hideSubmitButton ? 'invisible' : ''}"
+      disabled={loading}
+    >
       {#if loading}
         <LoaderCircle class="mr-1 animate-spin" /> Loading...
       {:else}
