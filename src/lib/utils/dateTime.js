@@ -313,3 +313,15 @@ export function isValidDate(date) {
   const dateObj = new Date(date);
   return !isNaN(dateObj.getTime());
 }
+
+export function getWeekdayName(date = new Date()) {
+  const dateObj = new Date(date);
+  const weekdayNameFormatter = new Intl.DateTimeFormat('en-US', { weekday: 'long' });
+  return weekdayNameFormatter.format(dateObj);
+}
+
+export function getMonthName(date = new Date()) {
+  const dateObj = new Date(date);
+  const monthNameFormatter = new Intl.DateTimeFormat('en-US', { month: 'long' });
+  return monthNameFormatter.format(dateObj);
+}

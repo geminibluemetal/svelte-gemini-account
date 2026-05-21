@@ -11,6 +11,7 @@ export async function load() {
     { name: 'Vehicle', emoji: '🚚', url: '/vehicle', key: 'V' },
     // { name: 'Weighment', emoji: '⚖️', url: '/weighment', key: 'W' },
     // { name: 'Settings', emoji: '⚙️', url: '/settings', key: 'S' },
+    { name: 'Attendance', emoji: '📒', url: '/attendance', key: 'E' },
   ];
   return { apps };
 }
