@@ -157,6 +157,6 @@
       allowedChars={[',', '.']}
     />
     <CheckBoxField name="isOwnerOrder" value={data.isOwnerOrder} placeholder="Is Owner Order?" />
-    <CheckBoxField name="tracktorOnly" value={data.tracktorOnly} placeholder="Tractor Only" />
+    <CheckBoxField name="tracktorOnly" value={data.tracktorOnly} placeholder="Eicher Only" />
   </Form>
 </Model>
