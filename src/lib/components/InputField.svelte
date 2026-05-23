@@ -25,6 +25,7 @@
     allowedChars = [],
     optionHelperText = () => {},
     onEnter = dummyFunction,
+    onBlur = dummyFunction,
     onValueChange = dummyFunction,
     onValueSelected = dummyFunction,
     silentOnValue = null,
@@ -154,6 +155,7 @@
       let val = eval(value.slice(1));
       value = val;
     }
+    onBlur(value);
   }
 
   async function handleCreateOption(e) {
