@@ -15,12 +15,15 @@ export default class AttendanceNameService {
 
   async updateName(data) {
     try {
-      console.log('Updating attendance name with data:', data);
       const parsed = await attendanceNameSchema.safeParse(data);
       if (!parsed.success) schemaError(parsed);
-      console.log('Parsed data:', parsed.data);
-      const result = await this.repository.updateById(data.nameId, parsed.data);
-      return result;
+      if (data.nameId) {
+        if (data.isDelete) {
+          return await this.repository.deleteById(data.nameId);
+        }
+        return await this.repository.updateById(data.nameId, parsed.data);
+      }
+      return await this.repository.create(parsed.data);
     } catch (error) {
       return handleServiceError(error);
     }

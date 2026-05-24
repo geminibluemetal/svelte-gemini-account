@@ -1,7 +1,7 @@
 import { applyProjection } from '../base/BaseMode';
 
 export default function AttendanceName(
-  { id = null, name = '', categoryId = null, dayFee = 0, createdAt = null, updatedAt = null } = {},
+  { id = null, name = '', categoryId = null, dayFee = 0, overallAdvance = 0, createdAt = null, updatedAt = null } = {},
   projection = {},
 ) {
   const allFields = {
@@ -9,6 +9,7 @@ export default function AttendanceName(
     name,
     categoryId,
     dayFee,
+    overallAdvance,
     createdAt,
     updatedAt,
   };

@@ -14,5 +14,7 @@ export const attendanceNameSchema = z.object({
       message: "Category selection is invalid",
     }),
 
+  overallAdvance: z.coerce.number().nonnegative("Amount must be a positive number or zero"),
+
   dayFee: z.coerce.number().nonnegative("Amount must be a positive number or zero"),
 });

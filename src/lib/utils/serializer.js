@@ -1,4 +1,3 @@
-// /utils/serialize.js
 import { ObjectId } from 'mongodb';
 
 const hiddenFields = ['password', 'token', 'OTP', 'secret', 'hashed_password'];
@@ -11,7 +10,8 @@ const hiddenFields = ['password', 'token', 'OTP', 'secret', 'hashed_password'];
 export function serializeDoc(doc) {
   if (!doc) return null;
 
-  if (Array.isArray(doc)) return doc.map((d) => serializeDoc(d, hiddenFields));
+  // Handle if the top-level item passed is an array
+  if (Array.isArray(doc)) return doc.map((d) => serializeDoc(d));
 
   const result = {};
   for (const [key, value] of Object.entries(doc)) {
@@ -22,11 +22,14 @@ export function serializeDoc(doc) {
     } else if (value instanceof Date) {
       result[key] = value.toISOString();
     } else if (Array.isArray(value)) {
-      result[key] = value.map((v) =>
-        v && typeof v === 'object' ? serializeDoc(v, hiddenFields) : v,
-      );
+      result[key] = value.map((v) => {
+        if (v instanceof ObjectId) return v.toString();
+        if (v instanceof Date) return v.toISOString();
+        if (v && typeof v === 'object') return serializeDoc(v);
+        return v;
+      });
     } else if (value && typeof value === 'object') {
-      result[key] = serializeDoc(value, hiddenFields);
+      result[key] = serializeDoc(value);
     } else {
       result[key] = value;
     }
@@ -41,6 +44,7 @@ export function serializeDoc(doc) {
 export function unserializeDoc(doc) {
   if (!doc) return null;
 
+  // Handle if the top-level item passed is an array
   if (Array.isArray(doc)) return doc.map(unserializeDoc);
 
   const result = {};
@@ -56,7 +60,19 @@ export function unserializeDoc(doc) {
         result[key] = value;
       }
     } else if (Array.isArray(value)) {
-      result[key] = value.map((v) => (v && typeof v === 'object' ? unserializeDoc(v) : v));
+      result[key] = value.map((v) => {
+        if (typeof v === 'string') {
+          if (ObjectId.isValid(v) && (v.length === 12 || v.length === 24)) {
+            return new ObjectId(v);
+          }
+          if (isoDateRegex.test(v)) {
+            return new Date(v);
+          }
+          return v;
+        }
+        if (v && typeof v === 'object') return unserializeDoc(v);
+        return v;
+      });
     } else if (value && typeof value === 'object') {
       result[key] = unserializeDoc(value);
     } else {

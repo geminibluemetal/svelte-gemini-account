@@ -1,92 +1,92 @@
-<div
-  class="grid w-fit max-w-full grid-cols-[max-content_200px_repeat(56,max-content)] overflow-auto border-2 *:px-1"
->
-  <!-- Heading -->
-  <div
-    class="sticky left-0 row-span-2 flex items-center justify-center border-r-2 border-b-2 bg-black text-white"
-  >
-    SN
-  </div>
-  <div
-    class="sticky left-7.75 row-span-2 flex items-center justify-center truncate border-r-2 border-b-2 bg-black text-white"
-  >
-    Jelly Driver
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    01-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    02-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    03-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    04-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    05-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    06-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    07-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    08-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    09-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    10-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    11-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    12-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-r-2 border-b-2 bg-black text-center text-white">
-    13-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
-  <div class="col-span-4 border-b-2 bg-black text-center text-white">
-    14-01-2026 <div class="-mt-1 text-sm text-white/70">Monday</div>
-  </div>
+<script>
+  import { getFormattedDate, getWeekdayName } from '$lib/utils/dateTime';
+  const { cycle, attendanceCategories, rowsData = [], attendanceNames } = $props();
+  const categorizedAttendanceNames = $derived.by(() => {
+    const categorized = {};
+    attendanceNames.forEach((name) => {
+      if (!Array.isArray(categorized[name.categoryId])) {
+        categorized[name.categoryId] = [];
+      }
+      categorized[name.categoryId].push(name);
+    });
+    return categorized;
+  });
+</script>
 
-  <!-- Heading 2 -->
-  {#each Array.from({ length: 14 }) as _, index (index)}
-    <div class="border-r border-b-2 bg-black text-white">AT</div>
-    <div class="border-r border-b-2 bg-black text-white">T</div>
-    <div class="border-r border-b-2 bg-black text-white">W</div>
-    <div class="{index != 13 && 'border-r-2'} border-b-2 bg-black text-white">Adv</div>
-  {/each}
+<div class="flex flex-col gap-5">
+  {#each attendanceCategories as category, catIdx (`${category.id}-${catIdx}`)}
+    {@const fieldsPerDate = category.fields.length + 2}
+    {@const totalDynamicCols = fieldsPerDate * cycle.length}
 
-  <div class="sticky left-0 border-r-2 border-b bg-white text-center">1</div>
-  <div class="sticky left-7.75 truncate border-r-2 border-b bg-white">Ashok Kumar</div>
-  {#each Array.from({ length: 14 }) as _, index (index)}
-    <div class="border-r border-b text-center">1</div>
-    <div class="border-r border-b text-center">2</div>
-    <div class="border-r border-b text-center">3</div>
-    <div class="text-center {index != 13 && 'border-r-2 '} border-b">4</div>
-  {/each}
+    <!-- Header Start -->
+    <div
+      class="grid w-fit max-w-full overflow-auto border-2 *:px-1"
+      style:grid-template-columns="max-content 200px repeat({totalDynamicCols}, max-content)"
+    >
+      <div
+        class="sticky left-0 row-span-2 flex items-center justify-center border-r-2 border-b-2 bg-black text-white"
+      >
+        SN
+      </div>
+      <div
+        class="sticky left-7.75 row-span-2 flex items-center justify-center truncate border-r-2 border-b-2 bg-black text-white"
+      >
+        {category.name}
+      </div>
 
-  <div class="sticky left-0 border-r-2 border-b bg-white text-center">1</div>
-  <div class="sticky left-7.75 truncate border-r-2 border-b bg-white">Ashok Kumar</div>
-  {#each Array.from({ length: 14 }) as _, index (index)}
-    <div class="border-r border-b text-center">1</div>
-    <div class="border-r border-b text-center">2</div>
-    <div class="border-r border-b text-center">3</div>
-    <div class="text-center {index != 13 && 'border-r-2 '} border-b">4</div>
-  {/each}
+      {#each cycle as date, dateIdx (date)}
+        <div
+          class="{cycle.length - 1 !== dateIdx &&
+            'border-r-2'} border-b-2 bg-black text-center text-white"
+          style:grid-column="span {fieldsPerDate}"
+        >
+          {getFormattedDate(date)}
+          <div class="-mt-1 text-sm text-white/70">{getWeekdayName(date)}</div>
+        </div>
+      {/each}
 
-  <div class="sticky left-0 border-r-2 border-b bg-white text-center">1</div>
-  <div class="sticky left-7.75 truncate border-r-2 border-b bg-white">Ashok Kumar</div>
-  {#each Array.from({ length: 14 }) as _, index (index)}
-    <div class="border-r border-b text-center">1</div>
-    <div class="border-r border-b text-center">2</div>
-    <div class="border-r border-b text-center">3</div>
-    <div class="text-center {index != 13 && 'border-r-2 '} border-b">4</div>
+      {#each Array.from({ length: cycle.length }) as _, cycleIdx (cycleIdx)}
+        <div class="min-w-8 border-r border-b-2 border-b-black bg-black text-center text-white">
+          AT
+        </div>
+        {#each category.fields as field, fieldIdx (fieldIdx)}
+          <div class="min-w-8 border-r border-b-2 border-b-black bg-black text-center text-white">
+            {field.shortName}
+          </div>
+        {/each}
+        <div
+          class="{cycleIdx !== cycle.length - 1 &&
+            'border-r-2'} min-w-8 border-b-2 border-b-black bg-black text-center text-white"
+        >
+          Adv
+        </div>
+      {/each}
+      <!-- Header End -->
+
+      {#each categorizedAttendanceNames[category._id] as row, rowIdx (row.id || rowIdx)}
+        <div class="sticky left-0 border-r-2 border-b bg-white text-center">
+          {rowIdx + 1}
+        </div>
+
+        <div class="sticky left-7.75 truncate border-r-2 border-b bg-white">
+          {row.name}
+        </div>
+
+        {#each Array.from({ length: cycle.length }) as _, cIdx (cIdx)}
+          <div class="border-r border-b border-gray-400 bg-white text-center">1</div>
+
+          {#each category.fields as _, fIdx (fIdx)}
+            <div class="border-r border-b border-gray-400 bg-white text-center">2</div>
+          {/each}
+
+          <div
+            class="{cIdx !== cycle.length - 1 && 'border-r-2'}
+              border-b border-b-gray-400 bg-white text-center"
+          >
+            4
+          </div>
+        {/each}
+      {/each}
+    </div>
   {/each}
 </div>

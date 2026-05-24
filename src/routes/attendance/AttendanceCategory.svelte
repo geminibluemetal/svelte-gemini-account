@@ -51,7 +51,7 @@
               Add Field
             </Button>
             <Button class="dark" color="success" type="submit">Save Category</Button>
-            <Button class="dark" color="danger">Delete Category</Button>
+            <!-- <Button class="dark" color="danger">Delete Category</Button> -->
           </div>
           {#each category.fields as field, index (field.id)}
             <input type="hidden" name={`fields[${index}][id]`} value={field.id} />

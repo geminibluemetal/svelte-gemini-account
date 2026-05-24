@@ -4,6 +4,7 @@ import AttendanceNameService from "$lib/features/attendanceName/AttendanceNameSe
 import { formDataToObject } from "$lib/utils/form.js";
 import { serializeDoc } from "$lib/utils/serializer";
 import { fail } from "@sveltejs/kit";
+import { get14dayCycle } from "./helper.js";
 
 export async function load({ depends }) {
   depends('ATTENDANCE.LIST');
@@ -14,6 +15,7 @@ export async function load({ depends }) {
   const response = {
     attendanceCategories,
     attendanceNames,
+    cycle: get14dayCycle({ ignoreFuture: true })
   };
   return serializeDoc(response);
 }
