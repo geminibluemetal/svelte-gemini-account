@@ -11,7 +11,10 @@
   };
 </script>
 
-<div class="rounded-md px-2 py-1 font-semibold {colorStyles[color]} {userClass}" {...props}>
+<div
+  class="rounded-md px-2 py-1 font-semibold caret-transparent {colorStyles[color]} {userClass}"
+  {...props}
+>
   {#if prefix}
     {@const Prefix = prefix}
     <Prefix class="mr-1 inline-block" />

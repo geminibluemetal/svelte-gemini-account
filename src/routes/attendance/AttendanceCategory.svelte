@@ -3,22 +3,17 @@
   import Button from '$lib/components/Button.svelte';
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
-  const { attendanceCategories } = $props();
-  let open = $state(false);
+  const { attendanceCategories, open, onClose } = $props();
 
   // eslint-disable-next-line svelte/prefer-writable-derived
   let categories = $state([]);
-
-  function handleClose() {
-    open = false;
-  }
 
   $effect(() => {
     categories = attendanceCategories;
   });
 </script>
 
-<Model {open} onClose={handleClose}>
+<Model {open} {onClose}>
   <div class="mx-auto w-full max-w-xl p-5">
     <h1
       class="sticky top-0 z-10 mb-8 flex justify-between border-b-2 border-black bg-white py-3 text-center text-2xl font-bold"
@@ -26,7 +21,7 @@
       <span>Attendance Categories</span>
       <button
         class="flex size-8 cursor-pointer items-center justify-center rounded-full border-2 bg-red-700 pb-1.5 text-white outline-0 hover:bg-red-800 hover:outline-2 hover:outline-red-800"
-        onclick={handleClose}
+        onclick={onClose}
       >
         &times;
       </button>

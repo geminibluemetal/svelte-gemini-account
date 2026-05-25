@@ -6,8 +6,10 @@ import { serializeDoc } from "$lib/utils/serializer";
 import { fail } from "@sveltejs/kit";
 import { get14dayCycle } from "./helper.js";
 
-export async function load({ depends }) {
+export async function load({ depends, url }) {
   depends('ATTENDANCE.LIST');
+  let cycleOffset = url.searchParams.get('cycleOffset');
+  cycleOffset = cycleOffset > 0 ? 0 : cycleOffset
   const attendanceCategoryService = new AttendanceCategoryService();
   const attendanceNameService = new AttendanceNameService();
   const attendanceCategories = await attendanceCategoryService.getAllCategories();
@@ -15,7 +17,7 @@ export async function load({ depends }) {
   const response = {
     attendanceCategories,
     attendanceNames,
-    cycle: get14dayCycle({ ignoreFuture: true })
+    cycle: get14dayCycle({ ignoreFuture: true, cycleOffset })
   };
   return serializeDoc(response);
 }

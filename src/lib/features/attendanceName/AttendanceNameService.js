@@ -10,7 +10,7 @@ export default class AttendanceNameService {
   }
 
   async getAllNames() {
-    return await this.repository.findAll();
+    return await this.repository.findAll({}, {}, { sort: { name: 1 } });
   }
 
   async updateName(data) {
