@@ -11,12 +11,15 @@
   import { resolve } from '$app/paths';
   import Model from '$lib/components/Model.svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
+  import AttendanceForm from './AttendanceForm.svelte';
 
   const { data, form } = $props();
 
   let openCategory = $state(false);
   let openNames = $state(false);
   let helperOpened = $state(false);
+  let openAttendanceEdit = $state(false);
+  let editableItem = $state({});
 
   const availableOptions = [
     { key: 'H', description: 'List available Shortcut' },
@@ -29,7 +32,7 @@
     { key: '🠊', description: 'Move to next Date' },
     { key: '🠉', description: 'Move to previous Name' },
     { key: '🠋', description: 'Move to next Name' },
-    { key: 'Ctrl', description: 'Change focus between Table' },
+    { key: 'N', description: 'Change focus to Next table' },
     { key: 'Enter', description: 'Edit Attendance' },
   ];
 
@@ -40,6 +43,10 @@
   const handleNextAttendanceCycle = () => handleCycleOffset(1);
   const handleCategoryOpen = () => (openCategory = true);
   const handleNameOpen = () => (openNames = true);
+  const handleAttendanceFormClose = () => {
+    openAttendanceEdit = false;
+    editableItem = { nameId: null, date: null, name: null, id: null };
+  };
 
   function handleCycleOffset(offset) {
     goto(resolve(`/attendance?cycleOffset=${data.cycle.cycleOffset + offset}`));
@@ -47,6 +54,15 @@
 
   function handleCurrentCycleOffset() {
     goto(resolve(`/attendance?cycleOffset=${0}`));
+  }
+
+  function handleAttendanceEdit(nameId, date, id) {
+    if (!openCategory && !openNames && !helperOpened) {
+      const name = data.attendanceNames.find((a) => a.id == nameId);
+      const selectedAttendance = data.attendance.find((a) => a.id == id);
+      editableItem = { nameId, date, name: name.name, id, ...selectedAttendance };
+      openAttendanceEdit = true;
+    }
   }
 
   $effect(() => {
@@ -74,7 +90,7 @@
 
 <div class="flex h-full gap-4 p-5">
   <div class="overflow-auto">
-    <AttendanceTable {...data} />
+    <AttendanceTable {...data} onEdit={handleAttendanceEdit} />
   </div>
   <div class="flex min-w-52 flex-col gap-2">
     <div class="dark flex w-full items-center gap-1">
@@ -122,3 +138,5 @@
     {/each}
   </div>
 </Model>
+
+<AttendanceForm open={openAttendanceEdit} onClose={handleAttendanceFormClose} {editableItem} />

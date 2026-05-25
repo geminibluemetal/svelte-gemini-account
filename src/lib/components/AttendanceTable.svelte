@@ -2,7 +2,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { getFormattedDate, getWeekdayName } from '$lib/utils/dateTime';
   import { onMount } from 'svelte';
-  const { cycle, attendanceCategories, attendanceNames } = $props();
+  const { cycle, attendanceCategories, attendanceNames, attendance, onEdit = () => {} } = $props();
 
   let overRow = $state({ categoryId: null, nameId: null, cIdx: -1 });
 
@@ -17,8 +17,8 @@
     return categorized;
   });
 
-  function handleMouseOver(categoryId, nameId, cIdx) {
-    overRow = { categoryId, nameId, cIdx };
+  function handleMouseOver(categoryId, nameId, cIdx, id) {
+    overRow = { categoryId, nameId, cIdx, id };
   }
 
   function scrollToEnd(node, dynamicCondition) {
@@ -41,7 +41,7 @@
   }
 
   function handleKeyboardNav(e) {
-    if (e.key == 'Control') {
+    if (e.key == 'n') {
       e.preventDefault();
       const categoryIdList = Object.keys(categorizedAttendanceNames);
       const currentIndex = categoryIdList.indexOf(overRow.categoryId);
@@ -78,6 +78,12 @@
       }
     }
 
+    // Always Update latest overId
+    const fieldData = attendance.find(
+      (a) => a.nameId == overRow.nameId && a.date == cycle.list[overRow.cIdx],
+    );
+    overRow.id = fieldData?.id;
+
     const gridWrapper = document.querySelector(`[data-identity="${overRow.categoryId}"]`);
     if (gridWrapper) {
       const element = gridWrapper.querySelector(
@@ -105,18 +111,41 @@
     }
   }
 
+  function handleAttendanceEdit() {
+    onEdit(overRow.nameId, cycle.list[overRow.cIdx], overRow.id);
+  }
+
+  function displayAT(AT) {
+    switch (AT) {
+      case 0:
+        return 'A';
+      case 0.5:
+        return 'H';
+      case 1:
+        return 'P';
+      case 1.5:
+        return 'PH';
+      case 2:
+        return 'PP';
+      default:
+        return '';
+    }
+  }
+
   onMount(() => {
     keyboardEventBus.on('ArrowUp', handleKeyboardNav);
     keyboardEventBus.on('ArrowDown', handleKeyboardNav);
     keyboardEventBus.on('ArrowLeft', handleKeyboardNav);
     keyboardEventBus.on('ArrowRight', handleKeyboardNav);
-    keyboardEventBus.on('Ctrl', handleKeyboardNav);
+    keyboardEventBus.on('N', handleKeyboardNav);
+    keyboardEventBus.on('Enter', handleAttendanceEdit);
     return () => {
       keyboardEventBus.off('ArrowUp', handleKeyboardNav);
       keyboardEventBus.off('ArrowDown', handleKeyboardNav);
       keyboardEventBus.off('ArrowLeft', handleKeyboardNav);
       keyboardEventBus.off('ArrowRight', handleKeyboardNav);
-      keyboardEventBus.off('Ctrl', handleKeyboardNav);
+      keyboardEventBus.off('N', handleKeyboardNav);
+      keyboardEventBus.off('Enter', handleAttendanceEdit);
     };
   });
 </script>
@@ -200,6 +229,9 @@
 
         <!-- eslint-disable-next-line no-unused-vars -->
         {#each Array.from({ length: cycle.list.length }) as _, cIdx (cIdx)}
+          {@const fieldData = attendance.find((a) => {
+            return a.nameId == row.id && a.date == cycle.list[cIdx];
+          })}
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
             class="border-r border-b border-gray-400 text-center
@@ -210,13 +242,13 @@
                   : 'bg-gray-300'
                 : 'bg-white'
               : 'bg-white'}"
-            onmousemove={() => handleMouseOver(category._id, row.id, cIdx)}
+            onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
           >
-            P
+            {displayAT(fieldData?.fields?.AT)}
           </div>
 
           <!-- eslint-disable-next-line no-unused-vars -->
-          {#each category.fields as _, fIdx (fIdx)}
+          {#each category.fields as field, fIdx (fIdx)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               class="border-r border-b border-gray-400 text-center
@@ -227,16 +259,16 @@
                     : 'bg-gray-300'
                   : 'bg-white'
                 : 'bg-white'}"
-              onmousemove={() => handleMouseOver(category._id, row.id, cIdx)}
+              onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
             >
-              2
+              {fieldData?.fields?.[field.shortName]}
             </div>
           {/each}
 
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
             data-identity={`${category._id}-${row.id}-${cIdx}`}
-            onmousemove={() => handleMouseOver(category._id, row.id, cIdx)}
+            onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
             class="{cIdx !== cycle.list.length - 1 && 'border-r-2'}
               border-b border-b-gray-400 text-center
               {overRow.categoryId == category._id
@@ -247,7 +279,7 @@
                 : 'bg-white'
               : 'bg-white'}"
           >
-            4
+            {fieldData?.fields?.Adv}
           </div>
         {/each}
       {/each}

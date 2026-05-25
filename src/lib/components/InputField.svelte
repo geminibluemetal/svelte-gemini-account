@@ -156,6 +156,7 @@
       value = val;
     }
     onBlur(value);
+    onValueSelected(value);
   }
 
   async function handleCreateOption(e) {

@@ -1,4 +1,4 @@
-import { getFormattedDate } from "$lib/utils/dateTime";
+import { getFormattedDate } from '$lib/utils/dateTime';
 
 /**
  * Generates the 14-day cycle list shifted by a specific number of cycles.
@@ -8,8 +8,12 @@ import { getFormattedDate } from "$lib/utils/dateTime";
  * @param {boolean} options.ignoreFuture - If true, skips dates that are ahead of the current real-world time.
  * @returns {Object} Object containing the filtered list, shortName, and longName.
  */
-export function get14dayCycle({ checkingDate = new Date(), cycleOffset = 0, ignoreFuture = false } = {}) {
-  cycleOffset = Number(cycleOffset)
+export function get14dayCycle({
+  checkingDate = new Date(),
+  cycleOffset = 0,
+  ignoreFuture = false,
+} = {}) {
+  cycleOffset = Number(cycleOffset);
   const oneDayMilliseconds = 1000 * 60 * 60 * 24;
   const anchorDate = new Date(2026, 3, 27); // April 27, 2026
 
@@ -25,7 +29,7 @@ export function get14dayCycle({ checkingDate = new Date(), cycleOffset = 0, igno
   const cycleDay = ((diffInDays % 14) + 14) % 14;
 
   // 1. Calculate the start of the CURRENT cycle
-  let startOfTheCycleTime = workingDate.getTime() - (cycleDay * oneDayMilliseconds);
+  let startOfTheCycleTime = workingDate.getTime() - cycleDay * oneDayMilliseconds;
 
   // 2. Adjust the starting Monday dynamically by multiplying the offset
   startOfTheCycleTime += cycleOffset * 14 * oneDayMilliseconds;
@@ -54,7 +58,7 @@ export function get14dayCycle({ checkingDate = new Date(), cycleOffset = 0, igno
   const longName = `${getFormattedDate(startDate)} - ${getFormattedDate(endDate)}`; // DD-MM-YYYY to DD-MM-YYYY
 
   // Note: Fixed a minor bug in your original regex replacement here as well
-  let shortName = longName.replace(/-\d{4}/g, ""); // DD-MM to DD-MM
+  let shortName = longName.replace(/-\d{4}/g, ''); // DD-MM to DD-MM
 
-  return { list, shortName, longName, cycleOffset };
+  return { list, shortName, longName, cycleOffset, startDate, endDate };
 }
