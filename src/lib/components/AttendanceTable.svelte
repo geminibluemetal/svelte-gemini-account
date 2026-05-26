@@ -2,6 +2,7 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { getFormattedDate, getWeekdayName } from '$lib/utils/dateTime';
   import { onMount } from 'svelte';
+  import { runCalculateRule } from '../../routes/attendance/calculationRule';
   const {
     cycle,
     attendanceCategories,
@@ -261,6 +262,8 @@
         </div>
       {/each}
       {#each categorizedAttendanceNames[category._id] || [] as row, rowIdx (row.id || rowIdx)}
+        {@const attendanceData = attendance.filter((a) => a.nameId == row.id)}
+        {@const calculatedData = runCalculateRule(row, category, attendanceData)}
         <!-- svelte-ignore a11y_no_static_element_interactions -->
         <div
           class="sticky left-0 border-r-2 border-b text-center

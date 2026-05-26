@@ -8,13 +8,40 @@
   // eslint-disable-next-line svelte/prefer-writable-derived
   let categories = $state([]);
 
+  function toCamelCase(str) {
+    return str
+      .replace(/[^a-zA-Z0-9 ]/g, '') // Remove special characters
+      .trim()
+      .split(/\s+/) // Split by spaces
+      .map((word, index) => {
+        if (index === 0) {
+          return word.toLowerCase();
+        }
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join('');
+  }
+
+  function handleRuleMoveUp(index, categoryId) {
+    const category = categories.find((c) => c._id == categoryId);
+    const tempRule = category.calculationRule[index];
+    category.calculationRule[index] = category.calculationRule[index - 1];
+    category.calculationRule[index - 1] = tempRule;
+  }
+  function handleRuleMoveDown(index, categoryId) {
+    const category = categories.find((c) => c._id == categoryId);
+    const tempRule = category.calculationRule[index];
+    category.calculationRule[index] = category.calculationRule[index + 1];
+    category.calculationRule[index + 1] = tempRule;
+  }
+
   $effect(() => {
     categories = attendanceCategories;
   });
 </script>
 
 <Model {open} {onClose}>
-  <div class="mx-auto w-full max-w-xl p-5">
+  <div class="mx-auto w-full max-w-4xl p-5">
     <h1
       class="sticky top-0 z-10 mb-8 flex justify-between border-b-2 border-black bg-white py-3 text-center text-2xl font-bold"
     >
@@ -74,6 +101,69 @@
                   class="dark"
                   onclick={() => {
                     category.fields = category.fields.filter((_, i) => i !== index);
+                  }}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          {/each}
+          <div class="flex flex-row items-center gap-3">
+            <Button
+              class="dark"
+              onclick={() => {
+                category.calculationRule = [
+                  ...category.calculationRule,
+                  { name: '', key: '', rule: '', id: crypto.randomUUID() },
+                ];
+              }}
+            >
+              Add Calculation Rule
+            </Button>
+          </div>
+          {#each category.calculationRule as rule, index (rule.id)}
+            <input type="hidden" name={`calculationRule[${index}][id]`} value={rule.id} />
+            <div class="flex items-center gap-3">
+              <span class="dark flex gap-1">
+                <Button disabled={index == 0} onclick={() => handleRuleMoveUp(index, category._id)}>
+                  ▲
+                </Button>
+                <Button
+                  disabled={index == category.calculationRule.length - 1}
+                  onclick={() => handleRuleMoveDown(index, category._id)}>▼</Button
+                >
+              </span>
+              <InputField
+                class="mb-0! w-100!"
+                placeholder="Name"
+                name={`calculationRule[${index}][name]`}
+                value={rule.name}
+                onValueChange={(value) => {
+                  rule.key = toCamelCase(value);
+                }}
+              />
+              <InputField
+                class="mb-0! w-100!"
+                placeholder="Key"
+                caseMode="none"
+                name={`calculationRule[${index}][key]`}
+                readonly
+                bind:value={rule.key}
+              />
+              <InputField
+                class="mb-0!"
+                placeholder="rule"
+                caseMode="none"
+                name={`calculationRule[${index}][rule]`}
+                value={rule.rule}
+              />
+              <div>
+                <Button
+                  class="dark"
+                  onclick={() => {
+                    category.calculationRule = category.calculationRule.filter(
+                      (_, i) => i !== index,
+                    );
                   }}
                 >
                   Delete

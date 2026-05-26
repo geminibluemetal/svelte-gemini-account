@@ -9,8 +9,16 @@ const fieldSchema = z.object({
   amount: z.coerce.number().nonnegative("Amount must be a positive number or zero"),
 });
 
+const calculationRuleSchema = z.object({
+  id: z.string().min(1, "ID is required"),
+  name: z.string().min(1, "Name is required"),
+  key: z.string().min(1, "Kame is required"),
+  rule: z.string().min(1, "Rule is required"),
+});
+
 // 2. Schema for the main category object
 export const attendanceCategorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
   fields: z.array(fieldSchema),
+  calculationRule: z.array(calculationRuleSchema),
 });

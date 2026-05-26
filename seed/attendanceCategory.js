@@ -8,6 +8,7 @@ export const seedData = [
       { shortName: 'T', longName: 'Jelly Tip', amount: 60, id: crypto.randomUUID() },
       { shortName: 'W', longName: 'Water Tip', amount: 40, id: crypto.randomUUID() },
     ],
+    calculationRule: [],
   },
   {
     name: 'Chakka Driver',
@@ -15,6 +16,7 @@ export const seedData = [
       { shortName: 'T', longName: 'Jelly Taras Tip', amount: 100, id: crypto.randomUUID() },
       { shortName: 'M', longName: 'Mayil Tip', amount: 25, id: crypto.randomUUID() },
     ],
+    calculationRule: [],
   },
   {
     name: 'Cleaner',
@@ -22,13 +24,16 @@ export const seedData = [
       { shortName: 'T', longName: 'Jelly Tip', amount: 60, id: crypto.randomUUID() },
       { shortName: 'W', longName: 'Water Tip', amount: 40, id: crypto.randomUUID() },
     ],
+    calculationRule: [],
   },
   {
     name: 'Crusher Operator',
     fields: [],
+    calculationRule: [],
   },
   {
     name: 'Crusher Helper',
     fields: [],
+    calculationRule: [],
   },
 ];
