@@ -20,20 +20,38 @@
   let helperOpened = $state(false);
   let openAttendanceEdit = $state(false);
   let editableItem = $state({});
+  let editableCategory = $state({});
 
   const availableOptions = [
-    { key: 'H', description: 'List available Shortcut' },
-    { key: '1', description: 'Goto Previous Cycle Attendance' },
-    { key: '2', description: 'Goto Next Cycle Attendance' },
-    { key: '3', description: 'Open Category Manager' },
-    { key: '4', description: 'Open Names Manager' },
-    { key: '5', description: 'Print Attendance Sheet' },
-    { key: '🠈', description: 'Move to previous Date' }, // 🠈	🠉	🠊	🠋
+    { key: 'H', description: 'Show available shortcuts' },
+    // Navigation
+    { key: '🠈', description: 'Move to previous Date' },
     { key: '🠊', description: 'Move to next Date' },
     { key: '🠉', description: 'Move to previous Name' },
     { key: '🠋', description: 'Move to next Name' },
-    { key: 'N', description: 'Change focus to Next table' },
-    { key: 'Enter', description: 'Edit Attendance' },
+    { key: 'T', description: 'Change focus to next Table/Category' },
+    // Attendance actions
+    { key: 'P', description: 'Set Present for selected Attendace' },
+    { key: 'A', description: 'Set Absent for selected Attendace' },
+    { key: 'Enter', description: 'Edit selected Attendance' },
+    // Cycle navigation
+    {
+      key: '<i class="font-black text-xl">&minus;</i>',
+      description: 'Go to Previous Attendance Cycle',
+    },
+    {
+      key: '<i class="font-black text-xl">&plus;</i>',
+      description: 'Go to Next Attendance Cycle',
+    },
+    // Numeric shortcuts
+    {
+      key: 'Top Row 0-9',
+      description: 'Set number in category field (second cell after AT)',
+    },
+    {
+      key: 'Numpad 0-9',
+      description: 'Set number in first category field near AT',
+    },
   ];
 
   const handleCategoryClose = () => (openCategory = false);
@@ -41,12 +59,23 @@
   const handleHelperOpen = () => (helperOpened = true);
   const handlePreviousAttendanceCycle = () => handleCycleOffset(-1);
   const handleNextAttendanceCycle = () => handleCycleOffset(1);
-  const handleCategoryOpen = () => (openCategory = true);
-  const handleNameOpen = () => (openNames = true);
   const handleAttendanceFormClose = () => {
     openAttendanceEdit = false;
     editableItem = { nameId: null, date: null, name: null, id: null };
+    editableCategory = {};
   };
+
+  async function transportAction(url, data) {
+    const formData = new FormData();
+    for (const key in data) {
+      formData.append(key, data[key]);
+    }
+    const res = await fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+    return await res.json();
+  }
 
   function handleCycleOffset(offset) {
     goto(resolve(`/attendance?cycleOffset=${data.cycle.cycleOffset + offset}`));
@@ -56,12 +85,71 @@
     goto(resolve(`/attendance?cycleOffset=${0}`));
   }
 
-  function handleAttendanceEdit(nameId, date, id) {
+  function handleAttendanceEdit(nameId, date, id, categoryId) {
     if (!openCategory && !openNames && !helperOpened) {
       const name = data.attendanceNames.find((a) => a.id == nameId);
       const selectedAttendance = data.attendance.find((a) => a.id == id);
-      editableItem = { nameId, date, name: name.name, id, ...selectedAttendance };
+      editableItem = { nameId, date, name: name?.name, id, ...selectedAttendance };
+      editableCategory = data.attendanceCategories.find((ac) => ac._id == categoryId);
       openAttendanceEdit = true;
+    }
+  }
+
+  function handleAttendanceOverChange(nameId, date, id, categoryId) {
+    const name = data.attendanceNames.find((a) => a.id == nameId);
+    const selectedAttendance = data.attendance.find((a) => a.id == id);
+    editableItem = { nameId, date, name: name?.name, id, ...selectedAttendance };
+    editableCategory = data.attendanceCategories.find((ac) => ac._id == categoryId);
+  }
+
+  function handleShortcutPresent() {
+    if (!openCategory && !openNames && !helperOpened) {
+      if (editableItem.nameId && editableItem.date) {
+        const data = { nameId: editableItem.nameId, date: editableItem.date, 'fields[AT]': 1 };
+        if (editableItem.id) data.id = editableItem.id;
+        transportAction('?/setAttendance', data);
+      }
+    }
+  }
+
+  function handleShortcutAbsent() {
+    if (!openCategory && !openNames && !helperOpened) {
+      if (editableItem.nameId && editableItem.date) {
+        const data = { nameId: editableItem.nameId, date: editableItem.date, 'fields[AT]': 0 };
+        if (editableItem.id) data.id = editableItem.id;
+        transportAction('?/setAttendance', data);
+      }
+    }
+  }
+
+  function handleKeyDown(e) {
+    // 1. IGNORE if the user is typing in an input, textarea, or select dropdown
+    const tagName = e.target.tagName;
+    if (
+      tagName === 'INPUT' ||
+      tagName === 'TEXTAREA' ||
+      tagName === 'SELECT' ||
+      e.target.isContentEditable
+    ) {
+      return;
+    }
+    // 2. Your original logic runs only when NOT typing in an input
+    if (e.key >= '0' && e.key <= '9') {
+      if (!openCategory && !openNames && !helperOpened) {
+        const pressedNumber = Number(e.key);
+        const fields = editableCategory?.fields;
+        const type = e.code.startsWith('Numpad') ? 0 : e.code.startsWith('Digit') ? 1 : -1;
+        if (editableItem.nameId && editableItem.date && type !== -1 && fields?.[type]?.shortName) {
+          const shortName = fields[type].shortName;
+          const data = {
+            nameId: editableItem.nameId,
+            date: editableItem.date,
+            [`fields[${shortName}]`]: pressedNumber,
+          };
+          if (editableItem.id) data.id = editableItem.id;
+          transportAction('?/setTip', data);
+        }
+      }
     }
   }
 
@@ -73,40 +161,43 @@
   onMount(() => {
     syncOn('ATTENDANCE.LIST');
     keyboardEventBus.on('H', handleHelperOpen);
-    keyboardEventBus.on('1', handlePreviousAttendanceCycle);
-    keyboardEventBus.on('2', handleNextAttendanceCycle);
-    keyboardEventBus.on('3', handleCategoryOpen);
-    keyboardEventBus.on('4', handleNameOpen);
+    keyboardEventBus.on('-', handlePreviousAttendanceCycle);
+    keyboardEventBus.on('+', handleNextAttendanceCycle);
+    keyboardEventBus.on('P', handleShortcutPresent);
+    keyboardEventBus.on('A', handleShortcutAbsent);
   });
   onDestroy(() => {
     syncOff('ATTENDANCE.LIST');
     keyboardEventBus.off('H', handleHelperOpen);
-    keyboardEventBus.off('1', handlePreviousAttendanceCycle);
-    keyboardEventBus.off('2', handleNextAttendanceCycle);
-    keyboardEventBus.off('3', handleCategoryOpen);
-    keyboardEventBus.off('4', handleNameOpen);
+    keyboardEventBus.off('-', handlePreviousAttendanceCycle);
+    keyboardEventBus.off('+', handleNextAttendanceCycle);
+    keyboardEventBus.off('P', handleShortcutPresent);
+    keyboardEventBus.off('A', handleShortcutAbsent);
   });
 </script>
 
+<svelte:window on:keydown={handleKeyDown} />
 <div class="flex h-full gap-4 p-5">
   <div class="overflow-auto">
-    <AttendanceTable {...data} onEdit={handleAttendanceEdit} />
+    <AttendanceTable
+      {...data}
+      onEdit={handleAttendanceEdit}
+      onOverRowChange={handleAttendanceOverChange}
+    />
   </div>
   <div class="flex min-w-52 flex-col gap-2">
     <div class="dark flex w-full items-center gap-1">
-      <Button onclick={handlePreviousAttendanceCycle} corner="1">&#129128;</Button>
+      <Button onclick={handlePreviousAttendanceCycle} corner="-">&#129128;</Button>
       <Badge class="flex-1 text-center" onclick={() => handleCurrentCycleOffset()}>
         {data.cycle.shortName}
       </Badge>
-      <Button onclick={handleNextAttendanceCycle} corner="2">&#129130;</Button>
+      <Button onclick={handleNextAttendanceCycle} corner="+">&#129130;</Button>
     </div>
     <div class="dark">
-      <Button corner="3" class="w-full" onclick={() => (openCategory = true)}
-        >Modify Category</Button
-      >
+      <Button class="w-full" onclick={() => (openCategory = true)}>Modify Category</Button>
     </div>
     <div class="dark">
-      <Button corner="4" class="w-full" onclick={() => (openNames = true)}>Modify Names</Button>
+      <Button class="w-full" onclick={() => (openNames = true)}>Modify Names</Button>
     </div>
     <div class="dark">
       <Button class="w-full" disabled>Print Attendance Sheet</Button>
@@ -131,7 +222,10 @@
   <div class="min-w-md bg-white p-5">
     {#each availableOptions as o (o.key)}
       <div class="m-1 mb-2 flex items-center gap-2">
-        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center">{o.key}</span>
+        <span class="inline-block flex-1 rounded-xs bg-gray-300 px-3 text-center whitespace-nowrap">
+          <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+          {@html o.key}
+        </span>
         <span>=</span>
         <span class="flex-11">{o.description}</span>
       </div>
@@ -139,4 +233,9 @@
   </div>
 </Model>
 
-<AttendanceForm open={openAttendanceEdit} onClose={handleAttendanceFormClose} {editableItem} />
+<AttendanceForm
+  open={openAttendanceEdit}
+  onClose={handleAttendanceFormClose}
+  {editableItem}
+  {editableCategory}
+/>

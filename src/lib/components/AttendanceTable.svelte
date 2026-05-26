@@ -2,7 +2,14 @@
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import { getFormattedDate, getWeekdayName } from '$lib/utils/dateTime';
   import { onMount } from 'svelte';
-  const { cycle, attendanceCategories, attendanceNames, attendance, onEdit = () => {} } = $props();
+  const {
+    cycle,
+    attendanceCategories,
+    attendanceNames,
+    attendance,
+    onEdit = () => {},
+    onOverRowChange = () => {},
+  } = $props();
 
   let overRow = $state({ categoryId: null, nameId: null, cIdx: -1 });
 
@@ -41,9 +48,9 @@
   }
 
   function handleKeyboardNav(e) {
-    if (e.key == 'n') {
+    if (e.key == 't') {
       e.preventDefault();
-      const categoryIdList = Object.keys(categorizedAttendanceNames);
+      const categoryIdList = attendanceCategories.map((ac) => ac._id);
       const currentIndex = categoryIdList.indexOf(overRow.categoryId);
       overRow.categoryId = categoryIdList[currentIndex + 1] || categoryIdList[0];
       overRow.nameId = categorizedAttendanceNames[overRow.categoryId][0].id;
@@ -112,7 +119,7 @@
   }
 
   function handleAttendanceEdit() {
-    onEdit(overRow.nameId, cycle.list[overRow.cIdx], overRow.id);
+    onEdit(overRow.nameId, cycle.list[overRow.cIdx], overRow.id, overRow.categoryId);
   }
 
   function displayAT(AT) {
@@ -132,19 +139,73 @@
     }
   }
 
+  function getAtColorClass(categoryId, rowId, cIdx, value) {
+    const staticStyle =
+      value == 0
+        ? { bg: 'bg-red-300', fg: 'text-red-800' }
+        : value == 0.5
+          ? { bg: 'bg-amber-300', fg: 'text-amber-800' }
+          : value == 1
+            ? { bg: 'bg-green-300', fg: 'text-green-800' }
+            : value == 1.5 || value == 2
+              ? { bg: 'bg-blue-300', fg: 'text-blue-800' }
+              : '';
+    const overingStyle =
+      overRow.categoryId == categoryId
+        ? overRow.nameId == rowId
+          ? overRow.cIdx == cIdx
+            ? { bg: 'bg-amber-400' }
+            : { bg: 'bg-gray-300' }
+          : { bg: 'bg-white' }
+        : { bg: 'bg-white' };
+    const finalStyle = { ...overingStyle, ...staticStyle };
+    return Object.values(finalStyle).join(' ');
+  }
+
+  function getAdvColorClass(categoryId, rowId, cIdx, value) {
+    const staticStyle = value ? { fg: 'text-red-800', more: 'border-r-black font-bold' } : '';
+    const overingStyle =
+      overRow.categoryId == categoryId
+        ? overRow.nameId == rowId
+          ? overRow.cIdx == cIdx
+            ? { bg: 'bg-amber-400' }
+            : { bg: 'bg-gray-300' }
+          : { bg: 'bg-white' }
+        : { bg: 'bg-white' };
+    const finalStyle = { ...overingStyle, ...staticStyle };
+    return Object.values(finalStyle).join(' ');
+  }
+
+  function getFieldColorClass(categoryId, rowId, cIdx) {
+    const overingStyle =
+      overRow.categoryId == categoryId
+        ? overRow.nameId == rowId
+          ? overRow.cIdx == cIdx
+            ? { bg: 'bg-amber-400' }
+            : { bg: 'bg-gray-300' }
+          : { bg: 'bg-white' }
+        : { bg: 'bg-white' };
+    const finalStyle = { ...overingStyle };
+    return Object.values(finalStyle).join(' ');
+  }
+
+  $effect(() => {
+    onOverRowChange(overRow.nameId, cycle.list[overRow.cIdx], overRow.id, overRow.categoryId);
+  });
+
   onMount(() => {
     keyboardEventBus.on('ArrowUp', handleKeyboardNav);
     keyboardEventBus.on('ArrowDown', handleKeyboardNav);
     keyboardEventBus.on('ArrowLeft', handleKeyboardNav);
     keyboardEventBus.on('ArrowRight', handleKeyboardNav);
-    keyboardEventBus.on('N', handleKeyboardNav);
+    keyboardEventBus.on('T', handleKeyboardNav);
     keyboardEventBus.on('Enter', handleAttendanceEdit);
     return () => {
       keyboardEventBus.off('ArrowUp', handleKeyboardNav);
       keyboardEventBus.off('ArrowDown', handleKeyboardNav);
       keyboardEventBus.off('ArrowLeft', handleKeyboardNav);
       keyboardEventBus.off('ArrowRight', handleKeyboardNav);
-      keyboardEventBus.off('N', handleKeyboardNav);
+      keyboardEventBus.off('T', handleKeyboardNav);
       keyboardEventBus.off('Enter', handleAttendanceEdit);
     };
   });
@@ -154,7 +215,6 @@
   {#each attendanceCategories as category, catIdx (`${category._id}-${catIdx}`)}
     {@const fieldsPerDate = category.fields.length + 2}
     {@const totalDynamicCols = fieldsPerDate * cycle.list.length}
-
     <div
       data-identity={category._id}
       class="grid w-fit max-w-full overflow-auto border-2 *:px-1"
@@ -235,13 +295,7 @@
           <!-- svelte-ignore a11y_no_static_element_interactions -->
           <div
             class="border-r border-b border-gray-400 text-center
-            {overRow.categoryId == category._id
-              ? row.id == overRow.nameId
-                ? overRow.cIdx == cIdx
-                  ? 'bg-violet-300'
-                  : 'bg-gray-300'
-                : 'bg-white'
-              : 'bg-white'}"
+            {getAtColorClass(category._id, row.id, cIdx, fieldData?.fields?.AT)}"
             onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
           >
             {displayAT(fieldData?.fields?.AT)}
@@ -252,16 +306,15 @@
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               class="border-r border-b border-gray-400 text-center
-              {overRow.categoryId == category._id
-                ? row.id == overRow.nameId
-                  ? overRow.cIdx == cIdx
-                    ? 'bg-violet-300'
-                    : 'bg-gray-300'
-                  : 'bg-white'
-                : 'bg-white'}"
+              {getFieldColorClass(
+                category._id,
+                row.id,
+                cIdx,
+                fieldData?.fields?.[field.shortName],
+              )}"
               onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
             >
-              {fieldData?.fields?.[field.shortName]}
+              {fieldData?.fields?.[field.shortName] || ''}
             </div>
           {/each}
 
@@ -271,15 +324,9 @@
             onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
             class="{cIdx !== cycle.list.length - 1 && 'border-r-2'}
               border-b border-b-gray-400 text-center
-              {overRow.categoryId == category._id
-              ? row.id == overRow.nameId
-                ? overRow.cIdx == cIdx
-                  ? 'bg-violet-300'
-                  : 'bg-gray-300'
-                : 'bg-white'
-              : 'bg-white'}"
+              {getAdvColorClass(category._id, row.id, cIdx, fieldData?.fields?.Adv)}"
           >
-            {fieldData?.fields?.Adv}
+            {fieldData?.fields?.Adv || ''}
           </div>
         {/each}
       {/each}

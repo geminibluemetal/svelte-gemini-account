@@ -4,7 +4,7 @@
   import Model from '$lib/components/Model.svelte';
   import { showToast } from '$lib/stores/toast';
   import { getFormattedDate } from '$lib/utils/dateTime';
-  const { open, onClose, editableItem } = $props();
+  const { open, onClose, editableItem, editableCategory } = $props();
   const options = {
     'Absent (0)': 0,
     'Present Full day (1)': 1,
@@ -46,8 +46,13 @@
       }}
       value={Object.keys(options).find((key) => options[key] === editableItem?.fields?.AT)}
     />
-    <InputField name="fields[T]" placeholder="Tip" value={editableItem?.fields?.T || ''} />
-    <InputField name="fields[W]" placeholder="Water" value={editableItem?.fields?.W || ''} />
+    {#each editableCategory.fields as field, index (index)}
+      <InputField
+        name={`fields[${field.shortName}]`}
+        placeholder={field.longName}
+        value={editableItem?.fields?.[field.shortName] || ''}
+      />
+    {/each}
     <InputField name="fields[Adv]" placeholder="Advance" value={editableItem?.fields?.Adv || ''} />
     <input type="hidden" name="date" value={editableItem.date} />
     <input type="hidden" name="nameId" value={editableItem.nameId} />

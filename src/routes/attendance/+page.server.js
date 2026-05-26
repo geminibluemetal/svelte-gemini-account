@@ -66,4 +66,30 @@ export const actions = {
     sseEmit({ type: 'ATTENDANCE.LIST' });
     return result;
   },
+
+  setAttendance: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const attendanceService = new AttendanceService();
+    const result = await attendanceService.setAttendance(data);
+
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+    sseEmit({ type: 'ATTENDANCE.LIST' });
+    return result;
+  },
+
+  setTip: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const attendanceService = new AttendanceService();
+    const result = await attendanceService.setTip(data);
+
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+    sseEmit({ type: 'ATTENDANCE.LIST' });
+    return result;
+  },
 };

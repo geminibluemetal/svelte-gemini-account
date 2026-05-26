@@ -25,4 +25,46 @@ export default class AttendanceService {
       return handleServiceError(error);
     }
   }
+
+  async setAttendance(data) {
+    try {
+      const AT = Number(data.fields.AT)
+      const date = new Date(data.date)
+      if (data?.id) {
+        return this.repository.updateById(data.id, { "fields.AT": AT });
+      }
+      return this.repository.create({ ...data, date, fields: { AT } });
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async setTip(data) {
+    try {
+      const date = new Date(data.date);
+
+      // 1. Get the dynamic key name (like "T" or "AT") from the fields object
+      const dynamicKey = Object.keys(data.fields)[0];
+      const fieldValue = Number(data.fields[dynamicKey]);
+
+      // --- UPDATE ---
+      if (data?.id) {
+        return this.repository.updateById(data.id, {
+          [`fields.${dynamicKey}`]: fieldValue // Becomes {"fields.T": value}
+        });
+      }
+
+      // --- CREATE ---
+      return this.repository.create({
+        nameId: data.nameId,
+        date,
+        fields: {
+          [dynamicKey]: fieldValue // Becomes { T: value }
+        }
+      });
+
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
 }
