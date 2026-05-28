@@ -15,9 +15,10 @@ export default class AttendanceService {
 
   async saveAttendance(data) {
     try {
+      const exist = await this.repository.findOne({ nameId: data.nameId, date: new Date(data.date) })
       const parsed = await attendanceSchema.safeParse(data);
       if (!parsed.success) schemaError(parsed);
-      if (data?.id) {
+      if (exist?.id) {
         return this.repository.updateById(data.id, parsed.data);
       }
       return this.repository.create(parsed.data);
@@ -28,9 +29,10 @@ export default class AttendanceService {
 
   async setAttendance(data) {
     try {
+      const exist = await this.repository.findOne({ nameId: data.nameId, date: new Date(data.date) })
       const AT = Number(data.fields.AT)
       const date = new Date(data.date)
-      if (data?.id) {
+      if (exist?.id) {
         return this.repository.updateById(data.id, { "fields.AT": AT });
       }
       return this.repository.create({ ...data, date, fields: { AT } });
@@ -46,9 +48,10 @@ export default class AttendanceService {
       // 1. Get the dynamic key name (like "T" or "AT") from the fields object
       const dynamicKey = Object.keys(data.fields)[0];
       const fieldValue = Number(data.fields[dynamicKey]);
+      const exist = await this.repository.findOne({ nameId: data.nameId, date: new Date(data.date) })
 
       // --- UPDATE ---
-      if (data?.id) {
+      if (exist?.id) {
         return this.repository.updateById(data.id, {
           [`fields.${dynamicKey}`]: fieldValue // Becomes {"fields.T": value}
         });

@@ -12,6 +12,7 @@
   import Model from '$lib/components/Model.svelte';
   import { keyboardEventBus } from '$lib/core/client/eventBus';
   import AttendanceForm from './AttendanceForm.svelte';
+  import AttendancePrint from './AttendancePrint.svelte';
 
   const { data, form } = $props();
 
@@ -177,7 +178,7 @@
 </script>
 
 <svelte:window on:keydown={handleKeyDown} />
-<div class="flex h-full gap-4 p-5">
+<div class="flex h-full gap-4 p-5 print:hidden">
   <div class="overflow-auto">
     <AttendanceTable
       {...data}
@@ -200,7 +201,7 @@
       <Button class="w-full" onclick={() => (openNames = true)}>Modify Names</Button>
     </div>
     <div class="dark">
-      <Button class="w-full" disabled>Print Attendance Sheet</Button>
+      <Button class="w-full" onclick={() => window.print()}>Print Attendance Sheet</Button>
     </div>
   </div>
 </div>
@@ -239,3 +240,5 @@
   {editableItem}
   {editableCategory}
 />
+
+<AttendancePrint {...data} />

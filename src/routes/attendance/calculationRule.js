@@ -1,13 +1,11 @@
 export function runCalculateRule(name, category, attendanceData) {
-  if (name.id == "6a12c3c8e3b55394c710f168") {
-
+  try {
     const calculatedData = {}
     const segementData = {}
     let listOfOptimaizedRule = sortRulesByDependency(category.calculationRule)
-    listOfOptimaizedRule = listOfOptimaizedRule.map(r => r.rule)
 
-    let segement = listOfOptimaizedRule.map(str => {
-      return str
+    let segement = listOfOptimaizedRule.map(r => {
+      return r.rule
         .split(/[+\-*/]+/) // Splits by any of these operators
         .filter(item => item.trim() !== ""); // Removes empty chunks if any
     });
@@ -31,16 +29,26 @@ export function runCalculateRule(name, category, attendanceData) {
       }
     })
 
-    console.log(segement, segementData)
+    listOfOptimaizedRule.map(r => {
+      const segement = r.rule.match(/[a-zA-Z0-9_:]+|[+\-*/]/g);
+      const result = segement.map(s => {
+        if (s == '+' || s == '-' || s == '*' || s == '/') return s
+        else if (s.startsWith('cl:')) {
+          const dataKey = s.replace("cl:", '')
+          return calculatedData[dataKey]
+        } else {
+          return segementData[s]
+        }
+      })
+      calculatedData[r.key] = eval(result.join(""))
+    })
+
+    return calculatedData
+  } catch (error) {
+    console.warn("Error Occured in Evaluating Calculation Rule")
+    console.error(error)
   }
 }
-
-const str = "cl:tipAmount+cl:mayilAmount+cl:waterAmount";
-
-// Pattern: Match word-characters-with-colons OR match any math operator
-const result = str.match(/[a-zA-Z0-9_:]+|[+\-*/]/g);
-
-console.log(result);
 
 function sortRulesByDependency(rules) {
   const sorted = [];

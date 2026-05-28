@@ -215,7 +215,7 @@
 <div class="flex flex-col gap-5 caret-transparent">
   {#each attendanceCategories as category, catIdx (`${category._id}-${catIdx}`)}
     {@const fieldsPerDate = category.fields.length + 2}
-    {@const totalDynamicCols = fieldsPerDate * cycle.list.length}
+    {@const totalDynamicCols = fieldsPerDate * cycle.list.length + category.calculationRule.length}
     <div
       data-identity={category._id}
       class="grid w-fit max-w-full overflow-auto border-2 *:px-1"
@@ -233,14 +233,23 @@
         {category.name}
       </div>
 
-      {#each cycle.list as date, dateIdx (date)}
+      {#each cycle.list as date (date)}
         <div
-          class="{cycle.list.length - 1 !== dateIdx &&
-            'border-r-2'} border-b-2 bg-black text-center text-white"
+          class="border-r-2 border-b-2 bg-black text-center text-white"
           style:grid-column="span {fieldsPerDate}"
         >
           {getFormattedDate(date)}
           <div class="-mt-1 text-sm text-white/70">{getWeekdayName(date)}</div>
+        </div>
+      {/each}
+
+      <!-- calculationRule head -->
+      {#each category.calculationRule as rule, index (rule.id)}
+        <div
+          class="row-span-2 w-min border-b-2 border-b-black bg-violet-800 text-center wrap-break-word text-white
+          {category.calculationRule.length - 1 !== index && 'border-r-2'}"
+        >
+          {rule.name}
         </div>
       {/each}
 
@@ -254,13 +263,11 @@
             {field.shortName}
           </div>
         {/each}
-        <div
-          class="{cycleIdx !== cycle.list.length - 1 &&
-            'border-r-2'} min-w-8 border-b-2 border-b-black bg-black text-center text-white"
-        >
+        <div class="min-w-8 border-r-2 border-b-2 border-b-black bg-black text-center text-white">
           Adv
         </div>
       {/each}
+
       {#each categorizedAttendanceNames[category._id] || [] as row, rowIdx (row.id || rowIdx)}
         {@const attendanceData = attendance.filter((a) => a.nameId == row.id)}
         {@const calculatedData = runCalculateRule(row, category, attendanceData)}
@@ -325,11 +332,27 @@
           <div
             data-identity={`${category._id}-${row.id}-${cIdx}`}
             onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
-            class="{cIdx !== cycle.list.length - 1 && 'border-r-2'}
-              border-b border-b-gray-400 text-center
+            class="border-r-2 border-b border-b-gray-400 text-center
               {getAdvColorClass(category._id, row.id, cIdx, fieldData?.fields?.Adv)}"
           >
             {fieldData?.fields?.Adv || ''}
+          </div>
+        {/each}
+
+        <!-- calculationRule body -->
+        {#each category.calculationRule as rule, index (rule.id)}
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="{category.calculationRule.length - 1 !== index && 'border-r-2'}
+          border-b border-b-gray-400 text-center
+          {overRow.categoryId == category._id
+              ? row.id == overRow.nameId
+                ? 'bg-gray-300'
+                : 'bg-white'
+              : 'bg-white'}"
+            onmousemove={() => handleMouseOver(category._id, row.id, -1)}
+          >
+            {calculatedData[rule.key]}
           </div>
         {/each}
       {/each}
