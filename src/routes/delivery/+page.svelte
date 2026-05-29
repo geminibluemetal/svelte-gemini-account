@@ -20,6 +20,8 @@
   import { parseDate } from '$lib/utils/dateTimeParser';
   import { updateParams } from '$lib/core/client/urlParams';
   import DeliveryExtraPopup from './DeliveryExtraPopup.svelte';
+  import InputField from '$lib/components/InputField.svelte';
+  import { enhance } from '$app/forms';
 
   const { data } = $props();
   let view = $state('All');
@@ -883,37 +885,62 @@
 />
 
 <!-- Vehicle Summary -->
-<Model open={vehicleSummaryOpened} onClose={() => (vehicleSummaryOpened = false)}>
+<Model
+  open={vehicleSummaryOpened}
+  onClose={() => (vehicleSummaryOpened = false)}
+  autoFocusTabIndex="-1"
+>
   <div class="mx-5 mt-5 flex justify-center text-center">Vehicle Summary</div>
-  <!-- <div class="text-center mt-5 mx-5 flex items-center">
-    <InputField />
-  </div> -->
-  <div
-    class="flex max-w-7xl items-start justify-start gap-2 overflow-x-auto bg-white p-5 whitespace-nowrap"
+  <form
+    class="mx-5 mt-2 flex items-center text-center"
+    action="?/vehicleOrder"
+    method="POST"
+    use:enhance
   >
+    <div class="mr-2 w-full">
+      <InputField
+        caseMode="none"
+        placeholder="Vehicle Order (row split by '|' and column split by ',')"
+        name="vehicleOrder"
+        value={data.vehicleOrder}
+      />
+    </div>
+    <Button type="submit">Save</Button>
+  </form>
+  <div class="w-full overflow-auto bg-white p-5 whitespace-nowrap">
     {#if Object.entries(vehicleSummary).length}
-      {#each Object.entries(vehicleSummary) as [vehicle, data], index (index)}
-        <table class="border-2">
-          <thead>
-            <tr>
-              <th class="border bg-black px-1 text-white" colspan="3">{vehicle}</th>
-            </tr>
-            <tr>
-              <th class="border bg-black px-1 text-white">S.no</th>
-              <th class="border bg-black px-1 text-white">Time</th>
-              <th class="border bg-black px-1 text-white">Address</th>
-            </tr>
-          </thead>
-          <tbody>
-            {#each data as entry, index (index)}
-              <tr>
-                <td class="border border-gray-500 px-1 text-center">{index + 1}</td>
-                <td class="border border-gray-500 px-1">{entry.time}</td>
-                <td class="border border-gray-500 px-1">{entry.address}</td>
-              </tr>
-            {/each}
-          </tbody>
-        </table>
+      {#each data.vehicleOrder.split('|') as row, rIdx (rIdx)}
+        <div class="mb-5 flex w-full gap-2">
+          {#each row.split(',') as vehicle, cIdx (cIdx)}
+            {@const vehicleName = `${vehicle.trim()} G`}
+            {@const vehicleData = vehicleSummary[vehicleName]}
+            {#if vehicleData}
+              <div>
+                <table class="border-2">
+                  <thead>
+                    <tr>
+                      <th class="border bg-black px-1 text-white" colspan="3">{vehicleName}</th>
+                    </tr>
+                    <tr>
+                      <th class="border bg-black px-1 text-white">S.no</th>
+                      <th class="border bg-black px-1 text-white">Time</th>
+                      <th class="border bg-black px-1 text-white">Address</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each vehicleData as data, index (index)}
+                      <tr>
+                        <td class="border border-gray-500 px-1 text-center">{index + 1}</td>
+                        <td class="border border-gray-500 px-1">{data.time}</td>
+                        <td class="border border-gray-500 px-1">{data.address}</td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            {/if}
+          {/each}
+        </div>
       {/each}
     {:else}
       <div class="flex gap-2 text-gray-500">

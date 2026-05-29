@@ -7,6 +7,7 @@ import ItemService from '$lib/features/items/ItemService.js';
 import OrderService from '$lib/features/orders/OrderService.js';
 import PartyService from '$lib/features/party/PartyService.js';
 import PartyStatementService from '$lib/features/partyStatement/PartyStatementService';
+import SettingsService from '$lib/features/settings/SettingsService.js';
 import { parseDate } from '$lib/utils/dateTimeParser';
 import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
@@ -24,9 +25,10 @@ export async function load({ depends, url }) {
   const partyService = new PartyService();
   const itemService = new ItemService();
   const partyStatement = new PartyStatementService();
+  const settingService = new SettingsService();
 
   // Make parllel fetching for better performance
-  const [orders, address, token, party, item, oldBalance, paytmOrder] = await Promise.all([
+  const [orders, address, token, party, item, oldBalance, paytmOrder, settings] = await Promise.all([
     orderService.availableOrderList(),
     addressService.addressList(),
     deliveryService.deliveryList(formattedDate),
@@ -34,6 +36,7 @@ export async function load({ depends, url }) {
     itemService.itemList(),
     partyStatement.getAllOldBalance(formattedDate),
     orderService.paytmAmountFromOrders(formattedDate),
+    settingService.getSettings()
   ]);
   return {
     token: serializeDoc(token),
@@ -43,6 +46,7 @@ export async function load({ depends, url }) {
     orders: serializeDoc(orders),
     oldBalance: serializeDoc(oldBalance),
     paytmOrder,
+    vehicleOrder: settings.vehicleOrder
   };
 }
 
@@ -203,4 +207,12 @@ export const actions = {
     sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
     sseEmit({ type: 'CASH.LIST' });
   },
+
+  vehicleOrder: async ({ request }) => {
+    const formData = await request.formData();
+    const { vehicleOrder } = formDataToObject(formData);
+    const settingService = new SettingsService();
+    await settingService.updateSetting({ vehicleOrder })
+    sseEmit({ type: 'DELIVERY.TOKEN.LIST' });
+  }
 };
