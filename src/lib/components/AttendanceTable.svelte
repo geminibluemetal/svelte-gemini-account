@@ -12,6 +12,7 @@
     attendance,
     onEdit = () => {},
     onOverRowChange = () => {},
+    showAmount,
   } = $props();
 
   let overRow = $state({ categoryId: null, nameId: null, cIdx: -1 });
@@ -249,8 +250,10 @@
 
 <div class="flex flex-col gap-5 caret-transparent">
   {#each attendanceCategories as category, catIdx (`${category._id}-${catIdx}`)}
-    {@const fieldsPerDate = category.fields.length + 2}
-    {@const totalDynamicCols = fieldsPerDate * cycle.list.length + category.calculationRule.length}
+    {@const fields = category.fields.filter((f) => !f.isHidden)}
+    {@const fieldsPerDate = fields.length + 2}
+    {@const totalDynamicCols =
+      fieldsPerDate * cycle.list.length + (showAmount ? category.calculationRule.length : 0)}
     <div
       data-identity={category._id}
       class="grid w-fit max-w-full overflow-auto border-2 *:px-1"
@@ -268,9 +271,10 @@
         {category.name}
       </div>
 
-      {#each cycle.list as date (date)}
+      {#each cycle.list as date, index (date)}
         <div
-          class="border-r-2 border-b-2 bg-black text-center text-white"
+          class="border-b-2 bg-black text-center text-white
+          {!showAmount && cycle.list.length - 1 == index ? 'border-r-0' : 'border-r-2'}"
           style:grid-column="span {fieldsPerDate}"
         >
           {getFormattedDate(date)}
@@ -279,26 +283,31 @@
       {/each}
 
       <!-- calculationRule head -->
-      {#each category.calculationRule as rule, index (rule.id)}
-        <div
-          class="row-span-2 w-min border-b-2 border-b-black bg-violet-800 text-center wrap-break-word text-white
+      {#if showAmount}
+        {#each category.calculationRule as rule, index (rule.id)}
+          <div
+            class="row-span-2 w-min border-b-2 border-b-black bg-violet-800 text-center wrap-break-word text-white
           {category.calculationRule.length - 1 !== index && 'border-r-2'}"
-        >
-          {rule.name}
-        </div>
-      {/each}
+          >
+            {rule.name}
+          </div>
+        {/each}
+      {/if}
 
       <!-- eslint-disable-next-line no-unused-vars -->
       {#each Array.from({ length: cycle.list.length }) as _, cycleIdx (cycleIdx)}
         <div class="min-w-8 border-r border-b-2 border-b-black bg-black text-center text-white">
           AT
         </div>
-        {#each category.fields as field, fieldIdx (fieldIdx)}
+        {#each fields as field, fieldIdx (fieldIdx)}
           <div class="min-w-8 border-r border-b-2 border-b-black bg-black text-center text-white">
             {field.shortName}
           </div>
         {/each}
-        <div class="min-w-8 border-r-2 border-b-2 border-b-black bg-black text-center text-white">
+        <div
+          class="min-w-8 border-b-2 border-b-black bg-black text-center text-white
+        {!showAmount && cycle.list.length - 1 == cycleIdx ? 'border-r-0' : 'border-r-2'}"
+        >
           Adv
         </div>
       {/each}
@@ -347,7 +356,7 @@
           </div>
 
           <!-- eslint-disable-next-line no-unused-vars -->
-          {#each category.fields as field, fIdx (fIdx)}
+          {#each fields as field, fIdx (fIdx)}
             <!-- svelte-ignore a11y_no_static_element_interactions -->
             <div
               class="border-r border-b border-gray-400 text-center
@@ -367,7 +376,8 @@
           <div
             data-identity={`${category._id}-${row.id}-${cIdx}`}
             onmousemove={() => handleMouseOver(category._id, row.id, cIdx, fieldData?.id)}
-            class="border-r-2 border-b border-b-gray-400 text-center
+            class="border-b border-b-gray-400 text-center
+              {!showAmount && cycle.list.length - 1 == cIdx ? 'border-r-0' : 'border-r-2'}
               {getAdvColorClass(category._id, row.id, cIdx, fieldData?.fields?.Adv)}"
           >
             {fieldData?.fields?.Adv || ''}
@@ -375,43 +385,27 @@
         {/each}
 
         <!-- calculationRule body -->
-        {#each category.calculationRule as rule, index (rule.id)}
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <div
-            class="{category.calculationRule.length - 1 !== index && 'border-r-2'}
+        {#if showAmount}
+          {#each category.calculationRule as rule, index (rule.id)}
+            <!-- svelte-ignore a11y_no_static_element_interactions -->
+            <div
+              class="{category.calculationRule.length - 1 !== index && 'border-r-2'}
           border-b border-b-gray-400 text-center
           {overRow.categoryId == category._id
-              ? row.id == overRow.nameId
-                ? 'bg-gray-300'
-                : 'bg-white'
-              : 'bg-white'}"
-            onmousemove={() => handleMouseOver(category._id, row.id, -1)}
-          >
-            {calculatedData[rule.key]}
-          </div>
-        {/each}
+                ? row.id == overRow.nameId
+                  ? 'bg-gray-300'
+                  : 'bg-white'
+                : 'bg-white'}"
+              onmousemove={() => handleMouseOver(category._id, row.id, -1)}
+            >
+              {calculatedData[rule.key]}
+            </div>
+          {/each}
+        {/if}
       {/each}
     </div>
   {/each}
 </div>
-
-{#each Object.entries(globalAttendanceSummary) as [categoryName, summary] (categoryName)}
-  <Teleport to="#attendance-sidebar">
-    <div class="mb-3 grid border *:border *:px-1">
-      <div style:grid-column="span 2" class="border-black bg-black text-center text-white">
-        {categoryName} Summary
-      </div>
-      <div>Total Amount</div>
-      <div>{formatNumber(summary.totalAmount)}</div>
-
-      <div>Total Advance</div>
-      <div>{formatNumber(summary.totalAdvance)}</div>
-
-      <div>Total Pending</div>
-      <div>{formatNumber(summary.totalPayable)}</div>
-    </div>
-  </Teleport>
-{/each}
 
 <Teleport to="#attendance-sidebar">
   <div class="mb-3 grid border *:border *:px-1">
@@ -440,3 +434,21 @@
     </div>
   </div>
 </Teleport>
+
+{#each Object.entries(globalAttendanceSummary) as [categoryName, summary] (categoryName)}
+  <Teleport to="#attendance-sidebar">
+    <div class="mb-3 grid border *:border *:px-1">
+      <div style:grid-column="span 2" class="border-black bg-black text-center text-white">
+        {categoryName} Summary
+      </div>
+      <div>Total Amount</div>
+      <div>{formatNumber(summary.totalAmount)}</div>
+
+      <div>Total Advance</div>
+      <div>{formatNumber(summary.totalAdvance)}</div>
+
+      <div>Total Pending</div>
+      <div>{formatNumber(summary.totalPayable)}</div>
+    </div>
+  </Teleport>
+{/each}

@@ -20,6 +20,7 @@
   let openNames = $state(false);
   let helperOpened = $state(false);
   let openAttendanceEdit = $state(false);
+  let showAmount = $state(false);
   let editableItem = $state({});
   let editableCategory = $state({});
 
@@ -33,6 +34,7 @@
     { key: 'T', description: 'Change focus to next Table/Category' },
     // Attendance actions
     { key: 'R', description: 'Print payment receipt for the selected person' },
+    { key: 'S', description: 'Show Amount Details in Table' },
     { key: 'P', description: 'Set Present for selected Attendace' },
     { key: 'A', description: 'Set Absent for selected Attendace' },
     { key: 'Enter', description: 'Edit selected Attendance' },
@@ -150,7 +152,7 @@
     if (e.key >= '0' && e.key <= '9') {
       if (!openCategory && !openNames && !helperOpened) {
         const pressedNumber = Number(e.key);
-        const fields = editableCategory?.fields;
+        const fields = editableCategory?.fields?.filter((f) => !f.isHidden);
         const type = e.code.startsWith('Numpad') ? 0 : e.code.startsWith('Digit') ? 1 : -1;
         if (editableItem.nameId && editableItem.date && type !== -1 && fields?.[type]?.shortName) {
           const shortName = fields[type].shortName;
@@ -166,6 +168,10 @@
     }
   }
 
+  function handleShowAmount() {
+    showAmount = !showAmount;
+  }
+
   $effect(() => {
     if (form?.message) {
       showToast(form.message, form.ok ? 'success' : 'danger');
@@ -179,6 +185,7 @@
     keyboardEventBus.on('P', handleShortcutPresent);
     keyboardEventBus.on('A', handleShortcutAbsent);
     keyboardEventBus.on('R', handlePaymentReceipt);
+    keyboardEventBus.on('S', handleShowAmount);
   });
   onDestroy(() => {
     syncOff('ATTENDANCE.LIST');
@@ -187,7 +194,8 @@
     keyboardEventBus.off('+', handleNextAttendanceCycle);
     keyboardEventBus.off('P', handleShortcutPresent);
     keyboardEventBus.off('A', handleShortcutAbsent);
-    keyboardEventBus.on('R', handlePaymentReceipt);
+    keyboardEventBus.off('R', handlePaymentReceipt);
+    keyboardEventBus.off('S', handleShowAmount);
   });
 </script>
 
@@ -196,17 +204,21 @@
   <div class="overflow-auto">
     <AttendanceTable
       {...data}
+      {showAmount}
       onEdit={handleAttendanceEdit}
       onOverRowChange={handleAttendanceOverChange}
     />
   </div>
-  <div class="flex h-full min-w-54 flex-col gap-2 overflow-auto">
+  <div class="flex h-full min-w-52 flex-col gap-2">
     <div class="dark flex w-full items-center gap-1">
       <Button onclick={handlePreviousAttendanceCycle} corner="-">&#129128;</Button>
       <Badge class="flex-1 text-center" onclick={() => handleCurrentCycleOffset()}>
         {data.cycle.shortName}
       </Badge>
       <Button onclick={handleNextAttendanceCycle} corner="+">&#129130;</Button>
+    </div>
+    <div class="dark">
+      <Button corner="S" class="w-full" onclick={handleShowAmount}>Show Amount</Button>
     </div>
     <div class="dark">
       <Button class="w-full" onclick={() => (openCategory = true)}>Modify Category</Button>
@@ -217,7 +229,7 @@
     <div class="dark">
       <Button class="w-full" onclick={() => window.print()}>Print Attendance Sheet</Button>
     </div>
-    <div id="attendance-sidebar"></div>
+    <div id="attendance-sidebar" class="h-full overflow-auto"></div>
   </div>
 </div>
 

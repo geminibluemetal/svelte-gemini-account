@@ -95,7 +95,7 @@ export const seedData = [
     ],
     calculationRule: [
       { name: "Working Days", key: "workingDays", rule: "SUM:AT", id: crypto.randomUUID() },
-      { name: "Food Fees", key: "foodFees", rule: "SUM:AT*fd:F", id: crypto.randomUUID() },
+      { name: "Food Fees", key: "foodFees", rule: "CEIL:SUM:AT*fd:F", id: crypto.randomUUID() },
       { name: "Day Fees", key: "dayFees", rule: "nd:dayFee", id: crypto.randomUUID() },
       { name: "Salary", key: "salary", rule: "cl:workingDays*nd:dayFee", id: crypto.randomUUID() },
       { name: "Total Salary", key: "totalSalary", rule: "cl:salary+cl:foodFees", id: crypto.randomUUID() },

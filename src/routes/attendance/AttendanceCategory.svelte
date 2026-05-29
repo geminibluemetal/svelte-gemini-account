@@ -1,6 +1,7 @@
 <script>
   import { enhance } from '$app/forms';
   import Button from '$lib/components/Button.svelte';
+  import CheckBoxField from '$lib/components/CheckBoxField.svelte';
   import InputField from '$lib/components/InputField.svelte';
   import Model from '$lib/components/Model.svelte';
   const { attendanceCategories, open, onClose } = $props();
@@ -96,6 +97,10 @@
                 name={`fields[${index}][amount]`}
                 value={field.amount}
               />
+              <div class="-mb-3 flex items-center justify-center">
+                <CheckBoxField name={`fields[${index}][isHidden]`} value={field.isHidden} />
+                <span class="mb-3">isHidden</span>
+              </div>
               <div>
                 <Button
                   class="dark"

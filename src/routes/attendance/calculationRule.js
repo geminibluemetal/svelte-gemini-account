@@ -1,3 +1,7 @@
+const evalFunction = {
+  CEIL: (value) => Math.ceil(value)
+}
+
 export function runCalculateRule(name, category, attendanceData) {
   try {
     const calculatedData = {}
@@ -12,13 +16,24 @@ export function runCalculateRule(name, category, attendanceData) {
     segement = segement.flat().sort()
 
     segement.forEach(s => {
-      if (s.startsWith("SUM:")) {
-        const path = s.replace("SUM:", "")
+      if (s.includes("SUM:")) {
+        const path = s.split(":")
+        const fieldKey = path.pop(); path.pop();
         const totalSum = attendanceData.reduce((sum, ad) => {
-          const value = ad.fields && ad.fields[path] ? Number(ad.fields[path]) : 0;
+          const value = ad.fields && ad.fields[fieldKey] ? Number(ad.fields[fieldKey]) : 0;
           return sum + value;
         }, 0);
-        segementData[`SUM:${path}`] = totalSum
+        const remainPaths = [...path].reverse();
+        let evalValue = totalSum
+        remainPaths.forEach(fn => {
+          evalValue = evalFunction[fn](evalValue)
+        })
+        if (remainPaths.length) {
+          const segementKey = [...path, "SUM", fieldKey].join(":")
+          segementData[segementKey] = evalValue
+        } else {
+          segementData[`SUM:${fieldKey}`] = evalValue
+        }
       } else if (s.startsWith("nd:")) {
         const path = s.replace("nd:", "")
         segementData[`nd:${path}`] = name[path]

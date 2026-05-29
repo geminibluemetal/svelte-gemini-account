@@ -7,6 +7,7 @@ const fieldSchema = z.object({
   shortName: z.string().min(1, "Short name is required"),
   longName: z.string().min(1, "Long name is required"),
   amount: z.coerce.number().nonnegative("Amount must be a positive number or zero"),
+  isHidden: z.coerce.boolean().default(false)
 });
 
 const calculationRuleSchema = z.object({
