@@ -13,6 +13,10 @@ export default class AttendanceCategoryService {
     return await this.repository.getAllCategories();
   }
 
+  async getCategoryById(id) {
+    return await this.repository.findById(id);
+  }
+
   async editCategory(data) {
     try {
       const parsed = await attendanceCategorySchema.safeParse(data);

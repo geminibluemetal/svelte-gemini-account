@@ -32,6 +32,7 @@
     { key: '🠋', description: 'Move to next Name' },
     { key: 'T', description: 'Change focus to next Table/Category' },
     // Attendance actions
+    { key: 'R', description: 'Print payment receipt for the selected person' },
     { key: 'P', description: 'Set Present for selected Attendace' },
     { key: 'A', description: 'Set Absent for selected Attendace' },
     { key: 'Enter', description: 'Edit selected Attendance' },
@@ -123,6 +124,17 @@
     }
   }
 
+  function handlePaymentReceipt() {
+    if (!openCategory && !openNames && !helperOpened && editableItem?.nameId) {
+      const payload = {
+        nameId: editableItem.nameId,
+        startDate: data.cycle.startDate,
+        endDate: data.cycle.endDate,
+      };
+      transportAction('?/printReceipt', payload);
+    }
+  }
+
   function handleKeyDown(e) {
     // 1. IGNORE if the user is typing in an input, textarea, or select dropdown
     const tagName = e.target.tagName;
@@ -166,6 +178,7 @@
     keyboardEventBus.on('+', handleNextAttendanceCycle);
     keyboardEventBus.on('P', handleShortcutPresent);
     keyboardEventBus.on('A', handleShortcutAbsent);
+    keyboardEventBus.on('R', handlePaymentReceipt);
   });
   onDestroy(() => {
     syncOff('ATTENDANCE.LIST');
@@ -174,6 +187,7 @@
     keyboardEventBus.off('+', handleNextAttendanceCycle);
     keyboardEventBus.off('P', handleShortcutPresent);
     keyboardEventBus.off('A', handleShortcutAbsent);
+    keyboardEventBus.on('R', handlePaymentReceipt);
   });
 </script>
 
@@ -186,7 +200,7 @@
       onOverRowChange={handleAttendanceOverChange}
     />
   </div>
-  <div class="flex min-w-52 flex-col gap-2">
+  <div class="flex h-full min-w-54 flex-col gap-2 overflow-auto">
     <div class="dark flex w-full items-center gap-1">
       <Button onclick={handlePreviousAttendanceCycle} corner="-">&#129128;</Button>
       <Badge class="flex-1 text-center" onclick={() => handleCurrentCycleOffset()}>
@@ -203,6 +217,7 @@
     <div class="dark">
       <Button class="w-full" onclick={() => window.print()}>Print Attendance Sheet</Button>
     </div>
+    <div id="attendance-sidebar"></div>
   </div>
 </div>
 

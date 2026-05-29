@@ -92,4 +92,16 @@ export const actions = {
     sseEmit({ type: 'ATTENDANCE.LIST' });
     return result;
   },
+
+  printReceipt: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const attendanceService = new AttendanceService();
+    const result = await attendanceService.printReceipt(data);
+
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+    return result;
+  },
 };

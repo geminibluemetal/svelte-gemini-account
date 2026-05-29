@@ -4,17 +4,17 @@
   const { attendanceCategories, attendanceNames, attendance, cycle } = $props();
 </script>
 
-<div class="hidden print:block">
+<div class="hidden px-5 print:block">
   <div class="text-center">
     {getFormattedDate(cycle.startDate)} - {getFormattedDate(cycle.endDate)}
   </div>
   {#each attendanceCategories as category (category._id)}
     {@const names = attendanceNames.filter((an) => an.categoryId == category._id)}
     <div class="mb-5 break-inside-avoid">
-      <div class="mb-2 text-center text-lg font-bold">{category.name}</div>
+      <div class="mb-2 text-center font-bold">{category.name}</div>
       <table class="w-full border-collapse">
         <thead>
-          <tr class="bg-gray-100 *:border *:px-1 *:text-base">
+          <tr class="bg-gray-100 *:border *:px-1 *:text-xs">
             <th>Sn</th>
             <th>Name</th>
             {#each category.calculationRule as rule (rule.id)}
@@ -27,7 +27,7 @@
           {#each names as name, index (name.id)}
             {@const attendanceData = attendance.filter((a) => a.nameId == name.id)}
             {@const calculatedData = runCalculateRule(name, category, attendanceData)}
-            <tr class="*:border *:px-1">
+            <tr class="*:border *:px-1 *:text-xs">
               <td>{index + 1}</td>
               <td class="whitespace-nowrap">{name.name}</td>
               {#each category.calculationRule as rule (rule.id)}

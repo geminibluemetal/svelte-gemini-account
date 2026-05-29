@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
 
-  let { disabled = false, children } = $props();
+  let { disabled = false, children, to = '' } = $props();
 
   let container;
   let content;
@@ -13,8 +13,13 @@
     container = document.createElement('div');
     container.setAttribute('data-teleport-container', '');
 
-    // Append to body immediately
-    document.body.appendChild(container);
+    if (to) {
+      const toElement = document.querySelector(to);
+      toElement.appendChild(container);
+    } else {
+      // Append to body immediately
+      document.body.appendChild(container);
+    }
 
     // Manually move the content to the container
     if (content) {

@@ -19,6 +19,6 @@ const calculationRuleSchema = z.object({
 // 2. Schema for the main category object
 export const attendanceCategorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
-  fields: z.array(fieldSchema),
-  calculationRule: z.array(calculationRuleSchema),
+  fields: z.array(fieldSchema).default([]),
+  calculationRule: z.array(calculationRuleSchema).default([]),
 });

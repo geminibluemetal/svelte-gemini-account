@@ -13,6 +13,10 @@ export default class AttendanceNameService {
     return await this.repository.findAll({}, {}, { sort: { name: 1 } });
   }
 
+  async getNameById(id) {
+    return await this.repository.findById(id);
+  }
+
   async updateName(data) {
     try {
       const parsed = await attendanceNameSchema.safeParse(data);

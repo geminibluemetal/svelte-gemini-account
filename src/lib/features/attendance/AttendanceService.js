@@ -1,5 +1,10 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
+import { printOut } from '$lib/core/server/print';
+import { getFormattedDate } from '$lib/utils/dateTime';
+import { runCalculateRule } from '../../../routes/attendance/calculationRule';
+import AttendanceCategoryService from '../attendanceCategory/AttendanceCategoryService';
+import AttendanceNameService from '../attendanceName/AttendanceNameService';
 import AttendanceRepository from './AttendanceRepository';
 import { attendanceSchema } from './AttendanceSchema';
 
@@ -11,6 +16,10 @@ export default class AttendanceService {
 
   async getAttendanceData(startDate, endDate) {
     return await this.repository.findAll({ date: { $gte: startDate, $lte: endDate } });
+  }
+
+  async getAttendanceDataById(startDate, endDate, nameId) {
+    return await this.repository.findAll({ date: { $gte: startDate, $lte: endDate }, nameId });
   }
 
   async saveAttendance(data) {
@@ -69,5 +78,47 @@ export default class AttendanceService {
     } catch (error) {
       return handleServiceError(error);
     }
+  }
+
+  async printReceipt(data) {
+    const attendanceNameService = new AttendanceNameService();
+    const attendanceCategoryService = new AttendanceCategoryService();
+    const name = await attendanceNameService.getNameById(data.nameId)
+    const category = await attendanceCategoryService.getCategoryById(name.categoryId)
+    const startDate = new Date(data.startDate)
+    const endDate = new Date(data.endDate)
+    const attendnace = await this.getAttendanceDataById(startDate, endDate, name.id)
+    const calculatedData = runCalculateRule(name, category, attendnace)
+
+    function camelToTitle(str) {
+      if (!str) return '';
+      const spacedStr = str.replace(/([A-Z])/g, ' $1');
+      return spacedStr.charAt(0).toUpperCase() + spacedStr.slice(1).trim();
+    }
+
+    return await printOut((p) => {
+      p.reset()
+        .beepOn(1, 5)
+        .align('center')
+        .setTextSize(1, 0)
+        .bold(true)
+        .line('Payment Recipt')
+        .line(name.name)
+        .setTextSize(0, 0)
+        .line(category.name)
+        .line(`${getFormattedDate(startDate)} to ${getFormattedDate(endDate)}`)
+        .setTextSize(1, 0)
+        .bold(false)
+        .dashedLine(17)
+        .align('left')
+
+      Object.entries(calculatedData).map(([key, value]) => {
+        p.pairsOptional(camelToTitle(key), value)
+      })
+
+      p.flushPairs()
+        .feed(1)
+        .cut();
+    });
   }
 }

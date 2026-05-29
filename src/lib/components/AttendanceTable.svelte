@@ -3,6 +3,8 @@
   import { getFormattedDate, getWeekdayName } from '$lib/utils/dateTime';
   import { onMount } from 'svelte';
   import { runCalculateRule } from '../../routes/attendance/calculationRule';
+  import Teleport from './Teleport.svelte';
+  import { formatNumber } from '$lib/utils/number';
   const {
     cycle,
     attendanceCategories,
@@ -23,6 +25,39 @@
       categorized[name.categoryId].push(name);
     });
     return categorized;
+  });
+
+  // A separate, standalone reactive summary of all categories
+  const globalAttendanceSummary = $derived.by(() => {
+    const summaries = {};
+
+    attendanceCategories.forEach((category) => {
+      let totalAmount = 0;
+      let totalAdvance = 0;
+      let totalPayable = 0;
+
+      // Get the rows belonging to this category
+      const rows = categorizedAttendanceNames[category._id] || [];
+
+      // Calculate the running totals across all rows
+      rows.forEach((row) => {
+        const attendanceData = attendance.filter((a) => a.nameId == row.id);
+        const calculatedData = runCalculateRule(row, category, attendanceData);
+
+        totalAmount += calculatedData.totalSalary || 0;
+        totalAdvance += calculatedData.totalAdvance || 0;
+        totalPayable += calculatedData.payableAmount || 0;
+      });
+
+      // Store only the summary data mapped to the category ID
+      summaries[category.name] = {
+        totalAmount,
+        totalAdvance,
+        totalPayable,
+      };
+    });
+
+    return summaries;
   });
 
   function handleMouseOver(categoryId, nameId, cIdx, id) {
@@ -359,3 +394,49 @@
     </div>
   {/each}
 </div>
+
+{#each Object.entries(globalAttendanceSummary) as [categoryName, summary] (categoryName)}
+  <Teleport to="#attendance-sidebar">
+    <div class="mb-3 grid border *:border *:px-1">
+      <div style:grid-column="span 2" class="border-black bg-black text-center text-white">
+        {categoryName} Summary
+      </div>
+      <div>Total Amount</div>
+      <div>{formatNumber(summary.totalAmount)}</div>
+
+      <div>Total Advance</div>
+      <div>{formatNumber(summary.totalAdvance)}</div>
+
+      <div>Total Pending</div>
+      <div>{formatNumber(summary.totalPayable)}</div>
+    </div>
+  </Teleport>
+{/each}
+
+<Teleport to="#attendance-sidebar">
+  <div class="mb-3 grid border *:border *:px-1">
+    <div style:grid-column="span 2" class="border-black bg-violet-800 text-center text-white">
+      Grand Total Summary
+    </div>
+    <div>Total Amount</div>
+    <div>
+      {formatNumber(
+        Object.values(globalAttendanceSummary).reduce((sum, v) => sum + v.totalAmount, 0),
+      )}
+    </div>
+
+    <div>Total Advance</div>
+    <div>
+      {formatNumber(
+        Object.values(globalAttendanceSummary).reduce((sum, v) => sum + v.totalAdvance, 0),
+      )}
+    </div>
+
+    <div>Total Pending</div>
+    <div>
+      {formatNumber(
+        Object.values(globalAttendanceSummary).reduce((sum, v) => sum + v.totalPayable, 0),
+      )}
+    </div>
+  </div>
+</Teleport>
