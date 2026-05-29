@@ -13,9 +13,15 @@
   };
 
   let data = $state(initialData);
+
   const descriptionOption = $derived(
     Array.from(
-      new Set([...cashDescription.map((cd) => cd.description), ...party.map((p) => p.name)]),
+      new Set([
+        ...cashDescription,
+        ...party
+          .filter((p) => !/(Driver|Cleaner|Crusher)$/.test(p.name)) // Filters out names ending with those 3 words
+          .map((p) => p.name),
+      ]),
     ),
   );
 

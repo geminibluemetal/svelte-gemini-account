@@ -43,8 +43,6 @@
     { key: '4', description: 'Go to Delivery Sheet' },
     { key: '5', description: 'Open Current Cash Report' },
     { key: '6', description: 'Go to Order Book' },
-    { key: '7', description: 'Create New Cash Report' },
-    { key: '8', description: 'Delete Cash Report' },
     { key: '9', description: 'Open Tokens' },
     { key: '🠈', description: 'Switch focus on Income and Expense' }, // 🠈	🠉	🠊	🠋
     { key: '🠊', description: 'Sign Cash Entry' },

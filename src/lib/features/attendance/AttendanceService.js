@@ -1,7 +1,8 @@
 import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { printOut } from '$lib/core/server/print';
-import { getFormattedDate } from '$lib/utils/dateTime';
+import { sseEmit } from '$lib/core/server/sseBus';
+import { getFormattedDate, getFormattedTimestamp } from '$lib/utils/dateTime';
 import { runCalculateRule } from '../../../routes/attendance/calculationRule';
 import AttendanceCategoryService from '../attendanceCategory/AttendanceCategoryService';
 import AttendanceNameService from '../attendanceName/AttendanceNameService';
@@ -78,6 +79,49 @@ export default class AttendanceService {
     } catch (error) {
       return handleServiceError(error);
     }
+  }
+
+  async syncAttendanceAdvance(oldCash, newCash) {
+    const attendanceCategoryService = new AttendanceCategoryService();
+    const attendanceNameService = new AttendanceNameService();
+    const categoryList = await attendanceCategoryService.getAllCategories();
+    const categoryNameList = categoryList.map(c => c.name)
+
+    async function getNameIdandDate(cashData) {
+      const cashMatches = categoryNameList.find(cn => cashData.description.endsWith(cn))
+      const category = categoryList.find(c => c.name == cashMatches)
+      const name = cashData.description.replace(cashMatches, "").trim();
+      const nameData = await attendanceNameService.getNameByNameAndCategory(name, category._id.toString())
+      let startDate = new Date(cashData.createdAt)
+      startDate.setHours(0, 0, 0, 0);
+      let endDate = new Date(startDate)
+      endDate.setDate(endDate.getDate() + 1)
+      return { startDate, endDate, nameId: nameData.id }
+    }
+
+    if (oldCash) {
+      const { startDate, endDate, nameId } = await getNameIdandDate(oldCash);
+      const attendance = (await this.getAttendanceDataById(startDate, endDate, nameId))?.[0];
+      if (attendance) {
+        await this.repository.updateFieldsById(attendance.id, { "fields.Adv": 0 });
+      }
+    }
+
+    if (newCash) {
+      const { startDate, endDate, nameId } = await getNameIdandDate(newCash);
+      const attendance = (await this.getAttendanceDataById(startDate, endDate, nameId))?.[0];
+
+      if (attendance) {
+        await this.repository.updateFieldsById(attendance.id, { "fields.Adv": newCash.amount });
+      } else {
+        await this.repository.create({
+          nameId,
+          date: startDate,
+          fields: { Adv: newCash.amount }
+        });
+      }
+    }
+    sseEmit({ type: 'ATTENDANCE.LIST' });
   }
 
   async printReceipt(data) {

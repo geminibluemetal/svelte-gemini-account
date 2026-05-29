@@ -1,4 +1,5 @@
 import { sseEmit } from '$lib/core/server/sseBus.js';
+import AttendanceNameService from '$lib/features/attendanceName/AttendanceNameService.js';
 import CashService from '$lib/features/cash/CashService';
 import CashDescriptionService from '$lib/features/cashDescription/CashDescriptionService';
 import CashReportService from '$lib/features/cashReport/CashReportService';
@@ -27,8 +28,9 @@ export async function load({ depends, url }) {
   const deliveryService = new DeliveryService();
   const partyStatementService = new PartyStatementService();
   const cashDescriptionService = new CashDescriptionService();
+  const attendanceNames = new AttendanceNameService();
   const partyService = new PartyService();
-  let [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party] =
+  let [reports, directCash, deliveryCash, oldBalanceCash, cashDescription, party, workerNamesWithCategory] =
     await Promise.all([
       cashReportService.cashReportList(formattedDate),
       cashService.cashList(formattedDate),
@@ -36,9 +38,12 @@ export async function load({ depends, url }) {
       partyStatementService.getAllOldBalanceCashList(formattedDate),
       cashDescriptionService.cashDescriptionList(),
       partyService.partyList(),
+      attendanceNames.getAllNamesWithCategory()
     ]);
   reports = [...reports, { id: 'current' }];
   reportIndex = reportIndex ?? reports.length - 1;
+
+  cashDescription = [...cashDescription.map((cd) => cd.description), ...workerNamesWithCategory.map(c => c.displayName)]
 
   // 3. Determine Report Time Boundaries
   const { fromDate, toDate } = getReportBoundaries(reports, reportIndex, formattedDate);

@@ -237,6 +237,7 @@
     keyboardEventBus.on('ArrowRight', handleKeyboardNav);
     keyboardEventBus.on('T', handleKeyboardNav);
     keyboardEventBus.on('Enter', handleAttendanceEdit);
+    keyboardEventBus.on('E', handleAttendanceEdit);
     return () => {
       keyboardEventBus.off('ArrowUp', handleKeyboardNav);
       keyboardEventBus.off('ArrowDown', handleKeyboardNav);
@@ -244,6 +245,7 @@
       keyboardEventBus.off('ArrowRight', handleKeyboardNav);
       keyboardEventBus.off('T', handleKeyboardNav);
       keyboardEventBus.off('Enter', handleAttendanceEdit);
+      keyboardEventBus.off('E', handleAttendanceEdit);
     };
   });
 </script>

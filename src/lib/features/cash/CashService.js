@@ -30,6 +30,7 @@ export default class CashService {
       });
     }
   }
+
   async createCash(data) {
     try {
       const parsed = await cashSchema.safeParse(data);
@@ -38,6 +39,8 @@ export default class CashService {
       // Emit Events
       // 1. Handle Cash Description Create
       serverBus.emit(EVENTS.CASH_DESCRIPTION.CREATE_IF_NOT_EXISTS, data);
+      // 2. Handle Attendance Advance Update
+      serverBus.emit(EVENTS.ATTENDANCE.UPDATE_ADVANCE_AMOUNT, { newCash: parsed.data });
 
       return await this.repository.create(parsed.data);
     } catch (error) {
@@ -53,6 +56,9 @@ export default class CashService {
       // Emit Events
       // 1. Handle Cash Description Create
       serverBus.emit(EVENTS.CASH_DESCRIPTION.CREATE_IF_NOT_EXISTS, data);
+      // 2. Handle Attendance Advance Update
+      const cash = await this.repository.findById(id)
+      serverBus.emit(EVENTS.ATTENDANCE.UPDATE_ADVANCE_AMOUNT, { oldCash: cash, newCash: parsed.data });
 
       return await this.repository.updateById(id, parsed.data);
     } catch (error) {
@@ -62,6 +68,8 @@ export default class CashService {
 
   async deleteCash(id) {
     try {
+      const cash = await this.repository.findById(id)
+      serverBus.emit(EVENTS.ATTENDANCE.UPDATE_ADVANCE_AMOUNT, { oldCash: cash });
       return await this.repository.deleteById(id);
     } catch (error) {
       return handleServiceError(error);
@@ -86,6 +94,8 @@ export default class CashService {
 
   async syncCashByOrderId(data) {
     await this.deleteCashByOrderId(data.id);
+    const cash = await this.repository.findById(data.id)
+    serverBus.emit(EVENTS.ATTENDANCE.UPDATE_ADVANCE_AMOUNT, { oldCash: cash });
     if (data.advance && data.amountType == 'Cash') {
       const cashData = {
         orderId: data.id,

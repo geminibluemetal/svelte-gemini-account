@@ -6,6 +6,7 @@ import '$lib/features/cashDescription/CashDescriptionListener';
 import '$lib/features/cash/CashListener';
 import '$lib/features/orders/OrderListener';
 import '$lib/features/partyStatement/PartyStatementListener';
+import '$lib/features/attendance/AttendanceListener';
 
 export async function handle({ event, resolve }) {
   const isAdmin = event.cookies.get('isAdmin') == 'true';

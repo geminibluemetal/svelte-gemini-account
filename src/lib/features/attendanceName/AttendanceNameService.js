@@ -13,8 +13,16 @@ export default class AttendanceNameService {
     return await this.repository.findAll({}, {}, { sort: { name: 1 } });
   }
 
+  async getAllNamesWithCategory() {
+    return await this.repository.getAllNamesWithCategoryName();
+  }
+
   async getNameById(id) {
     return await this.repository.findById(id);
+  }
+
+  async getNameByNameAndCategory(name, categoryId) {
+    return await this.repository.findOne({ name, categoryId });
   }
 
   async updateName(data) {
