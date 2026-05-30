@@ -43,7 +43,7 @@ export default class AttendanceService {
       const AT = Number(data.fields.AT)
       const date = new Date(data.date)
       if (exist?.id) {
-        return this.repository.updateById(data.id, { "fields.AT": AT });
+        return this.repository.updateById(exist.id, { "fields.AT": AT });
       }
       return this.repository.create({ ...data, date, fields: { AT } });
     } catch (error) {
@@ -62,7 +62,7 @@ export default class AttendanceService {
 
       // --- UPDATE ---
       if (exist?.id) {
-        return this.repository.updateById(data.id, {
+        return this.repository.updateById(exist.id, {
           [`fields.${dynamicKey}`]: fieldValue // Becomes {"fields.T": value}
         });
       }
