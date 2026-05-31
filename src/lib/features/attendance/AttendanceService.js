@@ -2,7 +2,7 @@ import { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { printOut } from '$lib/core/server/print';
 import { sseEmit } from '$lib/core/server/sseBus';
-import { getFormattedDate, getFormattedTimestamp } from '$lib/utils/dateTime';
+import { getFormattedDate } from '$lib/utils/dateTime';
 import { runCalculateRule } from '../../../routes/attendance/calculationRule';
 import AttendanceCategoryService from '../attendanceCategory/AttendanceCategoryService';
 import AttendanceNameService from '../attendanceName/AttendanceNameService';
