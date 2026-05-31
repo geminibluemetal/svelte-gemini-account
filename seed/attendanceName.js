@@ -21,7 +21,7 @@ export const seedData = [
   { name: "Senthil", categoryId: null, dayFee: 1000, overallAdvance: 0 },
   { name: "Anbu", categoryId: null, dayFee: 600, overallAdvance: 0 },
   { name: "Arasu", categoryId: null, dayFee: 600, overallAdvance: 0 },
-  { name: "Bangaru ", categoryId: null, dayFee: 600, overallAdvance: 0 },
+  { name: "Bangaru", categoryId: null, dayFee: 600, overallAdvance: 0 },
   { name: "Gowtham", categoryId: null, dayFee: 600, overallAdvance: 0 },
   { name: "Nandha kumar", categoryId: null, dayFee: 600, overallAdvance: 0 },
   { name: "Sridhar", categoryId: null, dayFee: 600, overallAdvance: 0 },
