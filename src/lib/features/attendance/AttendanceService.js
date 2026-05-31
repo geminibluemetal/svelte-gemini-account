@@ -1,9 +1,10 @@
-import { handleServiceError, schemaError } from '$lib/core/server/error';
+import AppError, { handleServiceError, schemaError } from '$lib/core/server/error';
 import { connectDB } from '$lib/core/server/mongodb';
 import { printOut } from '$lib/core/server/print';
 import { sseEmit } from '$lib/core/server/sseBus';
 import { getFormattedDate } from '$lib/utils/dateTime';
 import { runCalculateRule } from '../../../routes/attendance/calculationRule';
+import { get14dayCycle } from '../../../routes/attendance/helper';
 import AttendanceCategoryService from '../attendanceCategory/AttendanceCategoryService';
 import AttendanceNameService from '../attendanceName/AttendanceNameService';
 import AttendanceRepository from './AttendanceRepository';
@@ -76,6 +77,18 @@ export default class AttendanceService {
         }
       });
 
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async clearCycle(data) {
+    try {
+      const offset = data.cycleOffset
+      if (offset == 0) throw new AppError("Can't Clear Current Cycle");
+      const { startDate, endDate } = get14dayCycle({ cycleOffset: offset })
+      this.repository.deleteByFilter({ date: { $gte: startDate, $lte: endDate } })
+      sseEmit({ type: 'ATTENDANCE.LIST' });
     } catch (error) {
       return handleServiceError(error);
     }

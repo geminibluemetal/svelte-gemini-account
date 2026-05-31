@@ -104,4 +104,16 @@ export const actions = {
     }
     return result;
   },
+
+  clearCycle: async ({ request }) => {
+    const formData = await request.formData();
+    const data = formDataToObject(formData);
+    const attendanceService = new AttendanceService();
+    const result = await attendanceService.clearCycle(data);
+
+    if (!result?.ok) {
+      return fail(400, { message: result.message });
+    }
+    return result;
+  }
 };

@@ -1,12 +1,11 @@
 <script>
-  import { getFormattedDate } from '$lib/utils/dateTime';
   import { runCalculateRule } from './calculationRule';
   const { attendanceCategories, attendanceNames, attendance, cycle } = $props();
 </script>
 
 <div class="hidden px-5 print:block">
   <div class="text-center">
-    {getFormattedDate(cycle.startDate)} - {getFormattedDate(cycle.endDate)}
+    {cycle.longName}
   </div>
   {#each attendanceCategories as category (category._id)}
     {@const names = attendanceNames.filter((an) => an.categoryId == category._id)}

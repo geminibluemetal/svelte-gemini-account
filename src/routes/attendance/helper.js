@@ -55,7 +55,7 @@ export function get14dayCycle({
   }
 
   // Generate formatting names using the fixed cycle boundaries
-  const longName = `${getFormattedDate(startDate)} - ${getFormattedDate(endDate)}`; // DD-MM-YYYY to DD-MM-YYYY
+  const longName = `${getFormattedDate(startDate)} to ${getFormattedDate(endDate)}`; // DD-MM-YYYY to DD-MM-YYYY
 
   // Note: Fixed a minor bug in your original regex replacement here as well
   let shortName = longName.replace(/-\d{4}/g, ''); // DD-MM to DD-MM

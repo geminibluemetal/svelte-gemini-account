@@ -106,6 +106,11 @@
     editableCategory = data.attendanceCategories.find((ac) => ac._id == categoryId);
   }
 
+  function handleCycleClear() {
+    const confirmation = confirm(`Are you going to clear Attendance from ${data.cycle.longName}?`);
+    if (confirmation) transportAction('?/clearCycle', { cycleOffset: data.cycle.cycleOffset });
+  }
+
   function handleShortcutPresent() {
     if (!openCategory && !openNames && !helperOpened) {
       if (editableItem.nameId && editableItem.date) {
@@ -209,7 +214,7 @@
       onOverRowChange={handleAttendanceOverChange}
     />
   </div>
-  <div class="flex h-full min-w-52 flex-col gap-2">
+  <div class="flex h-full min-w-58 flex-col gap-2">
     <div class="dark flex w-full items-center gap-1">
       <Button onclick={handlePreviousAttendanceCycle} corner="-">&#129128;</Button>
       <Badge class="flex-1 text-center" onclick={() => handleCurrentCycleOffset()}>
@@ -228,6 +233,13 @@
     </div>
     <div class="dark">
       <Button class="w-full" onclick={() => window.print()}>Print Attendance Sheet</Button>
+    </div>
+    <div class="dark">
+      {#if data.cycle.cycleOffset != 0}
+        <Button class="w-full" color="danger" onclick={handleCycleClear}>
+          Clear This Attendance Cycle
+        </Button>
+      {/if}
     </div>
     <div id="attendance-sidebar" class="h-full overflow-auto"></div>
   </div>
