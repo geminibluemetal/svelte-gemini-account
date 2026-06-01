@@ -7,7 +7,7 @@ import { fail } from '@sveltejs/kit';
 import { get14dayCycle } from './helper.js';
 import AttendanceService from '$lib/features/attendance/AttendanceService.js';
 
-export async function load({ depends, url }) {
+export async function load({ depends, url, locals }) {
   depends('ATTENDANCE.LIST');
   let cycleOffset = url.searchParams.get('cycleOffset');
   cycleOffset = cycleOffset > 0 ? 0 : cycleOffset;
@@ -23,6 +23,7 @@ export async function load({ depends, url }) {
     attendanceNames,
     attendance,
     cycle,
+    isLockOpened: locals.isLockOpened
   };
   return serializeDoc(response);
 }

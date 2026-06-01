@@ -10,6 +10,8 @@ import '$lib/features/attendance/AttendanceListener';
 
 export async function handle({ event, resolve }) {
   const isAdmin = event.cookies.get('isAdmin') == 'true';
+  const isLockOpened = event.cookies.get('isLockOpened') == 'true';
   event.locals.isAdmin = isAdmin;
+  event.locals.isLockOpened = isLockOpened;
   return await resolve(event);
 }

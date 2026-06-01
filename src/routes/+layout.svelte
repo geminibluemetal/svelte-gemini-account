@@ -20,6 +20,8 @@
   async function setVisitorIdInCookie() {
     const isAdmin = localStorage.getItem('isAdmin');
     document.cookie = `isAdmin=${isAdmin}; path=/; max-age=31536000; SameSite=Lax`;
+    const isLockOpened = localStorage.getItem('isLockOpened');
+    document.cookie = `isLockOpened=${isLockOpened}; path=/; max-age=31536000; SameSite=Lax`;
   }
 
   function toggleAdmin() {
@@ -29,8 +31,21 @@
     );
     if (passkey == formatDateTime('DDMMYYYY').split('').reverse().join('')) {
       localStorage.setItem('isAdmin', isAdmin == 'true' ? 'false' : 'true');
+      setVisitorIdInCookie();
       window.location.reload();
       alert(isAdmin == 'true' ? 'Admin access has been cancelled' : 'Admin access granted');
+    }
+  }
+
+  function toggleLock() {
+    const isLockOpened = localStorage.getItem('isLockOpened');
+    const passkey = prompt(
+      `Enter pass key?  (Current: ${isLockOpened == 'true' ? 'Lock Opened' : 'Lock Closed'})`,
+    );
+    if (passkey == formatDateTime('HHII').split('').reverse().join('')) {
+      localStorage.setItem('isLockOpened', isLockOpened == 'true' ? 'false' : 'true');
+      setVisitorIdInCookie();
+      window.location.reload();
     }
   }
 
@@ -41,6 +56,7 @@
     // keyboardEventBus.on('Alt+X', toggleOpen);
     keyboardEventBus.on('Alt+H', gotoHome);
     keyboardEventBus.on(`Alt+Shift+Home`, toggleAdmin);
+    keyboardEventBus.on(`Alt+Shift+End`, toggleLock);
 
     // dynamic route shortcuts
     apps.forEach((app) => {
@@ -56,6 +72,7 @@
     // keyboardEventBus.off('Alt+X', toggleOpen);
     keyboardEventBus.off('Alt+H', gotoHome);
     keyboardEventBus.off(`Alt+Shift+Home`, toggleAdmin);
+    keyboardEventBus.off(`Alt+Shift+End`, toggleLock);
 
     shortcutHandlers.forEach(({ key, handler }) => {
       keyboardEventBus.off(`Alt+${key}`, handler);

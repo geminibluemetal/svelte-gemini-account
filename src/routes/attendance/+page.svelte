@@ -226,7 +226,9 @@
       <Button corner="S" class="w-full" onclick={handleShowAmount}>Show Amount</Button>
     </div>
     <div class="dark">
-      <Button class="w-full" onclick={() => (openCategory = true)}>Modify Category</Button>
+      <Button class="w-full" locked={data.isLockOpened} onclick={() => (openCategory = true)}>
+        Modify Category
+      </Button>
     </div>
     <div class="dark">
       <Button class="w-full" onclick={() => (openNames = true)}>Modify Names</Button>

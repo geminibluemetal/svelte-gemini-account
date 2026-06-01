@@ -1,4 +1,6 @@
 <script>
+  import { Lock } from 'lucide-svelte';
+
   // -------------------------------------
   // Props
   // -------------------------------------
@@ -10,6 +12,7 @@
     size = 'md',
     type = 'button',
     radius = '',
+    locked,
     corner = '',
     prefix = null,
     suffix = null,
@@ -55,7 +58,10 @@
   };
 
   const baseClass =
-    'cursor-pointer font-semibold inline-flex items-center justify-center focus:outline-2 focus:outline-offset-2 select-none';
+    'font-semibold inline-flex items-center justify-center focus:outline-2 focus:outline-offset-2 select-none';
+
+  const shouldCheckLock = $derived(typeof locked != 'undefined');
+  const lock = $derived(shouldCheckLock && !locked ? true : false);
 
   // -------------------------------------
   // Derived values
@@ -72,10 +78,12 @@
   );
 
   const disabledClass = $derived(
-    disabled
-      ? 'cursor-not-allowed pointer-events-none opacity-60 hover:bg-gray-300 active:bg-gray-300'
+    disabled || lock
+      ? 'cursor-not-allowed active:pointer-events-none opacity-60'
       : 'cursor-pointer',
   );
+
+  const activePrefix = $derived(lock ? Lock : prefix);
 </script>
 
 <!-- -------------------------------------
@@ -86,7 +94,7 @@
   <!-- Anchor Button -->
   <a
     {href}
-    class="{baseClass} {colorStyles[color]} {sizeStyles[size]}
+    class="{baseClass} {colorStyles[color]} {sizeStyles[size]} {disabledClass}
       {radiusStyles[radius || size]} relative {userClass}"
     {...props}
   >
@@ -101,8 +109,8 @@
       </div>
     {/if}
 
-    {#if prefix}
-      {@const Prefix = prefix}
+    {#if activePrefix}
+      {@const Prefix = activePrefix}
       <Prefix class="inline-block {prefixClassSize}" size={iconSize} />
     {/if}
 
@@ -119,7 +127,7 @@
     class="{baseClass} {colorStyles[color]} {sizeStyles[size]} {disabledClass}
       {radiusStyles[radius || size]} relative {userClass}"
     {onclick}
-    {disabled}
+    disabled={disabled || lock}
     {type}
     {...props}
   >
@@ -134,8 +142,8 @@
       </div>
     {/if}
 
-    {#if prefix}
-      {@const Prefix = prefix}
+    {#if activePrefix}
+      {@const Prefix = activePrefix}
       <Prefix class="inline-block {prefixClassSize}" size={iconSize} />
     {/if}
 
