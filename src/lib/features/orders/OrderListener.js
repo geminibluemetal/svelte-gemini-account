@@ -7,12 +7,21 @@ import OrderService from './OrderService';
 
 // Remove any existing listeners for this event to prevent duplicates
 serverBus.removeAllListeners(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY);
+serverBus.removeAllListeners(EVENTS.ORDER.UPDATE_DSV_BY_DELIVERY);
 
 // find and update phone
 serverBus.on(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, async ({ oldDelivery, newDelivery }) => {
   const orderService = new OrderService();
   await orderService.updateOrderDataFromOldDelivery(oldDelivery);
   await orderService.updateOrderDataFromNewDelivery(newDelivery);
+  sseEmit({ type: 'ORDERS.LIST' });
+});
+
+// evalulate and update DSV
+serverBus.on(EVENTS.ORDER.UPDATE_DSV_BY_DELIVERY, async ({ oldDelivery, newDelivery }) => {
+  const orderService = new OrderService();
+  await orderService.updateOrderDsvFromOldDelivery(oldDelivery);
+  await orderService.updateOrderDsvFromNewDelivery(newDelivery);
   sseEmit({ type: 'ORDERS.LIST' });
 });
 

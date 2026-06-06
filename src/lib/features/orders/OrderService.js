@@ -255,7 +255,9 @@ export default class OrderService {
       const orderNumber = Number(oldDelivery?.orderNumber);
       if (orderNumber) {
         const order = await this.getOrderByNumber(orderNumber);
+        const amount = Number(oldDelivery.amount1 || 0) + Number(oldDelivery.amount2 || 0)
         if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
+        if (amount) order.advance = Number(order.advance) - amount;
         order.deliveredQty = order.deliveredQty - oldDelivery.deliveryQuantity;
         order.status = OrderService.examineStatusByQuantity(
           order.totalQty,
@@ -274,13 +276,42 @@ export default class OrderService {
       const orderNumber = Number(newDelivery?.orderNumber);
       if (orderNumber) {
         const order = await this.getOrderByNumber(orderNumber);
+        const amount = Number(newDelivery.amount1 || 0) + Number(newDelivery.amount2 || 0)
         if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
+        if (amount) order.advance = Number(order.advance) + amount;
         order.deliveredQty = order.deliveredQty + newDelivery.deliveryQuantity;
         order.status = OrderService.examineStatusByQuantity(
           order.totalQty,
           order.deliveredQty,
           order.totalQty - order.deliveredQty,
         );
+        await this.repository.updateById(order.id, order);
+      }
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+
+  async updateOrderDsvFromOldDelivery(oldDelivery) {
+    try {
+      // Order number in delviery is string type, because we store 'NO' also in there.
+      const orderNumber = Number(oldDelivery?.orderNumber);
+      if (orderNumber) {
+        const order = await this.getOrderByNumber(orderNumber);
+        if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
+        await this.repository.updateById(order.id, order);
+      }
+    } catch (error) {
+      return handleServiceError(error);
+    }
+  }
+  async updateOrderDsvFromNewDelivery(newDelivery) {
+    try {
+      // Order number in delviery is string type, because we store 'NO' also in there.
+      const orderNumber = Number(newDelivery?.orderNumber);
+      if (orderNumber) {
+        const order = await this.getOrderByNumber(orderNumber);
+        if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
         await this.repository.updateById(order.id, order);
       }
     } catch (error) {
@@ -345,7 +376,7 @@ export default class OrderService {
         .pairs('Item', order.item)
         .pairs('Qty', formatFixed(order.totalQty))
         .pairs('Amount', order.amount)
-        .pairs('Advance', order.advance)
+        .pairs('Paid Amt', order.advance)
         .pairs('Discount', order.discount)
         .pairs('Balance', order.balance)
         .pairs('Tip', data.tip)

@@ -130,14 +130,14 @@
         caseMode="none"
         name="amount"
         value={data.amount}
-        placeholder="Amount"
+        placeholder="Total Amount"
         autoComplete="off"
       />
       <InputField
         caseMode="none"
         name="advance"
         value={data.advance}
-        placeholder="Advance"
+        placeholder="Paid Amount (including advance)"
         autoComplete="off"
       />
       <InputField

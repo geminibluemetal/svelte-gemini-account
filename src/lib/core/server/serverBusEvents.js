@@ -13,6 +13,7 @@ export const EVENTS = {
   },
   ORDER: {
     UPDATE_ORDER_BY_DELIVERY: 'update.order.by.delivery',
+    UPDATE_DSV_BY_DELIVERY: 'update.dsv.by.delivery',
   },
   ATTENDANCE: {
     UPDATE_ADVANCE_AMOUNT: 'update.advance.amount'

@@ -78,7 +78,7 @@
     { name: 'T Qty', align: 'center', key: 'totalQty', display: 'decimal', width: '53' },
     { name: 'AT', align: 'center', key: 'amountType', color: AmountTypeColor, width: '60' },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
-    { name: 'Advan', align: 'right', key: 'advance', display: 'currency' },
+    { name: 'Paid', align: 'right', key: 'advance', display: 'currency' },
     { name: 'Dis', align: 'right', key: 'discount', display: 'currency' },
     { name: 'Bal', align: 'right', key: 'balance', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', display: 'sign', color: SignColor },

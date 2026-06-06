@@ -60,13 +60,21 @@ export default class DeliveryService {
     try {
       const parsed = await amountEntrySchema.safeParseAsync(data);
       if (!parsed.success) schemaError(parsed);
+
+      // Get the delivery data before updating with new data
+      const oldDelivery = await this.repository.findById(id);
+
       parsed.data.paymentAt = data?.paymentAt ? new Date(data.paymentAt) : new Date();
       const result = await this.repository.updateById(id, parsed.data);
 
+      // Get the delivery data before updating with new data
+      const newDelivery = await this.repository.findById(id);
+
       // If operation success we do syncing
       if (result?.ok) {
-        // 1. Sync party statement
-        const newDelivery = await this.repository.findById(id);
+        // 1. Sync orders
+        serverBus.emit(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, { oldDelivery, newDelivery });
+        // 2. Sync party statement
         serverBus.emit(EVENTS.PARTY_STATEMENT.UPDATE_PARTY_STATEMENT_BY_DELIVERY, newDelivery);
       }
       return result;
@@ -86,7 +94,7 @@ export default class DeliveryService {
       // If operation success we do syncing
       if (result?.ok) {
         // 1. Sync orders
-        serverBus.emit(EVENTS.ORDER.UPDATE_ORDER_BY_DELIVERY, { oldDelivery, newDelivery });
+        serverBus.emit(EVENTS.ORDER.UPDATE_DSV_BY_DELIVERY, { oldDelivery, newDelivery });
         // 2. Sync party statement
         serverBus.emit(EVENTS.PARTY_STATEMENT.UPDATE_PARTY_STATEMENT_BY_DELIVERY, newDelivery);
       }
