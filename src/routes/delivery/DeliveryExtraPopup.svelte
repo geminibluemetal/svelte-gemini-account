@@ -125,7 +125,7 @@
           if (result.data.order.amount)
             displayData.order.Amount = formatNumber(result.data.order.amount);
           if (result.data.order.advance)
-            displayData.order.Advance = formatNumber(result.data.order.advance);
+            displayData.order.Paid = formatNumber(result.data.order.advance);
           if (result.data.order.discount)
             displayData.order.Discount = formatNumber(result.data.order.discount);
           if (result.data.order.balance)
