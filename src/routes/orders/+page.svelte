@@ -358,7 +358,7 @@
   {#snippet sidebar()}
     <div>
       <div class="dark flex flex-col gap-2 p-1">
-        {#if true}
+        {#if data?.isAdmin}
           <Button color="danger" onclick={handleOrderClear}>
             <span class="w-full">Clear</span>
           </Button>

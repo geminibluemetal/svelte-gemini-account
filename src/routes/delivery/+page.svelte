@@ -634,14 +634,16 @@
   overRowChange={(...a) => (reviewMode ? handleOverRowChange(...a) : null)}
 >
   {#snippet left()}
-    <button
-      class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"
-      onclick={handleClearDeliverySheet}
-      tabindex="-1"
-      title="Delete Current Delivery Sheet"
-    >
-      <Trash size={23} class="p-1 text-red-500" />
-    </button>
+    {#if data?.isAdmin}
+      <button
+        class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"
+        onclick={handleClearDeliverySheet}
+        tabindex="-1"
+        title="Delete Current Delivery Sheet"
+      >
+        <Trash size={23} class="p-1 text-red-500" />
+      </button>
+    {/if}
     <div>&nbsp;</div>
     <button
       class="m-0 cursor-pointer rounded-full bg-white p-0 hover:bg-white/90"

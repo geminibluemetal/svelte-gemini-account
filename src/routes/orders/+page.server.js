@@ -8,7 +8,7 @@ import { formDataToObject } from '$lib/utils/form';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
-export async function load({ depends }) {
+export async function load({ depends, locals }) {
   depends('ORDERS.LIST');
   const orderService = new OrderService();
   const addressService = new AddressService();
@@ -26,6 +26,7 @@ export async function load({ depends }) {
     address: serializeDoc(address),
     items: serializeDoc(items),
     vehicle: serializeDoc(vehicle),
+    isAdmin: locals.isAdmin
   };
 }
 

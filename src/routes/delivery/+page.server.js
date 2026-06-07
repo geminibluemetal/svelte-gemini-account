@@ -13,7 +13,7 @@ import { formDataToObject } from '$lib/utils/form.js';
 import { serializeDoc } from '$lib/utils/serializer.js';
 import { fail } from '@sveltejs/kit';
 
-export async function load({ depends, url }) {
+export async function load({ depends, url, locals }) {
   depends('DELIVERY.TOKEN.LIST');
 
   const date = url.searchParams.get('date');
@@ -46,7 +46,8 @@ export async function load({ depends, url }) {
     orders: serializeDoc(orders),
     oldBalance: serializeDoc(oldBalance),
     paytmOrder,
-    vehicleOrder: settings.vehicleOrder
+    vehicleOrder: settings.vehicleOrder,
+    isAdmin: locals.isAdmin
   };
 }
 

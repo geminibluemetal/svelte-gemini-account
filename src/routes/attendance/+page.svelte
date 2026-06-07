@@ -23,6 +23,7 @@
   let showAmount = $state(false);
   let editableItem = $state({});
   let editableCategory = $state({});
+  let lockShortcut = $state(true);
 
   const availableOptions = [
     { key: 'H', description: 'Show available shortcuts' },
@@ -35,6 +36,7 @@
     // Attendance actions
     { key: 'R', description: 'Print payment receipt for the selected person' },
     { key: 'S', description: 'Show Amount Details in Table' },
+    { key: 'L', description: 'Lock/Unlock Shortcut Entry' },
     { key: 'P', description: 'Set Present for selected Attendace' },
     { key: 'A', description: 'Set Absent for selected Attendace' },
     { key: 'Enter', description: 'Edit selected Attendance' },
@@ -112,7 +114,7 @@
   }
 
   function handleShortcutPresent() {
-    if (!openCategory && !openNames && !helperOpened) {
+    if (!openCategory && !openNames && !helperOpened && !lockShortcut) {
       if (editableItem.nameId && editableItem.date) {
         const data = { nameId: editableItem.nameId, date: editableItem.date, 'fields[AT]': 1 };
         if (editableItem.id) data.id = editableItem.id;
@@ -122,7 +124,7 @@
   }
 
   function handleShortcutAbsent() {
-    if (!openCategory && !openNames && !helperOpened) {
+    if (!openCategory && !openNames && !helperOpened && !lockShortcut) {
       if (editableItem.nameId && editableItem.date) {
         const data = { nameId: editableItem.nameId, date: editableItem.date, 'fields[AT]': 0 };
         if (editableItem.id) data.id = editableItem.id;
@@ -143,6 +145,8 @@
   }
 
   function handleKeyDown(e) {
+    if (lockShortcut) return;
+
     // 1. IGNORE if the user is typing in an input, textarea, or select dropdown
     const tagName = e.target.tagName;
     if (
@@ -177,6 +181,10 @@
     showAmount = !showAmount;
   }
 
+  function handleShortcutLock() {
+    lockShortcut = !lockShortcut;
+  }
+
   $effect(() => {
     if (form?.message) {
       showToast(form.message, form.ok ? 'success' : 'danger');
@@ -191,6 +199,7 @@
     keyboardEventBus.on('A', handleShortcutAbsent);
     keyboardEventBus.on('R', handlePaymentReceipt);
     keyboardEventBus.on('S', handleShowAmount);
+    keyboardEventBus.on('L', handleShortcutLock);
   });
   onDestroy(() => {
     syncOff('ATTENDANCE.LIST');
@@ -201,6 +210,7 @@
     keyboardEventBus.off('A', handleShortcutAbsent);
     keyboardEventBus.off('R', handlePaymentReceipt);
     keyboardEventBus.off('S', handleShowAmount);
+    keyboardEventBus.off('L', handleShortcutLock);
   });
 </script>
 
@@ -235,6 +245,11 @@
     </div>
     <div class="dark">
       <Button class="w-full" onclick={() => window.print()}>Print Attendance Sheet</Button>
+    </div>
+    <div class="dark">
+      <Button color="cyan" corner="L" class="w-full" onclick={handleShortcutLock}>
+        {lockShortcut ? 'Unlock' : 'Lock'} Shortcut Entry {lockShortcut ? '🔒' : '🔓'}
+      </Button>
     </div>
     <div class="dark">
       {#if data.cycle.cycleOffset != 0}
