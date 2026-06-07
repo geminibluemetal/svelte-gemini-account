@@ -184,12 +184,9 @@ export default class OrderService {
           $or: [
             { amountType: { $ne: 'Paytm' } },
             {
-              $and: [
-                { amountType: 'Paytm' },
-                { advance: 0 }
-              ]
-            }
-          ]
+              $and: [{ amountType: 'Paytm' }, { advance: 0 }],
+            },
+          ],
         },
         {
           isCleared: true,
@@ -231,7 +228,7 @@ export default class OrderService {
       status: 'Loading',
     });
     const tokenService = new TokenService();
-    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g);
     tokenService.createToken(
       {
         partyName: order.partyName,
@@ -243,7 +240,7 @@ export default class OrderService {
       },
       {
         phone: order.phone,
-        phone2: additionalPhones ? additionalPhones.join(", ") : null,
+        phone2: additionalPhones ? additionalPhones.join(', ') : null,
       },
     );
     return result;
@@ -255,9 +252,7 @@ export default class OrderService {
       const orderNumber = Number(oldDelivery?.orderNumber);
       if (orderNumber) {
         const order = await this.getOrderByNumber(orderNumber);
-        const amount = Number(oldDelivery.amount1 || 0) + Number(oldDelivery.amount2 || 0)
         if (oldDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified - 1;
-        if (amount) order.advance = Number(order.advance) - amount;
         order.deliveredQty = order.deliveredQty - oldDelivery.deliveryQuantity;
         order.status = OrderService.examineStatusByQuantity(
           order.totalQty,
@@ -276,9 +271,7 @@ export default class OrderService {
       const orderNumber = Number(newDelivery?.orderNumber);
       if (orderNumber) {
         const order = await this.getOrderByNumber(orderNumber);
-        const amount = Number(newDelivery.amount1 || 0) + Number(newDelivery.amount2 || 0)
         if (newDelivery.sign) order.deliverySheetVerified = order.deliverySheetVerified + 1;
-        if (amount) order.advance = Number(order.advance) + amount;
         order.deliveredQty = order.deliveredQty + newDelivery.deliveryQuantity;
         order.status = OrderService.examineStatusByQuantity(
           order.totalQty,
@@ -321,7 +314,7 @@ export default class OrderService {
 
   async singlePrint(data) {
     const order = await this.repository.findById(data.id);
-    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 2)
@@ -339,7 +332,7 @@ export default class OrderService {
         .pairs('Party', order.partyName)
         .pairs('Address', order.address)
         .pairs('Phone', order.phone)
-        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(', ') : null)
         .pairs('Item', order.item)
         .pairs('Qty', formatFixed(data.qty))
         .pairs('Amount', data.amount)
@@ -354,7 +347,7 @@ export default class OrderService {
 
   async fullPrint(data) {
     const order = await this.repository.findById(data.id);
-    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g);
     await printOut((p) => {
       p.reset()
         .beepOn(2, 2)
@@ -372,11 +365,11 @@ export default class OrderService {
         .pairs('Party', order.partyName)
         .pairs('Address', order.address)
         .pairs('Phone', order.phone)
-        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(', ') : null)
         .pairs('Item', order.item)
         .pairs('Qty', formatFixed(order.totalQty))
         .pairs('Amount', order.amount)
-        .pairs('Paid Amt', order.advance)
+        .pairs('Advance', order.advance)
         .pairs('Discount', order.discount)
         .pairs('Balance', order.balance)
         .pairs('Tip', data.tip)
@@ -390,7 +383,7 @@ export default class OrderService {
 
   async phonePrint(data) {
     const order = await this.repository.findById(data.id);
-    const additionalPhones = order.notes.match(/\b\d{10}\b/g)
+    const additionalPhones = order.notes.match(/\b\d{10}\b/g);
     await printOut((p) => {
       p.reset()
         .beepOn(1, 1)
@@ -400,7 +393,7 @@ export default class OrderService {
         // .pairs('Order', order.orderNumber)
         // .pairs('Address', order.address)
         .pairs('Phone', order.phone)
-        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(", ") : null)
+        .pairsOptional('Phone2', additionalPhones ? additionalPhones.join(', ') : null)
         .pairs('Item', `${order.item} - ${formatFixed(order.totalQty)}`)
         // .pairs('Qty', formatFixed(order.totalQty))
         .flushPairs()
