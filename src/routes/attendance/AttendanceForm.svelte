@@ -46,7 +46,7 @@
       }}
       value={Object.keys(options).find((key) => options[key] === editableItem?.fields?.AT)}
     />
-    {#each editableCategory.fields as field, index (index)}
+    {#each editableCategory.fields.filter((f) => f.isHidden !== true) as field, index (index)}
       <InputField
         name={`fields[${field.shortName}]`}
         placeholder={field.longName}
