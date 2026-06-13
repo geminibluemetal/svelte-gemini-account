@@ -107,6 +107,7 @@
     { key: '6', description: 'Filter Pending orders' },
     { key: '7', description: 'Show All orders' },
     { key: '8', description: 'Filter Loading orders' },
+    { key: '✱', description: 'Sort by Priority' },
     { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
     { key: 'V', description: 'Create Copy and Reuse Order' },

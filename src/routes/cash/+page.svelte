@@ -30,7 +30,14 @@
   const expenseHeader = [
     { name: 'Time', align: 'center', key: 'createdAt', width: '85', display: 'time' },
     { hide: true },
-    { name: 'Description', align: 'left', key: 'description', width: '250', nowrap: true },
+    {
+      name: 'Description',
+      align: 'left',
+      key: 'description',
+      width: '250',
+      nowrap: true,
+      color: attendanceColor,
+    },
     { name: 'Amount', align: 'right', key: 'amount', display: 'currency' },
     { name: 'Sign', align: 'center', key: 'sign', color: SignColor, display: 'sign' },
   ];
@@ -72,6 +79,17 @@
 
   function SignColor(value) {
     return value ? HighlightCell.green : null;
+  }
+
+  function attendanceColor(value) {
+    if (value && typeof value === 'string') {
+      for (const name of data.categories) {
+        if (value.endsWith(name)) {
+          return { foreground: 'text-red-700 font-bold' }; // Successfully returns from attendanceColor
+        }
+      }
+    }
+    // Optional: return a default color if no match is found
   }
 
   function ReferanceColor(value) {
