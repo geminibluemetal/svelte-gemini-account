@@ -245,7 +245,8 @@
                 : ''}
             >
               {#if header?.display && header.display instanceof Function}
-                {header.display(value, item)}
+                <!-- eslint-disable-next-line svelte/no-at-html-tags -->
+                {@html header.display(value, item)}
                 {#if header?.suffix && header?.suffix(value, item)}
                   <div
                     class="absolute right-0 mt-1 mr-1 inline-flex h-4 items-center justify-center rounded-full bg-black px-1 text-sm text-white"

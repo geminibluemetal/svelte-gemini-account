@@ -48,6 +48,11 @@ export function orderSchema(isUpdate = false) {
     discount: z.coerce.number().default(0),
 
     notes: z.string().optional().nullable(),
+    priority: z.coerce
+      .number()
+      .min(-5, 'Priority must be between -5 and 5')
+      .max(5, 'Priority must be between -5 and 5')
+      .default(0),
 
     paymentAt: z.preprocess(
       (val) => (val === '' ? undefined : val),

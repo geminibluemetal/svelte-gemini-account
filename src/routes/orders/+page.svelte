@@ -40,6 +40,7 @@
   const currentDate = $derived($page.url.searchParams.get('date') || getFormattedDate());
   let filterItem = $state();
   let filterQty = $state();
+  let priorityFilter = $state(false);
 
   const viewList = $derived({
     all: data.orders,
@@ -57,15 +58,22 @@
   const viewListQty = $derived([...new Set(viewList[view].map((o) => o.balanceQty))]);
 
   const filterList = $derived(
-    viewList[view].filter((o) => {
-      if (filterItem != 'All Item') {
-        if (o.item != filterItem) return false;
-      }
-      if (filterQty != 'All Qty') {
-        if (o.balanceQty != filterQty) return false;
-      }
-      return true;
-    }),
+    viewList[view]
+      .filter((o) => {
+        if (filterItem != 'All Item') {
+          if (o.item != filterItem) return false;
+        }
+        if (filterQty != 'All Qty') {
+          if (o.balanceQty != filterQty) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        if (!priorityFilter) return 0;
+        if (a.priority > b.priority) return -1;
+        else if (a.priority < b.priority) return 1;
+        else return 0;
+      }),
   );
 
   const headers = [
@@ -118,7 +126,13 @@
     const tractor = item.tracktorOnly ? '(🚗)' : '';
     const vehicle = item.assignedVehicle?.replace(' G', '') ?? '';
     const loading = item.status === 'Loading' ? `(⬆️${vehicle ? `-${vehicle}` : ''})` : '';
-    return `${tractor}${loading} ${value}`.trim();
+    const priority =
+      item?.priority >= 1
+        ? `(<span class="text-red-600">${'★'.repeat(item?.priority)}</span>)`
+        : item?.priority <= -1
+          ? `(<span class="text-gray-500">${'▼'.repeat(-item?.priority)}</span>)`
+          : '';
+    return `${priority}${tractor}${loading} ${value}`.trim();
   }
 
   function OrderNumberColor(value, item) {
@@ -311,6 +325,7 @@
   const handleFilterFinished = () => (view = 'finished');
   const handleFilterPending = () => (view = 'pending');
   const handleFilterLoading = () => (view = 'loading');
+  const handleSortPriority = () => (priorityFilter = !priorityFilter);
   // const handleFilterPartial = () => (view = 'partial');
   // const handleFilterNew = () => (view = 'new');
 
@@ -326,6 +341,7 @@
     keyboardEventBus.on('8', handleFilterLoading);
     keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('H', toggleHelper);
+    keyboardEventBus.on('*', handleSortPriority);
     syncOn('ORDERS.LIST');
   });
   onDestroy(() => {
@@ -340,6 +356,7 @@
     keyboardEventBus.off('8', handleFilterLoading);
     keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('H', toggleHelper);
+    keyboardEventBus.off('*', handleSortPriority);
     syncOff('ORDERS.LIST');
   });
 </script>
@@ -506,6 +523,14 @@
           class="flex justify-between gap-2"
         >
           <span>Remove</span>
+        </Button>
+        <Button
+          color="accent"
+          corner="✱"
+          class="dark flex justify-between gap-2"
+          onclick={handleSortPriority}
+        >
+          <span>Priority Sort</span>
         </Button>
       </div>
     </div>

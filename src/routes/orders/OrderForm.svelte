@@ -156,7 +156,26 @@
       caseMode="capitalizeWords"
       allowedChars={[',', '.']}
     />
-    <CheckBoxField name="isOwnerOrder" value={data.isOwnerOrder} placeholder="Is Owner Order?" />
-    <CheckBoxField name="tracktorOnly" value={data.tracktorOnly} placeholder="Eicher Only" />
+    <div class="inline-flex gap-2">
+      <div>
+        <CheckBoxField
+          name="isOwnerOrder"
+          value={data.isOwnerOrder}
+          placeholder="Is Owner Order?"
+        />
+      </div>
+      <div>
+        <CheckBoxField name="tracktorOnly" value={data.tracktorOnly} placeholder="Eicher Only" />
+      </div>
+      <div class="flex-1">
+        <InputField
+          name="priority"
+          value={data.priority}
+          caseMode="none"
+          placeholder="Priority (-5 to 5)"
+          autoComplete="off"
+        />
+      </div>
+    </div>
   </Form>
 </Model>
