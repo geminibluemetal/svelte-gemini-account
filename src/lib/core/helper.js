@@ -1,18 +1,4 @@
-import AddressService from '$lib/features/address/AddressService';
-import ItemService from '$lib/features/items/ItemService';
-
-export async function calculateAmount(address, item, qty) {
-  const addressService = new AddressService();
-  const itemService = new ItemService();
-
-  address =
-    typeof address === 'object' && address !== null
-      ? address
-      : await addressService.fetchSingleAddressByName(address);
-  item =
-    typeof item === 'object' && item !== null
-      ? item
-      : await itemService.fetchSingleItemByName(item);
+export function calculateAmount(address, item, qty) {
 
   let creditAmount = 0;
   // Get base item amount based on quantity
@@ -46,7 +32,7 @@ export async function calculateAmount(address, item, qty) {
 }
 
 // Helper function to get amount based on item quantity
-function getAmountByItemQuantity(item, qty) {
+export function getAmountByItemQuantity(item, qty) {
   const quantity = parseFloat(qty) || 0;
 
   if (quantity > 0 && ![0.25, 0.5, 1, 1.5, 2].includes(quantity)) {
@@ -67,7 +53,7 @@ function getAmountByItemQuantity(item, qty) {
 }
 
 // Helper function to get delivery charge based on quantity and address
-function getDeliveryCharge(qty, address) {
+export function getDeliveryCharge(qty, address) {
   const quantity = parseFloat(qty) || 0;
   if (quantity <= 0.25) {
     return parseFloat(address.deliveryCharges.chargeHalf) || 0;
@@ -79,7 +65,7 @@ function getDeliveryCharge(qty, address) {
 }
 
 // Helper function to round amount (you can customize this based on your needs)
-function roundAmount(amount) {
+export function roundAmount(amount) {
   if (!amount) return 0;
 
   const rounded = Math.floor(amount);

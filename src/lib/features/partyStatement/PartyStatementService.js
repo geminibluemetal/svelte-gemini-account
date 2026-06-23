@@ -5,6 +5,8 @@ import PartyStatementRepository from './PartyStatementRepository';
 import { partyStatementSchema } from './PartyStatementSchema';
 import { calculateAmount } from '$lib/core/helper';
 import PartyService from '../party/PartyService';
+import AddressService from '../address/AddressService';
+import ItemService from '../items/ItemService';
 
 const db = await connectDB();
 export default class PartyStatementService {
@@ -130,10 +132,14 @@ export default class PartyStatementService {
           (delivery.amountType1 == 'AC' ? delivery.amount1 : 0) +
           (delivery.amountType2 == 'AC' ? delivery.amount2 : 0);
         if (!amount) {
-          const calcResult = await calculateAmount(
-            delivery.address,
-            delivery.deliveryItem,
-            delivery.deliveryQuantity,
+          const addressService = new AddressService();
+          const itemService = new ItemService();
+          const address = await addressService.fetchSingleAddressByName(delivery.address);
+          const item = await itemService.fetchSingleItemByName(delivery.deliveryItem);
+          const calcResult = calculateAmount(
+            address,
+            item,
+            delivery.deliveryQuantity
           );
           if (calcResult.success && calcResult?.data) {
             amount = calcResult.data;

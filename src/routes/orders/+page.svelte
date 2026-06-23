@@ -24,12 +24,14 @@
     LucideSquareArrowUp,
     LucideTicket,
   } from 'lucide-svelte';
+  import PriceCalculator from './PriceCalculator.svelte';
 
   const { data } = $props();
   let view = $state('pending');
   let formOpened = $state(false);
   let tokenOpened = $state(false);
   let helperOpened = $state(false);
+  let calcOpened = $state(false);
   let editableOrder = $state(null);
   let quickToken = $state({
     id: null,
@@ -108,6 +110,7 @@
     { key: '7', description: 'Show All orders' },
     { key: '8', description: 'Filter Loading orders' },
     { key: '✱', description: 'Sort by Priority' },
+    { key: '+', description: 'Open Price Calaculator' },
     { key: '9', description: 'Go to Tokens' },
     { key: 'E', description: 'Edit Order' },
     { key: 'V', description: 'Create Copy and Reuse Order' },
@@ -279,6 +282,10 @@
     helperOpened = !helperOpened;
   }
 
+  function handleCalcToggle() {
+    calcOpened = !calcOpened;
+  }
+
   function handleQuickTokenClose() {
     tokenOpened = false;
     quickToken = {
@@ -343,6 +350,7 @@
     keyboardEventBus.on('9', gotoToken);
     keyboardEventBus.on('H', toggleHelper);
     keyboardEventBus.on('*', handleSortPriority);
+    keyboardEventBus.on('+', handleCalcToggle);
     syncOn('ORDERS.LIST');
   });
   onDestroy(() => {
@@ -358,6 +366,7 @@
     keyboardEventBus.off('9', gotoToken);
     keyboardEventBus.off('H', toggleHelper);
     keyboardEventBus.off('*', handleSortPriority);
+    keyboardEventBus.off('+', handleCalcToggle);
     syncOff('ORDERS.LIST');
   });
 </script>
@@ -533,6 +542,14 @@
         >
           <span>Priority Sort</span>
         </Button>
+        <Button
+          color="accent"
+          corner="+"
+          class="dark flex justify-between gap-2"
+          onclick={handleCalcToggle}
+        >
+          <span>Price Calc</span>
+        </Button>
       </div>
     </div>
   {/snippet}
@@ -578,4 +595,8 @@
       caseMode="none"
     />
   </Form>
+</Model>
+
+<Model open={calcOpened} onClose={handleCalcToggle} autoFocusTabIndex={0}>
+  <PriceCalculator address={data.address} items={data.items} />
 </Model>
