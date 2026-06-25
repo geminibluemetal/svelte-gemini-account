@@ -12,13 +12,13 @@ export async function POST({ request }) {
       .bold(true);
 
     // 1. Process Title
-    if (data.titles.length)
+    if (data?.titles?.length)
       data.titles.forEach(t => p.line(t))
 
     p.setTextSize(0, 0);
 
     // 2. Process Description
-    if (data.descriptions.length)
+    if (data?.descriptions?.length)
       data.descriptions.forEach(d => p.line(d))
 
     p.setTextSize(1, 0)
@@ -27,7 +27,7 @@ export async function POST({ request }) {
       .align('left');
 
     // 3. Process paris data
-    if (data.pairs.length)
+    if (data?.pairs?.length)
       data.pairs.forEach(r => p.pairs(r.name, r.value));
 
     // Footer
