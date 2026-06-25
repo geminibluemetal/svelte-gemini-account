@@ -106,6 +106,7 @@
     { key: 'R', description: 'Reset Balance' },
     { key: 'N', description: 'Nil Balance' },
     { key: '0', description: 'Add Adjustment (Discount, Roundoff)' },
+    { key: 'D', description: 'Delete Entry' },
     { key: 'Enter', description: 'Edit statement' },
     { key: 'Back', description: 'Return to Balance Sheet' },
   ];
@@ -155,8 +156,16 @@
     editableItem = statementFormOpened ? item : null;
   }
 
+  function handleDelete(item) {
+    if (item.amountType == 'Discount' || item.amountType == 'Roundoff') {
+      const isConfirmed = confirm(`Delete confirm ${item.amountType} with ${item.amount}`);
+      if (isConfirmed) transportAction(`?/delete`, { id: item._id });
+    }
+  }
+
   const customEvents = [
     { key: '0', handler: handleAdjustmentForm },
+    { key: 'D', handler: handleDelete },
     { key: 'Enter', handler: handleStatementForm },
   ];
 

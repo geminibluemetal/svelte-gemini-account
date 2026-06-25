@@ -1,7 +1,7 @@
 <script>
   // import Button from '$lib/components/Button.svelte';
   import InputField from '$lib/components/InputField.svelte';
-  import { calculateAmount } from '$lib/core/helper';
+  import { calculateAmount, getDeliveryCharge } from '$lib/core/helper';
   import { formatNumber } from '$lib/utils/number';
 
   const { address, items } = $props();
@@ -13,7 +13,6 @@
       { item: '', qty: '', load: 1, tip: '' },
     ],
     output: [],
-    addressInfo: '',
   });
 
   function addRowIfNeeded() {
@@ -32,9 +31,6 @@
   function calculatePrice() {
     addRowIfNeeded();
     const addressData = address.find((a) => a.name === data.address);
-    if (addressData) {
-      data.addressInfo = `${addressData.name} | 0.25unit: ${addressData.deliveryCharges.chargeHalf} | 1unit: ${addressData.deliveryCharges.chargeSingle} | 2unit: ${addressData.deliveryCharges.chargeMax} (${addressData.deliveryCharges.chargeMax * 2})`;
-    }
     const output = [];
     data.input.forEach((input) => {
       const itemData = items.find((i) => i.name === input.item);
@@ -47,7 +43,11 @@
             item: input.item,
             qty: input.qty,
             load: input.load,
-            amount: amount.data + (input.tip ? parseFloat(input.tip) : 0),
+            price: itemData.price.unit100,
+            deliveryCharge: addressData ? getDeliveryCharge(input.qty, addressData) : 0,
+            tip: addressData ? input.tip : 0,
+            amount: amount.data,
+            amountWithTip: amount.data + addressData ? (input.tip ? parseFloat(input.tip) : 0) : 0,
             totalAmount:
               (amount.data + (input.tip ? parseFloat(input.tip) : 0)) * parseInt(input.load),
           });
@@ -66,9 +66,6 @@
     bind:value={data.address}
     onBlur={calculatePrice}
   />
-  {#if data.addressInfo}
-    <div class="mb-3 text-center">{data.addressInfo}</div>
-  {/if}
   {#each data.input as input, index (index)}
     <div class="flex w-full flex-1 gap-3">
       <InputField
@@ -81,6 +78,7 @@
       <InputField
         placeholder="Qty"
         class="w-50!"
+        caseMode="none"
         bind:value={input.qty}
         onBlur={(value) => {
           input.tip = parseFloat(value) > 1 ? 100 : 50;
@@ -111,7 +109,11 @@
             <th class="border px-1 text-left">Item</th>
             <th class="border px-1 text-right">Qty</th>
             <th class="border px-1 text-right">Load</th>
+            <th class="border px-1 text-right">Price</th>
+            <th class="border px-1 text-right">Delivery</th>
+            <th class="border px-1 text-right">Tip</th>
             <th class="border px-1 text-right">Amount</th>
+            <th class="border px-1 text-right">Amt + Tip</th>
             <th class="border px-1 text-right">Total</th>
           </tr>
         </thead>
@@ -122,7 +124,11 @@
               <td class="border px-1">{output.item}</td>
               <td class="border px-1 text-right">{output.qty}</td>
               <td class="border px-1 text-right">{output.load}</td>
+              <td class="border px-1 text-right">{formatNumber(output.price)}</td>
+              <td class="border px-1 text-right">{formatNumber(output.deliveryCharge)}</td>
+              <td class="border px-1 text-right">{formatNumber(output.tip)}</td>
               <td class="border px-1 text-right">{formatNumber(output.amount)}</td>
+              <td class="border px-1 text-right">{formatNumber(output.amountWithTip)}</td>
               <td class="border px-1 text-right">{formatNumber(output.totalAmount)}</td>
             </tr>
           {/each}
@@ -130,7 +136,22 @@
 
         <tfoot>
           <tr class="bg-gray-100 font-bold">
-            <td colspan="4" class="border px-1 text-right"> Grand Total </td>
+            <td colspan="3" class="border px-1 text-right"> Grand Total </td>
+            <td class="border px-1 text-right">
+              {formatNumber(data.output.reduce((sum, row) => sum + row.price, 0))}
+            </td>
+            <td class="border px-1 text-right">
+              {formatNumber(data.output.reduce((sum, row) => sum + row.deliveryCharge, 0))}
+            </td>
+            <td class="border px-1 text-right">
+              {formatNumber(data.output.reduce((sum, row) => sum + row.tip, 0))}
+            </td>
+            <td class="border px-1 text-right">
+              {formatNumber(data.output.reduce((sum, row) => sum + row.amount, 0))}
+            </td>
+            <td class="border px-1 text-right">
+              {formatNumber(data.output.reduce((sum, row) => sum + row.amountWithTip, 0))}
+            </td>
             <td class="border px-1 text-right">
               {formatNumber(data.output.reduce((sum, row) => sum + row.totalAmount, 0))}
             </td>
