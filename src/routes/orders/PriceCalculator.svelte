@@ -47,7 +47,8 @@
             deliveryCharge: addressData ? getDeliveryCharge(input.qty, addressData) : 0,
             tip: addressData ? input.tip : 0,
             amount: amount.data,
-            amountWithTip: amount.data + addressData ? (input.tip ? parseFloat(input.tip) : 0) : 0,
+            amountWithTip:
+              amount.data + (addressData ? (input.tip ? parseFloat(input.tip) : 0) : 0),
             totalAmount:
               (amount.data + (input.tip ? parseFloat(input.tip) : 0)) * parseInt(input.load),
           });
