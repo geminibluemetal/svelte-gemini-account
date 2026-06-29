@@ -78,6 +78,23 @@
       }),
   );
 
+  const pendingItemCount = $derived.by(() => {
+    const itemCount = {};
+    viewList.pending.forEach(({ item, balanceQty }) => {
+      const qty = Number(balanceQty) || 0;
+      if (!qty) return; // Skip if quantity is 0 or invalid
+
+      const parts = item.split('+').map((t) => t.trim());
+      const isSplit = parts.length > 1;
+      const splitQty = isSplit ? qty / 2 : qty;
+
+      parts.forEach((part) => {
+        itemCount[part] = (itemCount[part] || 0) + splitQty;
+      });
+    });
+    return itemCount; // Crucial for $derived.by to work
+  });
+
   const headers = [
     { name: 'Date', align: 'center', key: 'createdAt', display: 'date', width: '96' },
     { name: 'ON', align: 'center', key: 'orderNumber', color: OrderNumberColor, width: '38' },
@@ -550,6 +567,35 @@
         >
           <span>Price Calc</span>
         </Button>
+
+        {#if Object.entries(pendingItemCount).length}
+          <table class="w-full border-2">
+            <thead>
+              <tr>
+                <th class="border border-black bg-black text-white" colspan="2">Pending</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each Object.entries(pendingItemCount) as [vehicle, count], index (index)}
+                <tr>
+                  <td class="border px-1">{vehicle}</td>
+                  <!-- Item name (MS, PS, etc.) -->
+                  <td class="border px-1 text-right">{count}</td>
+                  <!-- Quantity with 2 decimals -->
+                </tr>
+              {/each}
+              <tr>
+                <td class=" border border-black bg-black px-1 text-white">Total</td>
+                <!-- Item name (MS, PS, etc.) -->
+                <td class=" border border-black bg-black px-1 text-right text-white">
+                  <!-- eslint-disable-next-line no-unused-vars -->
+                  {Object.entries(pendingItemCount).reduce((total, [i, q]) => total + q, 0)}
+                </td>
+                <!-- Quantity with 2 decimals -->
+              </tr>
+            </tbody>
+          </table>
+        {/if}
       </div>
     </div>
   {/snippet}
